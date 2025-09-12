@@ -1,0 +1,188 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dashboard" %} - {% trans "ISR Datasets" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="display-4 fw-bold text-primary mb-3">
+                    <i class="bi bi-database-fill me-3"></i>
+                    {% trans "Welcome to ISR Datasets" %}
+                </h1>
+                <p class="lead text-muted">
+                    {% trans "A comprehensive platform for managing, accessing, and analyzing research datasets" %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-collection fs-1 mb-3"></i>
+                    <h3 class="card-title">1,247</h3>
+                    <p class="card-text">{% trans "Total Datasets" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-download fs-1 mb-3"></i>
+                    <h3 class="card-title">15.2TB</h3>
+                    <p class="card-text">{% trans "Data Volume" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people fs-1 mb-3"></i>
+                    <h3 class="card-title">342</h3>
+                    <p class="card-text">{% trans "Active Users" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-graph-up fs-1 mb-3"></i>
+                    <h3 class="card-title">89%</h3>
+                    <p class="card-text">{% trans "Uptime" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightning-charge me-2"></i>
+                        {% trans "Quick Actions" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="bi bi-upload fs-2 mb-2"></i>
+                                <span>{% trans "Upload Dataset" %}</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="bi bi-search fs-2 mb-2"></i>
+                                <span>{% trans "Search Datasets" %}</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="bi bi-graph-up fs-2 mb-2"></i>
+                                <span>{% trans "View Analytics" %}</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="bi bi-book fs-2 mb-2"></i>
+                                <span>{% trans "Documentation" %}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>
+                        {% trans "Recent Activity" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-upload text-success me-2"></i>
+                                <strong>{% trans "New dataset uploaded" %}</strong>
+                                <br>
+                                <small class="text-muted">{% trans "Climate Data 2023" %} • 2 hours ago</small>
+                            </div>
+                            <span class="badge bg-success">{% trans "New" %}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-download text-primary me-2"></i>
+                                <strong>{% trans "Dataset downloaded" %}</strong>
+                                <br>
+                                <small class="text-muted">{% trans "Population Statistics" %} • 4 hours ago</small>
+                            </div>
+                            <span class="badge bg-primary">{% trans "Download" %}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-pencil text-warning me-2"></i>
+                                <strong>{% trans "Dataset updated" %}</strong>
+                                <br>
+                                <small class="text-muted">{% trans "Economic Indicators" %} • 1 day ago</small>
+                            </div>
+                            <span class="badge bg-warning">{% trans "Updated" %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-star me-2"></i>
+                        {% trans "Popular Datasets" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{% trans "Climate Data 2023" %}</h6>
+                                <small class="text-muted">1.2K downloads</small>
+                            </div>
+                            <p class="mb-1">{% trans "Comprehensive climate measurements" %}</p>
+                            <small class="text-muted">{% trans "Updated 2 days ago" %}</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{% trans "Population Statistics" %}</h6>
+                                <small class="text-muted">856 downloads</small>
+                            </div>
+                            <p class="mb-1">{% trans "Demographic data by region" %}</p>
+                            <small class="text-muted">{% trans "Updated 1 week ago" %}</small>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{% trans "Economic Indicators" %}</h6>
+                                <small class="text-muted">642 downloads</small>
+                            </div>
+                            <p class="mb-1">{% trans "GDP, inflation, and trade data" %}</p>
+                            <small class="text-muted">{% trans "Updated 3 days ago" %}</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
