@@ -29,14 +29,14 @@ class DatasetCategoryAdmin(admin.ModelAdmin):
 @admin.register(Dataset)
 class DatasetAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'owner', 'category', 'status', 'access_level', 
+        'title', 'owner', 'category', 'project', 'status', 'access_level', 
         'download_count', 'view_count', 'is_featured', 'created_at'
     ]
     list_filter = [
-        'status', 'access_level', 'category', 'is_featured', 
+        'status', 'access_level', 'category', 'project', 'is_featured', 
         'created_at'
     ]
-    search_fields = ['title', 'description', 'abstract', 'tags', 'keywords']
+    search_fields = ['title', 'description', 'abstract', 'tags', 'keywords', 'project__title']
     list_editable = ['status', 'access_level', 'is_featured']
     readonly_fields = ['download_count', 'view_count', 'created_at', 'updated_at', 'published_at']
     filter_horizontal = ['contributors', 'related_datasets']
@@ -50,7 +50,7 @@ class DatasetAdmin(admin.ModelAdmin):
             'fields': ('status', 'access_level', 'is_featured')
         }),
         ('Ownership & Attribution', {
-            'fields': ('owner', 'contributors', 'related_datasets', 'license', 'citation', 'doi')
+            'fields': ('owner', 'contributors', 'related_datasets', 'project', 'license', 'citation', 'doi')
         }),
         ('Statistics', {
             'fields': ('download_count', 'view_count'),

@@ -1,0 +1,322 @@
+{% extends "_base.html" %}
+{% load i18n %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ project.title }} - {% trans "ISR Datasets" %}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'projects:project_list' %}">{% trans "Projects" %}</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ project.title }}</li>
+                </ol>
+            </nav>
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="bi bi-folder me-2"></i>
+                        {{ project.title }}
+                    </h1>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="badge {% if project.status == 'active' %}bg-success{% elif project.status == 'completed' %}bg-primary{% elif project.status == 'planning' %}bg-info{% elif project.status == 'on_hold' %}bg-warning{% else %}bg-secondary{% endif %} fs-6">
+                            {{ project.get_status_display }}
+                        </span>
+                        <span class="badge {% if project.access_level == 'public' %}bg-success{% elif project.access_level == 'restricted' %}bg-warning{% else %}bg-secondary{% endif %} fs-6">
+                            {{ project.get_access_level_display }}
+                        </span>
+                        {% if project.is_active %}
+                            <span class="badge bg-success fs-6">
+                                <i class="bi bi-play-circle me-1"></i>
+                                {% trans "Active" %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    {% if can_edit %}
+                        <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-pencil me-2"></i>
+                            {% trans "Edit Project" %}
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'projects:project_datasets' project.pk %}" class="btn btn-primary">
+                        <i class="bi bi-collection me-2"></i>
+                        {% trans "View Datasets" %}
+                        <span class="badge bg-light text-dark ms-2">{{ project.datasets.count }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Project Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-file-text me-2"></i>
+                        {% trans "Project Description" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="lead">{{ project.description|linebreaks }}</p>
+                    {% if project.abstract %}
+                        <hr>
+                        <h6>{% trans "Abstract" %}</h6>
+                        <p class="text-muted">{{ project.abstract|linebreaks }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Timeline -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-calendar me-2"></i>
+                        {% trans "Project Timeline" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>{% trans "Start Date" %}</h6>
+                            <p class="text-muted">
+                                {% if project.start_date %}
+                                    {{ project.start_date|date:"F d, Y" }}
+                                {% else %}
+                                    <span class="text-muted">{% trans "Not specified" %}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>{% trans "End Date" %}</h6>
+                            <p class="text-muted">
+                                {% if project.end_date %}
+                                    {{ project.end_date|date:"F d, Y" }}
+                                {% else %}
+                                    <span class="text-muted">{% trans "Not specified" %}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% if project.duration_days %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>{% trans "Duration" %}</h6>
+                                <p class="text-muted">{{ project.duration_days }} {% trans "days" %}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Metadata -->
+            {% if project.keywords or project.tags or project.project_url or project.funding_source or project.grant_number %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% trans "Project Information" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if project.keywords %}
+                        <div class="mb-3">
+                            <h6>{% trans "Keywords" %}</h6>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for keyword in project.get_keywords_list %}
+                                    <span class="badge bg-secondary">{{ keyword }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    {% if project.tags %}
+                        <div class="mb-3">
+                            <h6>{% trans "Tags" %}</h6>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for tag in project.get_tags_list %}
+                                    <span class="badge bg-info">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="row">
+                        {% if project.project_url %}
+                        <div class="col-md-6 mb-3">
+                            <h6>{% trans "Project URL" %}</h6>
+                            <a href="{{ project.project_url }}" target="_blank" class="text-decoration-none">
+                                {{ project.project_url|truncatechars:50 }}
+                                <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.funding_source %}
+                        <div class="col-md-6 mb-3">
+                            <h6>{% trans "Funding Source" %}</h6>
+                            <p class="text-muted mb-0">{{ project.funding_source }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if project.grant_number %}
+                        <div class="col-md-6 mb-3">
+                            <h6>{% trans "Grant Number" %}</h6>
+                            <p class="text-muted mb-0">{{ project.grant_number }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Project Team -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        {% trans "Project Team" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6>{% trans "Owner" %}</h6>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-person-circle text-primary me-2"></i>
+                            <span>{{ project.owner.username }}</span>
+                        </div>
+                    </div>
+                    
+                    {% if project.collaborators.exists %}
+                        <h6>{% trans "Collaborators" %}</h6>
+                        <div class="list-group list-group-flush">
+                            {% for collaborator in project.collaborators.all %}
+                                <div class="list-group-item px-0 py-2 d-flex align-items-center">
+                                    <i class="bi bi-person text-secondary me-2"></i>
+                                    <span>{{ collaborator.username }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">{% trans "No collaborators assigned" %}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Project Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        {% trans "Project Statistics" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ project.datasets.count }}</h4>
+                            <small class="text-muted">{% trans "Datasets" %}</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">{{ project.collaborators.count|add:1 }}</h4>
+                            <small class="text-muted">{% trans "Team Members" %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project Metadata -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock me-2"></i>
+                        {% trans "Project Timeline" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{% trans "Created" %}:</span>
+                            <span class="text-muted">{{ project.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{% trans "Last Updated" %}:</span>
+                            <span class="text-muted">{{ project.updated_at|date:"M d, Y" }}</span>
+                        </div>
+                        {% if project.duration_days %}
+                            <div class="d-flex justify-content-between">
+                                <span>{% trans "Duration" %}:</span>
+                                <span class="text-muted">{{ project.duration_days }} {% trans "days" %}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Associated Datasets -->
+    {% if project_datasets %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-collection me-2"></i>
+                            {% trans "Associated Datasets" %}
+                        </h5>
+                        <a href="{% url 'projects:project_datasets' project.pk %}" class="btn btn-outline-primary btn-sm">
+                            {% trans "View All" %}
+                            <span class="badge bg-primary ms-1">{{ project.datasets.count }}</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for dataset in project_datasets %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card border">
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="text-decoration-none">
+                                            {{ dataset.title }}
+                                        </a>
+                                    </h6>
+                                    <p class="card-text small text-muted">
+                                        {{ dataset.description|truncatechars:100 }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            {% trans "by" %} {{ dataset.owner.username }}
+                                        </small>
+                                        <span class="badge {% if dataset.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                                            {{ dataset.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}

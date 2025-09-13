@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from .models import Dataset, DatasetCategory, DatasetVersion
 
 User = get_user_model()
@@ -13,7 +14,7 @@ class DatasetForm(forms.ModelForm):
         fields = [
             'title', 'description', 'abstract', 'category', 'tags', 'keywords',
             'status', 'access_level', 'is_featured', 'license',
-            'citation', 'doi', 'contributors', 'related_datasets'
+            'citation', 'doi', 'contributors', 'related_datasets', 'project'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -63,6 +64,9 @@ class DatasetForm(forms.ModelForm):
             'related_datasets': forms.SelectMultiple(attrs={
                 'class': 'form-select',
                 'size': 5
+            }),
+            'project': forms.Select(attrs={
+                'class': 'form-select'
             })
         }
 
@@ -87,6 +91,18 @@ class DatasetForm(forms.ModelForm):
         else:
             # When creating, show all datasets
             self.fields['related_datasets'].queryset = Dataset.objects.all()
+        
+        # Configure project queryset based on user access
+        if user and user.is_authenticated:
+            # Show projects the user owns or collaborates on
+            from projects.models import Project
+            accessible_projects = Project.objects.filter(
+                Q(owner=user) | Q(collaborators=user) | Q(access_level='public')
+            ).distinct()
+            self.fields['project'].queryset = accessible_projects
+        else:
+            # No projects if user is not authenticated
+            self.fields['project'].queryset = Project.objects.none()
 
     def clean_tags(self):
         tags = self.cleaned_data.get('tags')

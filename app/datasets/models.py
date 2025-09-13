@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
 
@@ -82,6 +83,17 @@ class Dataset(models.Model):
         symmetrical=False,
         related_name='related_to',
         help_text='Other datasets that are related to this one'
+    )
+    
+    # Project association
+    project = models.ForeignKey(
+        'projects.Project',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='datasets',
+        verbose_name=_("Project"),
+        help_text=_("The research project this dataset is associated with")
     )
     
     # License and citation

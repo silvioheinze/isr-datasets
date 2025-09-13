@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('pages.urls')),
     path('user/', include('user.urls')),
     path('datasets/', include('datasets.urls')),
+    path('projects/', include('projects.urls')),
 ]
 
 # Serve static and media files during development
