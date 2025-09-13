@@ -12,7 +12,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.exceptions import PermissionDenied
 
-from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm
+from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserProfileForm, DataExportForm
 from .models import Role
 
 CustomUser = get_user_model()
@@ -55,14 +55,41 @@ class SignupPageView(CreateView):
 
 def SettingsView(request):
     """
-    Display a dashboard overview for the logged-in user.
+    Display user settings including profile and language preferences.
     If the user is not authenticated, display the login form.
     """
     if request.user.is_authenticated:
-        # Here, you can add additional context for the dashboard as needed
+        # Initialize forms
+        profile_form = UserProfileForm(instance=request.user)
+        settings_form = UserSettingsForm(instance=request.user)
+        
+        # Handle form submissions
+        if request.method == 'POST':
+            # Check which form was submitted
+            if 'profile_submit' in request.POST:
+                profile_form = UserProfileForm(request.POST, instance=request.user)
+                if profile_form.is_valid():
+                    profile_form.save()
+                    messages.success(request, 'Your profile information has been updated successfully.')
+                    return redirect('user-settings')
+            
+            elif 'language_submit' in request.POST:
+                settings_form = UserSettingsForm(request.POST, instance=request.user)
+                if settings_form.is_valid():
+                    settings_form.save()
+                    # Activate the new language immediately
+                    from django.utils import translation
+                    new_language = settings_form.cleaned_data.get('language')
+                    if new_language:
+                        translation.activate(new_language)
+                        request.LANGUAGE_CODE = new_language
+                    messages.success(request, 'Your language preference has been updated successfully.')
+                    return redirect('user-settings')
+        
         context = {
             'user': request.user,
-            # add other variables for your dashboard here
+            'profile_form': profile_form,
+            'settings_form': settings_form,
         }
         return render(request, "user/settings.html", context)
     else:
@@ -74,6 +101,202 @@ def SettingsView(request):
                 login(request, user)
                 return redirect("home")
         return render(request, "user/login.html", {"form": form})
+
+
+@login_required
+def data_export_view(request):
+    """
+    Handle data export requests for GDPR compliance
+    """
+    if request.method == 'POST':
+        form = DataExportForm(request.POST)
+        if form.is_valid():
+            export_format = form.cleaned_data['format']
+            include_datasets = form.cleaned_data['include_datasets']
+            include_projects = form.cleaned_data['include_projects']
+            include_activity = form.cleaned_data['include_activity']
+            
+            # Prepare user data for export
+            user_data = {
+                'user_info': {
+                    'username': request.user.username,
+                    'email': request.user.email,
+                    'first_name': request.user.first_name,
+                    'last_name': request.user.last_name,
+                    'date_joined': request.user.date_joined.isoformat(),
+                    'last_login': request.user.last_login.isoformat() if request.user.last_login else None,
+                    'language': request.user.language,
+                    'role': request.user.role.name if request.user.role else None,
+                }
+            }
+            
+            # Add datasets if requested
+            if include_datasets:
+                try:
+                    from datasets.models import Dataset, DatasetVersion
+                    user_datasets = []
+                    datasets = Dataset.objects.filter(owner=request.user)
+                    for dataset in datasets:
+                        dataset_info = {
+                            'title': dataset.title,
+                            'description': dataset.description,
+                            'abstract': dataset.abstract,
+                            'status': dataset.status,
+                            'created_at': dataset.created_at.isoformat(),
+                            'updated_at': dataset.updated_at.isoformat(),
+                            'download_count': dataset.download_count,
+                            'view_count': dataset.view_count,
+                        }
+                        
+                        # Add dataset versions
+                        versions = DatasetVersion.objects.filter(dataset=dataset)
+                        dataset_info['versions'] = [
+                            {
+                                'version_number': version.version_number,
+                                'description': version.description,
+                                'created_at': version.created_at.isoformat(),
+                                'file_size': version.file_size,
+                            }
+                            for version in versions
+                        ]
+                        user_datasets.append(dataset_info)
+                    
+                    user_data['datasets'] = user_datasets
+                except ImportError:
+                    user_data['datasets'] = []
+            
+            # Add projects if requested
+            if include_projects:
+                try:
+                    from projects.models import Project
+                    user_projects = []
+                    projects = Project.objects.filter(
+                        Q(owner=request.user) | Q(collaborators=request.user)
+                    ).distinct()
+                    for project in projects:
+                        project_info = {
+                            'title': project.title,
+                            'description': project.description,
+                            'abstract': project.abstract,
+                            'status': project.status,
+                            'access_level': project.access_level,
+                            'created_at': project.created_at.isoformat(),
+                            'updated_at': project.updated_at.isoformat(),
+                            'is_owner': project.owner == request.user,
+                        }
+                        user_projects.append(project_info)
+                    
+                    user_data['projects'] = user_projects
+                except ImportError:
+                    user_data['projects'] = []
+            
+            # Add activity log if requested
+            if include_activity:
+                try:
+                    from auditlog.models import LogEntry
+                    # Get audit log entries for this user
+                    log_entries = LogEntry.objects.filter(
+                        content_type__model='customuser',
+                        object_id=request.user.id
+                    ).order_by('-timestamp')[:100]  # Limit to last 100 entries
+                    
+                    activity_log = [
+                        {
+                            'timestamp': entry.timestamp.isoformat(),
+                            'action': entry.action,
+                            'changes': entry.changes,
+                        }
+                        for entry in log_entries
+                    ]
+                    
+                    user_data['activity_log'] = activity_log
+                except ImportError:
+                    user_data['activity_log'] = []
+            
+            # Generate response based on format
+            from django.http import HttpResponse
+            from datetime import datetime
+            import json
+            
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            
+            if export_format == 'json':
+                response = HttpResponse(
+                    json.dumps(user_data, indent=2, ensure_ascii=False),
+                    content_type='application/json'
+                )
+                response['Content-Disposition'] = f'attachment; filename="user_data_export_{timestamp}.json"'
+            
+            elif export_format == 'csv':
+                import csv
+                import io
+                
+                output = io.StringIO()
+                writer = csv.writer(output)
+                
+                # Write user info
+                writer.writerow(['Field', 'Value'])
+                for key, value in user_data['user_info'].items():
+                    writer.writerow([key, value])
+                
+                # Write datasets if included
+                if 'datasets' in user_data:
+                    writer.writerow([])
+                    writer.writerow(['Dataset', 'Title', 'Status', 'Created'])
+                    for dataset in user_data['datasets']:
+                        writer.writerow(['', dataset['title'], dataset['status'], dataset['created_at']])
+                
+                response = HttpResponse(
+                    output.getvalue(),
+                    content_type='text/csv'
+                )
+                response['Content-Disposition'] = f'attachment; filename="user_data_export_{timestamp}.csv"'
+            
+            else:  # XML
+                from django.utils.xmlutils import SimplerXMLGenerator
+                import io
+                
+                output = io.StringIO()
+                xml = SimplerXMLGenerator(output, 'utf-8')
+                xml.startDocument()
+                xml.startElement('user_data_export', {})
+                
+                # User info
+                xml.startElement('user_info', {})
+                for key, value in user_data['user_info'].items():
+                    xml.startElement(key, {})
+                    xml.characters(str(value) if value is not None else '')
+                    xml.endElement(key)
+                xml.endElement('user_info')
+                
+                # Datasets
+                if 'datasets' in user_data:
+                    xml.startElement('datasets', {})
+                    for dataset in user_data['datasets']:
+                        xml.startElement('dataset', {})
+                        for key, value in dataset.items():
+                            if key != 'versions':
+                                xml.startElement(key, {})
+                                xml.characters(str(value) if value is not None else '')
+                                xml.endElement(key)
+                        xml.endElement('dataset')
+                    xml.endElement('datasets')
+                
+                xml.endElement('user_data_export')
+                xml.endDocument()
+                
+                response = HttpResponse(
+                    output.getvalue(),
+                    content_type='application/xml'
+                )
+                response['Content-Disposition'] = f'attachment; filename="user_data_export_{timestamp}.xml"'
+            
+            return response
+    
+    else:
+        form = DataExportForm()
+    
+    return render(request, 'user/data_export.html', {'form': form})
 
 
 class UsersUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

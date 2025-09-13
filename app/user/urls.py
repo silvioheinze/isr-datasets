@@ -3,7 +3,7 @@ from django.urls import path, include
 from user.views import (
     AccountDeleteView, SettingsView, SignupPageView, 
     UsersUpdateView, UsersListView, RoleListView, RoleCreateView, 
-    RoleUpdateView, RoleDeleteView, user_management_view
+    RoleUpdateView, RoleDeleteView, user_management_view, data_export_view
 )
 
 
@@ -11,6 +11,7 @@ urlpatterns = [
     # User Management
     path('delete/', AccountDeleteView.as_view(), name='user-delete'),
     path('settings/', SettingsView, name='user-settings'),
+    path('data-export/', data_export_view, name='data-export'),
     path("signup/", SignupPageView.as_view(), name="user-signup"),
     path('list/', UsersListView.as_view(), name='user-list'),
     path('edit/<int:user_id>/', UsersUpdateView.as_view(), name='user-edit'),

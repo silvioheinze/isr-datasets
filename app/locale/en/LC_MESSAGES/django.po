@@ -1,0 +1,2598 @@
+# English translations for ISR Datasets
+# Copyright (C) 2025 ISR Datasets
+# This file is distributed under the same license as the ISR Datasets package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ISR Datasets 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-13 23:33+0200\n"
+"PO-Revision-Date: 2025-09-13 23:33+0200\n"
+"Last-Translator: ISR Datasets Team\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: datasets/models.py:95 projects/models.py:123
+#: templates/projects/project_list.html:86
+msgid "Project"
+msgstr ""
+
+#: datasets/models.py:96
+msgid "The research project this dataset is associated with"
+msgstr ""
+
+#: main/settings.py:127 templates/user/settings.html:217 user/models.py:48
+msgid "English"
+msgstr ""
+
+#: main/settings.py:128 templates/user/settings.html:227 user/models.py:49
+msgid "German"
+msgstr ""
+
+#: projects/admin.py:49 templates/datasets/category_list.html:76
+#: templates/datasets/dataset_confirm_delete.html:16
+#: templates/datasets/dataset_detail.html:16
+#: templates/datasets/dataset_list.html:4
+#: templates/datasets/dataset_version_form.html:16
+#: templates/projects/project_datasets.html:6
+#: templates/projects/project_datasets.html:21
+#: templates/projects/project_datasets.html:70
+#: templates/projects/project_detail.html:232
+#: templates/projects/project_list.html:90
+msgid "Datasets"
+msgstr ""
+
+#: projects/admin.py:54 projects/models.py:80
+#: templates/projects/project_confirm_delete.html:71
+#: templates/projects/project_detail.html:205
+#: templates/projects/project_form.html:320
+msgid "Collaborators"
+msgstr ""
+
+#: projects/forms.py:22
+msgid "Enter project title"
+msgstr ""
+
+#: projects/forms.py:27
+msgid "Describe the project objectives and scope..."
+msgstr ""
+
+#: projects/forms.py:32
+msgid "Brief summary of the project..."
+msgstr ""
+
+#: projects/forms.py:50
+msgid "Enter keywords separated by commas"
+msgstr ""
+
+#: projects/forms.py:54
+msgid "Enter tags separated by commas"
+msgstr ""
+
+#: projects/forms.py:58
+msgid "https://example.com/project"
+msgstr ""
+
+#: projects/forms.py:62
+msgid "Funding organization name"
+msgstr ""
+
+#: projects/forms.py:66 projects/models.py:114
+msgid "Grant or contract number"
+msgstr ""
+
+#: projects/forms.py:83
+msgid "A descriptive title for the project"
+msgstr ""
+
+#: projects/forms.py:84
+msgid "Detailed description of project objectives and scope"
+msgstr ""
+
+#: projects/forms.py:85
+msgid "Brief summary for quick understanding"
+msgstr ""
+
+#: projects/forms.py:86
+msgid "When the project starts"
+msgstr ""
+
+#: projects/forms.py:87
+msgid "When the project is expected to end"
+msgstr ""
+
+#: projects/forms.py:88
+msgid "Current status of the project"
+msgstr ""
+
+#: projects/forms.py:89
+msgid "Who can view this project"
+msgstr ""
+
+#: projects/forms.py:90
+msgid "Comma-separated keywords for searching"
+msgstr ""
+
+#: projects/forms.py:91 projects/models.py:95
+msgid "Comma-separated tags for categorization"
+msgstr ""
+
+#: projects/forms.py:92 projects/models.py:102
+msgid "External URL to project website or repository"
+msgstr ""
+
+#: projects/forms.py:93
+msgid "Organization funding this project"
+msgstr ""
+
+#: projects/forms.py:94
+msgid "Grant or contract identifier"
+msgstr ""
+
+#: projects/forms.py:95 projects/models.py:81
+msgid "Users who can collaborate on this project"
+msgstr ""
+
+#: projects/forms.py:103
+msgid "End date must be after start date."
+msgstr ""
+
+#: projects/forms.py:113
+msgid "Maximum 20 keywords allowed."
+msgstr ""
+
+#: projects/forms.py:122
+msgid "Maximum 15 tags allowed."
+msgstr ""
+
+#: projects/forms.py:129
+msgid "All Statuses"
+msgstr ""
+
+#: projects/forms.py:130
+msgid "All Access Levels"
+msgstr ""
+
+#: projects/forms.py:136
+msgid "Search projects..."
+msgstr ""
+
+#: projects/forms.py:138 templates/datasets/category_list.html:37
+#: templates/datasets/dataset_list.html:35
+#: templates/datasets/dataset_list.html:60
+#: templates/projects/project_list.html:39 templates/user/role_list.html:43
+msgid "Search"
+msgstr ""
+
+#: projects/forms.py:146 projects/models.py:59
+#: templates/datasets/category_confirm_delete.html:46
+#: templates/datasets/category_list.html:43
+#: templates/datasets/category_list.html:75
+#: templates/datasets/dataset_detail.html:87
+#: templates/datasets/dataset_detail.html:209
+#: templates/datasets/dataset_form.html:170
+#: templates/projects/project_confirm_delete.html:56
+#: templates/projects/project_datasets.html:96
+#: templates/projects/project_form.html:179
+#: templates/projects/project_list.html:45
+#: templates/projects/project_list.html:88 templates/user/list.html:35
+#: templates/user/role_list.html:50 templates/user/role_list.html:86
+msgid "Status"
+msgstr ""
+
+#: projects/forms.py:154 projects/models.py:65
+#: templates/datasets/dataset_detail.html:219
+#: templates/datasets/dataset_form.html:181
+#: templates/projects/project_confirm_delete.html:62
+#: templates/projects/project_form.html:195
+msgid "Access Level"
+msgstr ""
+
+#: projects/forms.py:159
+msgid "All Owners"
+msgstr ""
+
+#: projects/forms.py:163 templates/datasets/dataset_detail.html:195
+#: templates/projects/project_confirm_delete.html:68
+#: templates/projects/project_datasets.html:99
+#: templates/projects/project_detail.html:197
+#: templates/projects/project_list.html:57
+#: templates/projects/project_list.html:87
+msgid "Owner"
+msgstr ""
+
+#: projects/models.py:13
+msgid "Planning"
+msgstr ""
+
+#: projects/models.py:14 templates/datasets/category_confirm_delete.html:48
+#: templates/datasets/category_form.html:168
+#: templates/datasets/category_list.html:106
+#: templates/projects/project_detail.html:37 templates/user/edit.html:143
+#: templates/user/list.html:83 templates/user/management.html:225
+#: templates/user/role_list.html:54 templates/user/role_list.html:112
+msgid "Active"
+msgstr ""
+
+#: projects/models.py:15
+msgid "Completed"
+msgstr ""
+
+#: projects/models.py:16
+msgid "On Hold"
+msgstr ""
+
+#: projects/models.py:17
+msgid "Cancelled"
+msgstr ""
+
+#: projects/models.py:21
+msgid "Public"
+msgstr ""
+
+#: projects/models.py:22
+msgid "Restricted"
+msgstr ""
+
+#: projects/models.py:23
+msgid "Private"
+msgstr ""
+
+#: projects/models.py:29 templates/projects/project_form.html:71
+msgid "Project Title"
+msgstr ""
+
+#: projects/models.py:30
+msgid "Name of the research project"
+msgstr ""
+
+#: projects/models.py:33 templates/datasets/category_confirm_delete.html:57
+#: templates/datasets/category_form.html:102
+#: templates/datasets/category_list.html:73
+#: templates/datasets/dataset_detail.html:58
+#: templates/datasets/dataset_detail.html:299
+#: templates/datasets/dataset_form.html:88
+#: templates/projects/project_confirm_delete.html:53
+#: templates/projects/project_form.html:90
+#: templates/user/role_confirm_delete.html:27 templates/user/role_form.html:61
+#: templates/user/role_list.html:84
+msgid "Description"
+msgstr ""
+
+#: projects/models.py:34
+msgid "Detailed description of the project objectives and scope"
+msgstr ""
+
+#: projects/models.py:38 templates/datasets/dataset_detail.html:65
+#: templates/datasets/dataset_form.html:102
+#: templates/projects/project_detail.html:74
+#: templates/projects/project_form.html:109
+msgid "Abstract"
+msgstr ""
+
+#: projects/models.py:39
+msgid "Brief summary of the project"
+msgstr ""
+
+#: projects/models.py:46 templates/projects/project_detail.html:91
+#: templates/projects/project_form.html:136
+msgid "Start Date"
+msgstr ""
+
+#: projects/models.py:47
+msgid "Project start date"
+msgstr ""
+
+#: projects/models.py:52 templates/projects/project_detail.html:101
+#: templates/projects/project_form.html:152
+msgid "End Date"
+msgstr ""
+
+#: projects/models.py:53
+msgid "Project end date"
+msgstr ""
+
+#: projects/models.py:73
+msgid "Project Owner"
+msgstr ""
+
+#: projects/models.py:74
+msgid "User who owns and manages this project"
+msgstr ""
+
+#: projects/models.py:88 templates/datasets/dataset_detail.html:117
+#: templates/datasets/dataset_form.html:143
+#: templates/projects/project_detail.html:135
+#: templates/projects/project_form.html:222
+msgid "Keywords"
+msgstr ""
+
+#: projects/models.py:89
+msgid "Comma-separated keywords for the project"
+msgstr ""
+
+#: projects/models.py:94 templates/datasets/dataset_detail.html:109
+#: templates/datasets/dataset_form.html:128
+#: templates/datasets/dataset_list.html:51
+#: templates/projects/project_detail.html:146
+#: templates/projects/project_form.html:238
+msgid "Tags"
+msgstr ""
+
+#: projects/models.py:101 templates/projects/project_detail.html:158
+#: templates/projects/project_form.html:265
+msgid "Project URL"
+msgstr ""
+
+#: projects/models.py:107 templates/projects/project_detail.html:168
+#: templates/projects/project_form.html:284
+msgid "Funding Source"
+msgstr ""
+
+#: projects/models.py:108
+msgid "Organization or agency funding this project"
+msgstr ""
+
+#: projects/models.py:113 templates/projects/project_detail.html:175
+#: templates/projects/project_form.html:300
+msgid "Grant Number"
+msgstr ""
+
+#: projects/models.py:124 templates/projects/project_confirm_delete.html:16
+#: templates/projects/project_datasets.html:16
+#: templates/projects/project_detail.html:16
+#: templates/projects/project_form.html:18
+#: templates/projects/project_list.html:6
+msgid "Projects"
+msgstr ""
+
+#: templates/account/account_inactive.html:4
+#: templates/account/account_inactive.html:14
+msgid "Account Inactive"
+msgstr ""
+
+#: templates/account/account_inactive.html:4 templates/account/email.html:4
+#: templates/account/email_verification_sent.html:4
+#: templates/account/login.html:4 templates/account/password_change.html:4
+#: templates/account/password_reset_from_key_done.html:4
+#: templates/account/verification_sent.html:4
+#: templates/datasets/category_confirm_delete.html:4
+#: templates/datasets/category_form.html:6
+#: templates/datasets/category_form.html:8
+#: templates/datasets/category_list.html:4
+#: templates/datasets/dataset_confirm_delete.html:4
+#: templates/datasets/dataset_detail.html:4
+#: templates/datasets/dataset_form.html:6
+#: templates/datasets/dataset_form.html:8
+#: templates/datasets/dataset_list.html:4
+#: templates/datasets/dataset_version_form.html:4 templates/home.html:4
+#: templates/projects/project_confirm_delete.html:4
+#: templates/projects/project_datasets.html:6
+#: templates/projects/project_detail.html:6
+#: templates/projects/project_form.html:5
+#: templates/projects/project_list.html:6 templates/user/edit.html:5
+#: templates/user/login.html:4 templates/user/management.html:6
+#: templates/user/password_change.html:4 templates/user/role_list.html:6
+#: templates/user/settings.html:6
+msgid "ISR Datasets"
+msgstr ""
+
+#: templates/account/account_inactive.html:16
+msgid "This account is inactive"
+msgstr ""
+
+#: templates/account/account_inactive.html:23
+msgid "This account is inactive."
+msgstr ""
+
+#: templates/account/account_inactive.html:28
+#: templates/account/email_verification_sent.html:28
+#: templates/account/verification_sent.html:28
+msgid "Go to Home"
+msgstr ""
+
+#: templates/account/email.html:4 templates/account/email.html:14
+msgid "Email Addresses"
+msgstr ""
+
+#: templates/account/email.html:19
+msgid "The following e-mail addresses are associated with your account:"
+msgstr ""
+
+#: templates/account/email.html:30
+msgid "Verified"
+msgstr ""
+
+#: templates/account/email.html:32
+msgid "Unverified"
+msgstr ""
+
+#: templates/account/email.html:34
+msgid "Primary"
+msgstr ""
+
+#: templates/account/email.html:40
+msgid "Make Primary"
+msgstr ""
+
+#: templates/account/email.html:41
+msgid "Re-send Verification"
+msgstr ""
+
+#: templates/account/email.html:42
+msgid "Remove"
+msgstr ""
+
+#: templates/account/email.html:47
+msgid "Warning:"
+msgstr ""
+
+#: templates/account/email.html:47
+msgid ""
+"You currently do not have any e-mail address set up. You should really add "
+"an e-mail address so you can receive notifications, reset your password, etc."
+msgstr ""
+
+#: templates/account/email.html:50
+msgid "Add E-mail Address"
+msgstr ""
+
+#: templates/account/email.html:54 templates/account/login.html:32
+#: templates/account/password_reset.html:42 templates/account/signup.html:31
+#: templates/user/edit.html:87 templates/user/login.html:32
+#: templates/user/password_reset.html:42 templates/user/signup.html:31
+msgid "Email Address"
+msgstr ""
+
+#: templates/account/email.html:55 templates/user/edit.html:95
+msgid "Enter email address"
+msgstr ""
+
+#: templates/account/email.html:57
+msgid "Add E-mail"
+msgstr ""
+
+#: templates/account/email.html:67
+msgid "Do you really want to remove the selected e-mail address?"
+msgstr ""
+
+#: templates/account/email_confirm.html:4
+#: templates/account/email_confirm.html:6 templates/user/email_confirm.html:4
+#: templates/user/email_confirm.html:6
+msgid "Confirm E-mail Address"
+msgstr ""
+
+#: templates/account/email_confirm.html:8 templates/user/email_confirm.html:8
+#, python-format
+msgid ""
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"address for user\n"
+"%(user_display)s."
+msgstr ""
+
+#: templates/account/email_confirm.html:11 templates/user/email_confirm.html:11
+msgid "Confirm"
+msgstr ""
+
+#: templates/account/email_confirm.html:14 templates/user/email_confirm.html:14
+#, python-format
+msgid ""
+"This e-mail confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>.\\\n"
+msgstr ""
+
+#: templates/account/email_verification_sent.html:4
+#: templates/account/email_verification_sent.html:14
+msgid "Email Verification Sent"
+msgstr ""
+
+#: templates/account/email_verification_sent.html:16
+#: templates/account/verification_sent.html:16
+msgid "Please check your email"
+msgstr ""
+
+#: templates/account/email_verification_sent.html:23
+msgid ""
+"We have sent an email to you for verification. Follow the link provided to "
+"finalize the signup process. Please contact us if you do not receive it "
+"within a few minutes."
+msgstr ""
+
+#: templates/account/login.html:4 templates/account/signup.html:107
+#: templates/user/login.html:4 templates/user/signup.html:107
+msgid "Log in"
+msgstr ""
+
+#: templates/account/login.html:14 templates/user/login.html:14
+msgid "Welcome Back"
+msgstr ""
+
+#: templates/account/login.html:16 templates/user/login.html:16
+msgid "Sign in to your ISR Datasets account"
+msgstr ""
+
+#: templates/account/login.html:25 templates/account/logout.html:36
+#: templates/account/password_change.html:38
+#: templates/account/password_reset.html:35
+#: templates/account/password_reset_from_key.html:52
+#: templates/account/signup.html:24 templates/datasets/category_form.html:60
+#: templates/datasets/dataset_form.html:57
+#: templates/datasets/dataset_version_form.html:41
+#: templates/projects/project_form.html:48 templates/user/edit.html:39
+#: templates/user/login.html:25 templates/user/logout.html:36
+#: templates/user/password_change.html:23 templates/user/password_reset.html:35
+#: templates/user/password_reset_from_key.html:52
+#: templates/user/settings.html:146 templates/user/signup.html:24
+msgid "Please correct the errors below."
+msgstr ""
+
+#: templates/account/login.html:39 templates/account/password_reset.html:49
+#: templates/account/signup.html:38 templates/user/login.html:39
+#: templates/user/password_reset.html:49 templates/user/signup.html:38
+msgid "Enter your email address"
+msgstr ""
+
+#: templates/account/login.html:52 templates/account/signup.html:51
+#: templates/user/login.html:52 templates/user/settings.html:252
+#: templates/user/signup.html:51
+msgid "Password"
+msgstr ""
+
+#: templates/account/login.html:59 templates/account/signup.html:58
+#: templates/user/login.html:59 templates/user/signup.html:58
+msgid "Enter your password"
+msgstr ""
+
+#: templates/account/login.html:78 templates/user/login.html:78
+msgid "Remember me"
+msgstr ""
+
+#: templates/account/login.html:86
+#: templates/account/password_reset_from_key_done.html:28
+#: templates/user/login.html:86
+msgid "Sign In"
+msgstr ""
+
+#: templates/account/login.html:94 templates/user/login.html:94
+msgid "Don't have an account?"
+msgstr ""
+
+#: templates/account/login.html:97 templates/user/login.html:97
+msgid "Create Account"
+msgstr ""
+
+#: templates/account/login.html:104 templates/account/password_change.html:123
+#: templates/user/login.html:104 templates/user/password_change.html:100
+msgid "Forgot your password?"
+msgstr ""
+
+#: templates/account/logout.html:4 templates/account/logout.html:14
+#: templates/account/logout.html:43 templates/user/logout.html:4
+#: templates/user/logout.html:14 templates/user/logout.html:43
+msgid "Log out"
+msgstr ""
+
+#: templates/account/logout.html:23 templates/user/logout.html:23
+msgid "Confirm Logout"
+msgstr ""
+
+#: templates/account/logout.html:27 templates/user/logout.html:27
+msgid "Do you really want to log out?"
+msgstr ""
+
+#: templates/account/logout.html:47
+#: templates/datasets/category_confirm_delete.html:98
+#: templates/datasets/category_form.html:186
+#: templates/datasets/dataset_confirm_delete.html:61
+#: templates/datasets/dataset_form.html:299
+#: templates/datasets/dataset_version_form.html:231
+#: templates/projects/project_confirm_delete.html:107
+#: templates/projects/project_form.html:346
+#: templates/user/confirm_delete.html:13
+#: templates/user/data_confirm_delete.html:13 templates/user/edit.html:167
+#: templates/user/logout.html:47 templates/user/role_confirm_delete.html:53
+#: templates/user/role_form.html:123
+msgid "Cancel"
+msgstr ""
+
+#: templates/account/password_change.html:4
+#: templates/account/password_change.html:18
+#: templates/account/password_change.html:23
+#: templates/account/password_change.html:109
+#: templates/user/password_change.html:4 templates/user/password_change.html:12
+#: templates/user/password_change.html:90 templates/user/settings.html:257
+msgid "Change Password"
+msgstr ""
+
+#: templates/account/password_change.html:16 templates/home.html:96
+#: templates/user/settings.html:6 templates/user/settings.html:36
+msgid "Settings"
+msgstr ""
+
+#: templates/account/password_change.html:25
+msgid "Update your password to keep your account secure"
+msgstr ""
+
+#: templates/account/password_change.html:45
+#: templates/user/password_change.html:30
+msgid "Current Password"
+msgstr ""
+
+#: templates/account/password_change.html:52
+#: templates/user/password_change.html:37
+msgid "Enter your current password"
+msgstr ""
+
+#: templates/account/password_change.html:65
+#: templates/account/password_reset_from_key.html:59
+#: templates/user/password_change.html:50
+#: templates/user/password_reset_from_key.html:59
+msgid "New Password"
+msgstr ""
+
+#: templates/account/password_change.html:72
+#: templates/user/password_change.html:57
+msgid "Enter your new password"
+msgstr ""
+
+#: templates/account/password_change.html:82
+msgid ""
+"Your password must be at least 8 characters long and contain a mix of "
+"letters, numbers, and symbols."
+msgstr ""
+
+#: templates/account/password_change.html:89
+#: templates/account/password_reset_from_key.html:83
+#: templates/user/password_change.html:70
+#: templates/user/password_reset_from_key.html:83
+msgid "Confirm New Password"
+msgstr ""
+
+#: templates/account/password_change.html:96
+#: templates/user/password_change.html:77
+msgid "Confirm your new password"
+msgstr ""
+
+#: templates/account/password_change.html:119
+msgid "Back to Settings"
+msgstr ""
+
+#: templates/account/password_change.html:134
+msgid "Password Security Tips"
+msgstr ""
+
+#: templates/account/password_change.html:141
+msgid "Use at least 8 characters"
+msgstr ""
+
+#: templates/account/password_change.html:145
+msgid "Include uppercase and lowercase letters"
+msgstr ""
+
+#: templates/account/password_change.html:149
+msgid "Add numbers and special characters"
+msgstr ""
+
+#: templates/account/password_change.html:153
+msgid "Avoid common words or personal information"
+msgstr ""
+
+#: templates/account/password_change.html:157
+msgid "Don't reuse passwords from other accounts"
+msgstr ""
+
+#: templates/account/password_reset.html:4
+#: templates/account/password_reset.html:14
+#: templates/account/password_reset_from_key.html:5
+#: templates/account/password_reset_from_key.html:15
+#: templates/user/email/password_reset_key_message.html:10
+#: templates/user/password_reset.html:4 templates/user/password_reset.html:14
+#: templates/user/password_reset_from_key.html:5
+#: templates/user/password_reset_from_key.html:15
+msgid "Password Reset"
+msgstr ""
+
+#: templates/account/password_reset.html:21
+#: templates/user/password_reset.html:21
+msgid "You are already logged in."
+msgstr ""
+
+#: templates/account/password_reset.html:26
+#: templates/user/password_reset.html:26
+msgid ""
+"Forgotten your password? Enter your email address below, and we'll send you "
+"an email allowing you to reset it."
+msgstr ""
+
+#: templates/account/password_reset.html:62
+#: templates/user/password_reset.html:62
+msgid "Send Reset Email"
+msgstr ""
+
+#: templates/account/password_reset.html:66
+#: templates/account/password_reset_done.html:34
+#: templates/account/password_reset_from_key.html:36
+#: templates/user/password_reset.html:66
+#: templates/user/password_reset_done.html:34
+#: templates/user/password_reset_from_key.html:36
+msgid "Back to Login"
+msgstr ""
+
+#: templates/account/password_reset_done.html:4
+#: templates/account/password_reset_done.html:14
+#: templates/user/password_reset_done.html:4
+#: templates/user/password_reset_done.html:14
+msgid "Password Reset Email Sent"
+msgstr ""
+
+#: templates/account/password_reset_done.html:23
+#: templates/user/password_reset_done.html:23
+msgid "Check Your Email"
+msgstr ""
+
+#: templates/account/password_reset_done.html:28
+#: templates/user/password_reset_done.html:28
+msgid ""
+"We have sent you an email with instructions to reset your password. If you "
+"have not received it please check your spam folder. Otherwise contact us if "
+"you do not receive it in a few minutes."
+msgstr ""
+
+#: templates/account/password_reset_done.html:38
+#: templates/account/password_reset_from_key.html:123
+#: templates/user/password_reset_done.html:38
+#: templates/user/password_reset_from_key.html:123
+msgid "Go to Homepage"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:22
+#: templates/user/password_reset_from_key.html:22
+msgid "Password Reset Failed"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:26
+#: templates/user/password_reset_from_key.html:26
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used or has expired."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:32
+#: templates/user/password_reset_from_key.html:32
+msgid "Request New Password Reset"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:43
+#: templates/user/password_reset_from_key.html:43
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:102
+#: templates/user/password_reset_from_key.html:102
+msgid "Change My Password"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:109
+#: templates/account/password_reset_from_key_done.html:4
+#: templates/account/password_reset_from_key_done.html:14
+#: templates/user/password_reset_from_key.html:109
+msgid "Password Reset Complete"
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:113
+#: templates/user/password_reset_from_key.html:113
+msgid "Your password has been set. You may go ahead and log in now."
+msgstr ""
+
+#: templates/account/password_reset_from_key.html:119
+#: templates/user/password_reset_from_key.html:119
+msgid "Log In"
+msgstr ""
+
+#: templates/account/password_reset_from_key_done.html:16
+msgid "Your password has been reset"
+msgstr ""
+
+#: templates/account/password_reset_from_key_done.html:23
+msgid ""
+"Your password is now changed. You can now sign in with your new password."
+msgstr ""
+
+#: templates/account/signup.html:4 templates/account/signup.html:14
+#: templates/account/signup.html:96 templates/user/signup.html:4
+#: templates/user/signup.html:14 templates/user/signup.html:96
+msgid "Register"
+msgstr ""
+
+#: templates/account/signup.html:76 templates/user/signup.html:76
+msgid "Confirm Password"
+msgstr ""
+
+#: templates/account/signup.html:83 templates/user/signup.html:83
+msgid "Confirm your password"
+msgstr ""
+
+#: templates/account/signup.html:104 templates/user/signup.html:104
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/account/verification_sent.html:4
+#: templates/account/verification_sent.html:14
+msgid "Verification Sent"
+msgstr ""
+
+#: templates/account/verification_sent.html:23
+msgid ""
+"We have sent an e-mail to you for verification. Please follow the link "
+"provided to finalize the signup process. Please contact us if you do not "
+"receive it within a few minutes."
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:4
+#: templates/datasets/category_confirm_delete.html:23
+#: templates/datasets/category_confirm_delete.html:102
+msgid "Delete Category"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:16
+#: templates/datasets/category_form.html:22
+#: templates/datasets/category_list.html:4 templates/user/settings.html:61
+msgid "Categories"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:18
+#: templates/datasets/category_list.html:122
+#: templates/datasets/dataset_confirm_delete.html:21
+#: templates/projects/project_list.html:155 templates/user/role_list.html:126
+msgid "Delete"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:25
+msgid "Are you sure you want to delete this category?"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:34
+msgid "Category Information"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:40
+#: templates/datasets/category_list.html:72
+#: templates/user/role_confirm_delete.html:26 templates/user/role_list.html:83
+msgid "Name"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:50
+#: templates/datasets/category_list.html:108 templates/user/list.html:85
+#: templates/user/management.html:225 templates/user/role_list.html:55
+#: templates/user/role_list.html:114
+msgid "Inactive"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:64
+#: templates/datasets/category_list.html:77
+#: templates/datasets/dataset_confirm_delete.html:50
+#: templates/datasets/dataset_detail.html:199
+#: templates/projects/project_datasets.html:100
+#: templates/projects/project_detail.html:253
+#: templates/projects/project_list.html:92
+#: templates/user/role_confirm_delete.html:29 templates/user/role_list.html:87
+msgid "Created"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:74
+#: templates/datasets/dataset_confirm_delete.html:43
+#: templates/projects/project_confirm_delete.html:84
+#: templates/user/role_confirm_delete.html:19 templates/user/settings.html:450
+msgid "Warning"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:75
+#, python-format
+msgid ""
+"\n"
+"                    This category is currently used by %(dataset_count)s "
+"dataset. You cannot delete it.\n"
+"                "
+msgid_plural ""
+"\n"
+"                    This category is currently used by %(dataset_count)s "
+"datasets. You cannot delete it.\n"
+"                "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/datasets/category_confirm_delete.html:84
+#: templates/projects/project_confirm_delete.html:97
+#: templates/user/settings.html:180
+msgid "Note"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:85
+msgid ""
+"This category is not currently used by any datasets and can be safely "
+"deleted."
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:114
+msgid "Back to Categories"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:118
+#: templates/datasets/category_form.html:6
+#: templates/datasets/category_form.html:36
+msgid "Edit Category"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:130
+msgid "About Category Deletion"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:137
+msgid "Categories can only be deleted if they are not used by any datasets"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:141
+msgid "Deleting a category is permanent and cannot be undone"
+msgstr ""
+
+#: templates/datasets/category_confirm_delete.html:145
+msgid "Consider deactivating the category instead of deleting it"
+msgstr ""
+
+#: templates/datasets/category_form.html:8
+#: templates/datasets/category_form.html:38
+#: templates/datasets/category_list.html:22
+msgid "Add Category"
+msgstr ""
+
+#: templates/datasets/category_form.html:26
+#: templates/datasets/category_list.html:119
+#: templates/datasets/dataset_detail.html:38
+#: templates/projects/project_datasets.html:158
+#: templates/projects/project_list.html:150 templates/user/list.html:92
+#: templates/user/list.html:93 templates/user/role_list.html:122
+msgid "Edit"
+msgstr ""
+
+#: templates/datasets/category_form.html:28
+msgid "Add"
+msgstr ""
+
+#: templates/datasets/category_form.html:43
+msgid "Update the category information below."
+msgstr ""
+
+#: templates/datasets/category_form.html:45
+msgid "Create a new dataset category with the information below."
+msgstr ""
+
+#: templates/datasets/category_form.html:76
+msgid "Category Name"
+msgstr ""
+
+#: templates/datasets/category_form.html:84
+msgid "Enter category name"
+msgstr ""
+
+#: templates/datasets/category_form.html:109
+msgid "Describe this category..."
+msgstr ""
+
+#: templates/datasets/category_form.html:126
+#: templates/datasets/category_list.html:74
+msgid "Color"
+msgstr ""
+
+#: templates/datasets/category_form.html:135
+msgid "Choose color"
+msgstr ""
+
+#: templates/datasets/category_form.html:191
+msgid "Update Category"
+msgstr ""
+
+#: templates/datasets/category_form.html:193 templates/user/settings.html:392
+msgid "Create Category"
+msgstr ""
+
+#: templates/datasets/category_form.html:206
+msgid "Category Guidelines"
+msgstr ""
+
+#: templates/datasets/category_form.html:213
+msgid "Choose a clear, descriptive name for the category"
+msgstr ""
+
+#: templates/datasets/category_form.html:217
+msgid "Provide a helpful description to explain the category's purpose"
+msgstr ""
+
+#: templates/datasets/category_form.html:221
+msgid "Select a color that represents the category visually"
+msgstr ""
+
+#: templates/datasets/category_form.html:225
+msgid "Only active categories will be available for dataset selection"
+msgstr ""
+
+#: templates/datasets/category_list.html:15 templates/home.html:199
+#: templates/user/settings.html:353
+msgid "Dataset Categories"
+msgstr ""
+
+#: templates/datasets/category_list.html:17
+msgid "Manage dataset categories and their properties"
+msgstr ""
+
+#: templates/datasets/category_list.html:52
+#: templates/projects/project_list.html:66 templates/user/role_list.html:63
+msgid "Filter"
+msgstr ""
+
+#: templates/datasets/category_list.html:78
+#: templates/datasets/dataset_detail.html:304
+#: templates/projects/project_datasets.html:101
+#: templates/projects/project_list.html:93 templates/user/list.html:39
+#: templates/user/role_list.html:88
+msgid "Actions"
+msgstr ""
+
+#: templates/datasets/category_list.html:95
+#: templates/datasets/dataset_detail.html:320 templates/user/role_list.html:104
+msgid "No description"
+msgstr ""
+
+#: templates/datasets/category_list.html:139
+msgid "Categories pagination"
+msgstr ""
+
+#: templates/datasets/category_list.html:144
+#: templates/datasets/dataset_list.html:177
+#: templates/projects/project_list.html:178 templates/user/role_list.html:154
+msgid "First"
+msgstr ""
+
+#: templates/datasets/category_list.html:149
+#: templates/datasets/dataset_list.html:182
+#: templates/projects/project_list.html:183 templates/user/role_list.html:159
+msgid "Previous"
+msgstr ""
+
+#: templates/datasets/category_list.html:156
+#: templates/datasets/dataset_list.html:189
+#: templates/projects/project_list.html:190 templates/user/role_list.html:166
+msgid "Page"
+msgstr ""
+
+#: templates/datasets/category_list.html:156
+#: templates/datasets/dataset_list.html:189
+#: templates/projects/project_list.html:190 templates/user/role_list.html:166
+msgid "of"
+msgstr ""
+
+#: templates/datasets/category_list.html:163
+#: templates/datasets/dataset_list.html:196
+#: templates/projects/project_list.html:197 templates/user/role_list.html:173
+msgid "Next"
+msgstr ""
+
+#: templates/datasets/category_list.html:168
+#: templates/datasets/dataset_list.html:201
+#: templates/projects/project_list.html:202 templates/user/role_list.html:178
+msgid "Last"
+msgstr ""
+
+#: templates/datasets/category_list.html:184
+msgid "No Categories Found"
+msgstr ""
+
+#: templates/datasets/category_list.html:187
+msgid ""
+"No categories match your current filters. Try adjusting your search criteria."
+msgstr ""
+
+#: templates/datasets/category_list.html:189
+msgid "Get started by creating your first dataset category."
+msgstr ""
+
+#: templates/datasets/category_list.html:195
+msgid "Create First Category"
+msgstr ""
+
+#: templates/datasets/category_list.html:200
+#: templates/projects/project_list.html:233 templates/user/role_list.html:209
+msgid "Clear Filters"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:4
+#: templates/datasets/dataset_confirm_delete.html:26
+#: templates/datasets/dataset_confirm_delete.html:65
+msgid "Delete Dataset"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:28
+msgid "Are you sure you want to delete this dataset?"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:37
+#: templates/projects/project_confirm_delete.html:37
+msgid "Confirm Deletion"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:43
+msgid ""
+"This action cannot be undone. All data associated with this dataset will be "
+"permanently deleted."
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:47
+#: templates/datasets/dataset_detail.html:190
+msgid "Dataset Information"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:49
+#: templates/projects/project_confirm_delete.html:50
+msgid "Title"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:51
+#: templates/datasets/dataset_detail.html:82
+#: templates/datasets/dataset_detail.html:263
+#: templates/projects/project_datasets.html:98
+msgid "Downloads"
+msgstr ""
+
+#: templates/datasets/dataset_confirm_delete.html:52
+#: templates/datasets/dataset_detail.html:83
+#: templates/datasets/dataset_detail.html:268
+#: templates/projects/project_datasets.html:97
+msgid "Versions"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:30
+msgid "Featured"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:43
+msgid "Back"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:76
+msgid "Dataset Statistics"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:86
+msgid "Views"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:103
+msgid "Tags & Keywords"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:131
+#: templates/datasets/dataset_form.html:212
+msgid "Attribution & License"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:137
+#: templates/datasets/dataset_detail.html:236
+#: templates/datasets/dataset_form.html:265
+msgid "Contributors"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:151
+#: templates/datasets/dataset_form.html:220
+msgid "License"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:158
+#: templates/datasets/dataset_form.html:235
+msgid "Citation"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:167
+#: templates/datasets/dataset_form.html:250
+msgid "DOI"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:204 templates/home.html:137
+msgid "Published"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:255
+msgid "Statistics"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:282
+msgid "Dataset Versions"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:287
+#: templates/datasets/dataset_version_form.html:4
+#: templates/datasets/dataset_version_form.html:21
+#: templates/datasets/dataset_version_form.html:26
+msgid "Add New Version"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:298
+msgid "Version"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:300
+#: templates/datasets/dataset_version_form.html:206
+msgid "File Size"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:301
+msgid "File Source"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:302
+msgid "Created By"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:303
+#: templates/projects/project_confirm_delete.html:77
+msgid "Created At"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:313
+msgid "Latest"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:330
+msgid "Uploaded"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:336
+msgid "External"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:362
+msgid "Download this version"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:369
+msgid "Open external URL"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:373
+msgid "No file"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:387
+msgid "No versions yet"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:388
+msgid "This dataset doesn't have any versions yet."
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:399
+#: templates/datasets/dataset_form.html:280
+msgid "Related Datasets"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:410
+#: templates/datasets/dataset_list.html:161
+#: templates/projects/project_datasets.html:154
+#: templates/projects/project_list.html:146
+msgid "View"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:6
+#: templates/datasets/dataset_form.html:24
+msgid "Edit Dataset"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:8
+#: templates/datasets/dataset_form.html:27
+#: templates/datasets/dataset_form.html:307
+#: templates/datasets/dataset_list.html:20 templates/home.html:78
+#: templates/projects/project_datasets.html:37
+#: templates/projects/project_datasets.html:217
+msgid "Add Dataset"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:32
+msgid "Update your dataset information"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:34
+msgid "Share your research data with the community"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:41
+msgid "Back to Datasets"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:66
+#: templates/projects/project_form.html:64
+msgid "Basic Information"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:74
+msgid "Dataset Title"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:110
+msgid "Brief summary of the dataset (optional)"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:117
+#: templates/datasets/dataset_list.html:40
+#: templates/projects/project_datasets.html:95
+msgid "Category"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:136
+msgid "Separate tags with commas"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:151
+msgid "Keywords for search (one per line)"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:162
+msgid "Access & Status"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:198
+msgid "Featured Dataset"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:200
+msgid "Show this dataset in the featured section"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:228
+msgid "e.g., CC BY 4.0, MIT License"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:243
+msgid "How to cite this dataset"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:258
+msgid "Digital Object Identifier (optional)"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:273
+msgid "Select users who contributed to this dataset"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:288
+msgid "Select other datasets that are related to this one"
+msgstr ""
+
+#: templates/datasets/dataset_form.html:304
+msgid "Update Dataset"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:13
+msgid "Research Datasets"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:14
+msgid "Discover and access research datasets"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:37
+msgid "Search datasets..."
+msgstr ""
+
+#: templates/datasets/dataset_list.html:42
+msgid "All Categories"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:53
+msgid "Filter by tags..."
+msgstr ""
+
+#: templates/datasets/dataset_list.html:74
+msgid "Featured Datasets"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:100
+msgid "View Details"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:115
+msgid "All Datasets"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:116
+msgid "datasets found"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:172
+msgid "Dataset pagination"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:212
+msgid "No datasets found"
+msgstr ""
+
+#: templates/datasets/dataset_list.html:213
+msgid "No datasets match your search criteria."
+msgstr ""
+
+#: templates/datasets/dataset_list.html:217 templates/home.html:148
+#: templates/projects/project_datasets.html:188
+msgid "Add First Dataset"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:28
+msgid "Create a new version for"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:48
+msgid "Version Number"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:56
+msgid "e.g., 1.1, 2.0, 1.2.3"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:73
+msgid "Version Description"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:80
+msgid "Describe the changes in this version..."
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:97
+msgid "File Input Method"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:111
+msgid "Upload File"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:125
+msgid "External URL"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:134
+msgid "Version File"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:159
+msgid "File URL"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:167
+msgid "https://example.com/dataset.zip"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:183
+msgid "File Location Description"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:190
+msgid ""
+"Describe where the file is located (e.g., \"GitHub repository\", "
+"\"University server\", \"Cloud storage\")"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:214
+msgid "e.g., 2.5 MB, 1.2 GB"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:235
+msgid "Create Version"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:247
+msgid "Version Guidelines"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:254
+msgid "Use semantic versioning (e.g., 1.0, 1.1, 2.0)"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:258
+msgid "Describe significant changes in the version description"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:262
+msgid "Ensure the file format is consistent with previous versions"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:266
+msgid "Test the file before uploading"
+msgstr ""
+
+#: templates/datasets/dataset_version_form.html:270
+msgid "The new version will become the current version automatically"
+msgstr ""
+
+#: templates/home.html:4
+msgid "Dashboard"
+msgstr ""
+
+#: templates/home.html:14
+msgid "Welcome to ISR Datasets"
+msgstr ""
+
+#: templates/home.html:17
+msgid ""
+"A comprehensive platform for managing, accessing, and analyzing research "
+"datasets"
+msgstr ""
+
+#: templates/home.html:30
+msgid "Published Datasets"
+msgstr ""
+
+#: templates/home.html:39
+msgid "Data Volume"
+msgstr ""
+
+#: templates/home.html:48 templates/user/management.html:56
+msgid "Active Users"
+msgstr ""
+
+#: templates/home.html:57
+msgid "System Uptime"
+msgstr ""
+
+#: templates/home.html:70
+msgid "Quick Actions"
+msgstr ""
+
+#: templates/home.html:84
+msgid "Browse Datasets"
+msgstr ""
+
+#: templates/home.html:90 templates/user/settings.html:357
+msgid "Manage Categories"
+msgstr ""
+
+#: templates/home.html:112
+msgid "Recent Activity"
+msgstr ""
+
+#: templates/home.html:124
+msgid "New version added"
+msgstr ""
+
+#: templates/home.html:126
+msgid "Version updated"
+msgstr ""
+
+#: templates/home.html:133 templates/home.html:174 templates/home.html:247
+msgid "ago"
+msgstr ""
+
+#: templates/home.html:137
+msgid "Draft"
+msgstr ""
+
+#: templates/home.html:145
+msgid "No recent activity found"
+msgstr ""
+
+#: templates/home.html:160
+msgid "Popular Datasets"
+msgstr ""
+
+#: templates/home.html:170
+msgid "downloads"
+msgstr ""
+
+#: templates/home.html:174 templates/projects/project_detail.html:305
+msgid "by"
+msgstr ""
+
+#: templates/home.html:182
+msgid "No datasets available yet"
+msgstr ""
+
+#: templates/home.html:210
+msgid "datasets"
+msgstr ""
+
+#: templates/home.html:218 templates/user/settings.html:377
+msgid "View All Categories"
+msgstr ""
+
+#: templates/home.html:232
+msgid "Your Datasets"
+msgstr ""
+
+#: templates/home.html:247
+msgid "versions"
+msgstr ""
+
+#: templates/home.html:255
+msgid "Add New Dataset"
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:4
+#: templates/projects/project_confirm_delete.html:21
+#: templates/projects/project_confirm_delete.html:26
+#: templates/projects/project_confirm_delete.html:111
+msgid "Delete Project"
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:28
+msgid "Are you sure you want to delete this research project?"
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:42
+msgid "You are about to delete the project:"
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:45
+msgid "This action cannot be undone."
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:74
+#: templates/projects/project_detail.html:281
+msgid "Associated Datasets"
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:85
+#, python-format
+msgid ""
+"This project is currently associated with %(dataset_count)s dataset. The "
+"datasets will remain in the system but will no longer be associated with "
+"this project."
+msgid_plural ""
+"This project is currently associated with %(dataset_count)s datasets. The "
+"datasets will remain in the system but will no longer be associated with "
+"this project."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/projects/project_confirm_delete.html:90
+msgid ""
+"This project is not currently associated with any datasets, so it can be "
+"safely deleted."
+msgstr ""
+
+#: templates/projects/project_confirm_delete.html:98
+#, python-format
+msgid ""
+"This project has %(collaborator_count)s collaborator. They will lose access "
+"to this project."
+msgid_plural ""
+"This project has %(collaborator_count)s collaborators. They will lose access "
+"to this project."
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/projects/project_datasets.html:28
+msgid "Project Datasets"
+msgstr ""
+
+#: templates/projects/project_datasets.html:31
+msgid "Datasets associated with"
+msgstr ""
+
+#: templates/projects/project_datasets.html:41
+msgid "Back to Project"
+msgstr ""
+
+#: templates/projects/project_datasets.html:74
+#: templates/projects/project_detail.html:236
+msgid "Team Members"
+msgstr ""
+
+#: templates/projects/project_datasets.html:94
+msgid "Dataset"
+msgstr ""
+
+#: templates/projects/project_datasets.html:129
+msgid "No category"
+msgstr ""
+
+#: templates/projects/project_datasets.html:163
+msgid "Download"
+msgstr ""
+
+#: templates/projects/project_datasets.html:182
+msgid "No Datasets Found"
+msgstr ""
+
+#: templates/projects/project_datasets.html:184
+msgid "This project doesn't have any associated datasets yet."
+msgstr ""
+
+#: templates/projects/project_datasets.html:203
+msgid "Project Management"
+msgstr ""
+
+#: templates/projects/project_datasets.html:211
+#: templates/projects/project_detail.html:46
+#: templates/projects/project_form.html:5
+#: templates/projects/project_form.html:21
+#: templates/projects/project_form.html:27
+msgid "Edit Project"
+msgstr ""
+
+#: templates/projects/project_datasets.html:223
+msgid "All Projects"
+msgstr ""
+
+#: templates/projects/project_detail.html:51
+msgid "View Datasets"
+msgstr ""
+
+#: templates/projects/project_detail.html:67
+msgid "Project Description"
+msgstr ""
+
+#: templates/projects/project_detail.html:85
+#: templates/projects/project_detail.html:247
+#: templates/projects/project_form.html:129
+msgid "Project Timeline"
+msgstr ""
+
+#: templates/projects/project_detail.html:96
+#: templates/projects/project_detail.html:106
+msgid "Not specified"
+msgstr ""
+
+#: templates/projects/project_detail.html:115
+#: templates/projects/project_detail.html:262
+#: templates/projects/project_list.html:91
+msgid "Duration"
+msgstr ""
+
+#: templates/projects/project_detail.html:116
+#: templates/projects/project_detail.html:263
+#: templates/projects/project_list.html:136
+msgid "days"
+msgstr ""
+
+#: templates/projects/project_detail.html:129
+msgid "Project Information"
+msgstr ""
+
+#: templates/projects/project_detail.html:192
+msgid "Project Team"
+msgstr ""
+
+#: templates/projects/project_detail.html:215
+msgid "No collaborators assigned"
+msgstr ""
+
+#: templates/projects/project_detail.html:225
+msgid "Project Statistics"
+msgstr ""
+
+#: templates/projects/project_detail.html:257
+msgid "Last Updated"
+msgstr ""
+
+#: templates/projects/project_detail.html:284
+msgid "View All"
+msgstr ""
+
+#: templates/projects/project_form.html:5
+#: templates/projects/project_form.html:21
+#: templates/projects/project_form.html:27
+msgid "Add New Project"
+msgstr ""
+
+#: templates/projects/project_form.html:31
+msgid "Update the details for this research project."
+msgstr ""
+
+#: templates/projects/project_form.html:33
+msgid "Create a new research project to organize and manage your datasets."
+msgstr ""
+
+#: templates/projects/project_form.html:172
+msgid "Project Status and Access"
+msgstr ""
+
+#: templates/projects/project_form.html:215
+msgid "Keywords and Tags"
+msgstr ""
+
+#: templates/projects/project_form.html:258
+msgid "External References"
+msgstr ""
+
+#: templates/projects/project_form.html:327
+msgid "Project Collaborators"
+msgstr ""
+
+#: templates/projects/project_form.html:350 templates/user/edit.html:171
+#: templates/user/settings.html:122
+msgid "Save Changes"
+msgstr ""
+
+#: templates/projects/project_form.html:350
+msgid "Create Project"
+msgstr ""
+
+#: templates/projects/project_form.html:362
+msgid "Project Guidelines"
+msgstr ""
+
+#: templates/projects/project_form.html:369
+msgid "Use clear and descriptive project titles"
+msgstr ""
+
+#: templates/projects/project_form.html:373
+msgid ""
+"Provide detailed descriptions to help collaborators understand the project"
+msgstr ""
+
+#: templates/projects/project_form.html:377
+msgid "Set appropriate access levels based on project sensitivity"
+msgstr ""
+
+#: templates/projects/project_form.html:381
+msgid "Add relevant keywords and tags for better discoverability"
+msgstr ""
+
+#: templates/projects/project_list.html:17
+msgid "Research Projects"
+msgstr ""
+
+#: templates/projects/project_list.html:19
+msgid "Manage and explore research projects and their associated datasets"
+msgstr ""
+
+#: templates/projects/project_list.html:24
+msgid "Add Project"
+msgstr ""
+
+#: templates/projects/project_list.html:51
+#: templates/projects/project_list.html:89
+msgid "Access"
+msgstr ""
+
+#: templates/projects/project_list.html:173
+msgid "Projects pagination"
+msgstr ""
+
+#: templates/projects/project_list.html:217
+msgid "No Projects Found"
+msgstr ""
+
+#: templates/projects/project_list.html:220
+msgid ""
+"No projects match your current filters. Try adjusting your search criteria."
+msgstr ""
+
+#: templates/projects/project_list.html:222
+msgid "Get started by creating your first research project."
+msgstr ""
+
+#: templates/projects/project_list.html:228
+msgid "Create First Project"
+msgstr ""
+
+#: templates/user/confirm_delete.html:5 templates/user/confirm_delete.html:8
+#: templates/user/data_confirm_delete.html:5
+msgid "Delete Your Account"
+msgstr ""
+
+#: templates/user/confirm_delete.html:9
+msgid ""
+"Are you sure you want to delete your account? This action cannot be undone."
+msgstr ""
+
+#: templates/user/confirm_delete.html:12
+#: templates/user/data_confirm_delete.html:12
+msgid "Confirm Delete"
+msgstr ""
+
+#: templates/user/data_confirm_delete.html:8
+msgid "Delete Your Data"
+msgstr ""
+
+#: templates/user/data_confirm_delete.html:9
+msgid ""
+"Are you sure you want to delete all your Data? This action cannot be undone."
+msgstr ""
+
+#: templates/user/edit.html:5 templates/user/edit.html:19
+#: templates/user/edit.html:24
+msgid "Edit User"
+msgstr ""
+
+#: templates/user/edit.html:17 templates/user/management.html:6
+#: templates/user/management.html:17 templates/user/management.html:83
+#: templates/user/management.html:259 templates/user/role_form.html:98
+msgid "User Management"
+msgstr ""
+
+#: templates/user/edit.html:26
+msgid "Update user information and settings"
+msgstr ""
+
+#: templates/user/edit.html:47 templates/user/settings.html:98
+msgid "First Name"
+msgstr ""
+
+#: templates/user/edit.html:55
+msgid "Enter first name"
+msgstr ""
+
+#: templates/user/edit.html:66 templates/user/settings.html:102
+msgid "Last Name"
+msgstr ""
+
+#: templates/user/edit.html:74
+msgid "Enter last name"
+msgstr ""
+
+#: templates/user/edit.html:109 templates/user/list.html:34
+#: templates/user/settings.html:108
+msgid "Role"
+msgstr ""
+
+#: templates/user/edit.html:116
+msgid "No role assigned"
+msgstr ""
+
+#: templates/user/edit.html:158 templates/user/list.html:36
+msgid "Staff"
+msgstr ""
+
+#: templates/user/email/email_confirmation_message.txt:5
+#, python-format
+msgid ""
+"\\\n"
+"You're receiving this e-mail because user %(user_display)s has given your\\\n"
+"e-mail address to register an account on %(site_domain)s.\n"
+"To confirm this is correct, go to %(activate_url)s\\\n"
+msgstr ""
+
+#: templates/user/email/email_confirmation_subject.txt:3
+msgid "Confirm Your Sign Up"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:90
+msgid "Password Reset Request"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:94
+msgid "Hello"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:96
+msgid ""
+"You're receiving this email because you or someone else has requested a "
+"password reset for your user account. It can be safely ignored if you did "
+"not request a password reset."
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:98
+msgid "Click the button below to reset your password:"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:102
+msgid "Reset My Password"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:107
+msgid "Security Notice:"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:108
+msgid ""
+"This link will expire in 24 hours for security reasons. If you didn't "
+"request this password reset, please ignore this email."
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:111
+msgid ""
+"If the button doesn't work, you can copy and paste this link into your "
+"browser:"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:118
+msgid "Your username:"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:124
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:125
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: templates/user/email/password_reset_key_message.html:127
+msgid "This is an automated message, please do not reply to this email."
+msgstr ""
+
+#: templates/user/email/password_reset_key_subject.txt:3
+#, python-format
+msgid "Password Reset - %(site_name)s"
+msgstr ""
+
+#: templates/user/list.html:6 templates/user/list.html:17
+#: templates/user/role_list.html:85
+msgid "Users"
+msgstr ""
+
+#: templates/user/list.html:31
+msgid "ID"
+msgstr ""
+
+#: templates/user/list.html:32 templates/user/settings.html:88
+msgid "Username"
+msgstr ""
+
+#: templates/user/list.html:33 templates/user/settings.html:92
+msgid "Email"
+msgstr ""
+
+#: templates/user/list.html:37
+msgid "Superuser"
+msgstr ""
+
+#: templates/user/list.html:38
+msgid "Date joined"
+msgstr ""
+
+#: templates/user/list.html:57
+msgid "Group Admin"
+msgstr ""
+
+#: templates/user/list.html:61
+msgid "Leader"
+msgstr ""
+
+#: templates/user/list.html:65
+msgid "Deputy Leader"
+msgstr ""
+
+#: templates/user/list.html:69
+msgid "Board Member"
+msgstr ""
+
+#: templates/user/list.html:102
+msgid "No users found."
+msgstr ""
+
+#: templates/user/management.html:19
+msgid "Manage users, roles, and permissions"
+msgstr ""
+
+#: templates/user/management.html:24 templates/user/management.html:90
+msgid "View All Users"
+msgstr ""
+
+#: templates/user/management.html:28
+msgid "Manage Roles"
+msgstr ""
+
+#: templates/user/management.html:42
+msgid "User Statistics"
+msgstr ""
+
+#: templates/user/management.html:50
+msgid "Total Users"
+msgstr ""
+
+#: templates/user/management.html:62
+msgid "Users with Roles"
+msgstr ""
+
+#: templates/user/management.html:68
+msgid "Total Roles"
+msgstr ""
+
+#: templates/user/management.html:85
+msgid "View, edit, and manage user accounts and their permissions."
+msgstr ""
+
+#: templates/user/management.html:94
+msgid "Add New User"
+msgstr ""
+
+#: templates/user/management.html:104 templates/user/management.html:276
+#: templates/user/role_form.html:108 templates/user/role_list.html:6
+#: templates/user/role_list.html:17
+msgid "Role Management"
+msgstr ""
+
+#: templates/user/management.html:106
+msgid "Create and manage user roles and permissions."
+msgstr ""
+
+#: templates/user/management.html:111
+msgid "View All Roles"
+msgstr ""
+
+#: templates/user/management.html:115 templates/user/role_form.html:20
+msgid "Create New Role"
+msgstr ""
+
+#: templates/user/management.html:130
+msgid "Quick Filters"
+msgstr ""
+
+#: templates/user/management.html:138
+msgid "Inactive Users"
+msgstr ""
+
+#: templates/user/management.html:144
+msgid "Users without Roles"
+msgstr ""
+
+#: templates/user/management.html:150 templates/user/management.html:172
+msgid "Recent Users"
+msgstr ""
+
+#: templates/user/management.html:156
+msgid "Django Admin"
+msgstr ""
+
+#: templates/user/management.html:200
+msgid "No recent users"
+msgstr ""
+
+#: templates/user/management.html:211
+msgid "Recent Roles"
+msgstr ""
+
+#: templates/user/management.html:239
+msgid "No recent roles"
+msgstr ""
+
+#: templates/user/management.html:253
+msgid "Management Tips"
+msgstr ""
+
+#: templates/user/management.html:263
+msgid "Regularly review inactive user accounts"
+msgstr ""
+
+#: templates/user/management.html:267
+msgid "Assign appropriate roles to new users"
+msgstr ""
+
+#: templates/user/management.html:271
+msgid "Keep user information up to date"
+msgstr ""
+
+#: templates/user/management.html:280
+msgid "Create clear, descriptive role names"
+msgstr ""
+
+#: templates/user/management.html:284
+msgid "Document role permissions and responsibilities"
+msgstr ""
+
+#: templates/user/management.html:288
+msgid "Regularly audit role assignments"
+msgstr ""
+
+#: templates/user/management.html:296 templates/user/settings.html:431
+msgid "Tip"
+msgstr ""
+
+#: templates/user/management.html:297
+msgid ""
+"Use the Django Admin interface for advanced user management tasks and bulk "
+"operations."
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:5
+#: templates/user/role_confirm_delete.html:14
+#: templates/user/role_confirm_delete.html:56
+msgid "Delete Role"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:20
+msgid "Are you sure you want to delete the role"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:24
+msgid "Role Details"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:28
+msgid "Users with this role"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:35
+#: templates/user/role_confirm_delete.html:45
+msgid "Cannot Delete"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:36
+msgid "This role cannot be deleted because it is assigned to"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:36
+msgid "user(s)"
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:37
+msgid "Please reassign or remove all users from this role before deleting it."
+msgstr ""
+
+#: templates/user/role_confirm_delete.html:42
+msgid "Back to Roles"
+msgstr ""
+
+#: templates/user/role_form.html:6 templates/user/role_form.html:18
+msgid "Edit Role"
+msgstr ""
+
+#: templates/user/role_form.html:6 templates/user/role_form.html:130
+msgid "Create Role"
+msgstr ""
+
+#: templates/user/role_form.html:30
+msgid "Please correct the following errors:"
+msgstr ""
+
+#: templates/user/role_form.html:38
+msgid "Role Name"
+msgstr ""
+
+#: templates/user/role_form.html:47
+msgid "A unique name for this role (e.g., 'Admin', 'Manager', 'User')"
+msgstr ""
+
+#: templates/user/role_form.html:54
+msgid "Inactive roles cannot be assigned to users"
+msgstr ""
+
+#: templates/user/role_form.html:70
+msgid "A brief description of what this role is for"
+msgstr ""
+
+#: templates/user/role_form.html:76
+msgid "Permissions"
+msgstr ""
+
+#: templates/user/role_form.html:85
+msgid ""
+"Enter permissions as JSON array. Example: ['user.view', 'user.edit', "
+"'user.delete']"
+msgstr ""
+
+#: templates/user/role_form.html:93
+msgid "Common Permission Examples"
+msgstr ""
+
+#: templates/user/role_form.html:100
+msgid "View users"
+msgstr ""
+
+#: templates/user/role_form.html:101
+msgid "Edit users"
+msgstr ""
+
+#: templates/user/role_form.html:102
+msgid "Delete users"
+msgstr ""
+
+#: templates/user/role_form.html:103
+msgid "Create users"
+msgstr ""
+
+#: templates/user/role_form.html:104
+msgid "Full user management"
+msgstr ""
+
+#: templates/user/role_form.html:110
+msgid "View roles"
+msgstr ""
+
+#: templates/user/role_form.html:111
+msgid "Edit roles"
+msgstr ""
+
+#: templates/user/role_form.html:112
+msgid "Delete roles"
+msgstr ""
+
+#: templates/user/role_form.html:113
+msgid "Create roles"
+msgstr ""
+
+#: templates/user/role_form.html:128
+msgid "Update Role"
+msgstr ""
+
+#: templates/user/role_list.html:19
+msgid "Manage user roles and permissions"
+msgstr ""
+
+#: templates/user/role_list.html:24
+msgid "Add Role"
+msgstr ""
+
+#: templates/user/role_list.html:28
+msgid "Back to Management"
+msgstr ""
+
+#: templates/user/role_list.html:46
+msgid "Search by name or description"
+msgstr ""
+
+#: templates/user/role_list.html:53
+msgid "All"
+msgstr ""
+
+#: templates/user/role_list.html:131
+msgid "Cannot delete role with assigned users"
+msgstr ""
+
+#: templates/user/role_list.html:149
+msgid "Roles pagination"
+msgstr ""
+
+#: templates/user/role_list.html:193
+msgid "No Roles Found"
+msgstr ""
+
+#: templates/user/role_list.html:196
+msgid ""
+"No roles match your current filters. Try adjusting your search criteria."
+msgstr ""
+
+#: templates/user/role_list.html:198
+msgid "Get started by creating your first role."
+msgstr ""
+
+#: templates/user/role_list.html:204
+msgid "Create First Role"
+msgstr ""
+
+#: templates/user/settings.html:17
+msgid "Account Settings"
+msgstr ""
+
+#: templates/user/settings.html:19
+msgid "Manage your account preferences and security settings"
+msgstr ""
+
+#: templates/user/settings.html:24
+msgid "Back to Dashboard"
+msgstr ""
+
+#: templates/user/settings.html:41
+msgid "Profile"
+msgstr ""
+
+#: templates/user/settings.html:45 user/models.py:52
+msgid "Language"
+msgstr ""
+
+#: templates/user/settings.html:49
+msgid "Security"
+msgstr ""
+
+#: templates/user/settings.html:53
+msgid "Notifications"
+msgstr ""
+
+#: templates/user/settings.html:57
+msgid "Privacy"
+msgstr ""
+
+#: templates/user/settings.html:65 templates/user/settings.html:444
+msgid "Danger Zone"
+msgstr ""
+
+#: templates/user/settings.html:80
+msgid "Profile Information"
+msgstr ""
+
+#: templates/user/settings.html:112
+msgid "Member Since"
+msgstr ""
+
+#: templates/user/settings.html:117
+msgid "Bio"
+msgstr ""
+
+#: templates/user/settings.html:118
+msgid "Tell us about yourself..."
+msgstr ""
+
+#: templates/user/settings.html:136
+msgid "Language Preferences"
+msgstr ""
+
+#: templates/user/settings.html:181
+msgid ""
+"Changing your language preference will update the interface language for "
+"your account. Some changes may require a page refresh to take effect."
+msgstr ""
+
+#: templates/user/settings.html:190
+msgid "Current language"
+msgstr ""
+
+#: templates/user/settings.html:196
+msgid "Save Language Preference"
+msgstr ""
+
+#: templates/user/settings.html:208
+msgid "Supported Languages"
+msgstr ""
+
+#: templates/user/settings.html:219
+msgid "Default language"
+msgstr ""
+
+#: templates/user/settings.html:229
+msgid "Deutsch"
+msgstr ""
+
+#: templates/user/settings.html:244
+msgid "Security Settings"
+msgstr ""
+
+#: templates/user/settings.html:254
+msgid ""
+"Update your account password to keep your account secure. Choose a strong "
+"password that you haven't used elsewhere."
+msgstr ""
+
+#: templates/user/settings.html:271
+msgid "Notification Preferences"
+msgstr ""
+
+#: templates/user/settings.html:276
+msgid "Email Notifications"
+msgstr ""
+
+#: templates/user/settings.html:280
+msgid "Dataset updates and new versions"
+msgstr ""
+
+#: templates/user/settings.html:286
+msgid "Comments on my datasets"
+msgstr ""
+
+#: templates/user/settings.html:294
+msgid "Save Preferences"
+msgstr ""
+
+#: templates/user/settings.html:306
+msgid "Privacy Settings"
+msgstr ""
+
+#: templates/user/settings.html:311
+msgid "Profile Visibility"
+msgstr ""
+
+#: templates/user/settings.html:315
+msgid "Make my profile public"
+msgstr ""
+
+#: templates/user/settings.html:317
+msgid "Allow other users to see your profile and datasets"
+msgstr ""
+
+#: templates/user/settings.html:322
+msgid "Show email address on profile"
+msgstr ""
+
+#: templates/user/settings.html:330
+msgid "Data Export"
+msgstr ""
+
+#: templates/user/settings.html:331
+msgid "Download a copy of your personal data"
+msgstr ""
+
+#: templates/user/settings.html:334
+msgid "Request Data Export"
+msgstr ""
+
+#: templates/user/settings.html:340
+msgid "Save Privacy Settings"
+msgstr ""
+
+#: templates/user/settings.html:363
+msgid ""
+"Manage dataset categories to organize and classify your datasets. Categories "
+"help users find related datasets more easily."
+msgstr ""
+
+#: templates/user/settings.html:371
+msgid "Category Management"
+msgstr ""
+
+#: templates/user/settings.html:373
+msgid ""
+"Create, edit, and organize dataset categories with custom colors and "
+"descriptions."
+msgstr ""
+
+#: templates/user/settings.html:386
+msgid "Create New Category"
+msgstr ""
+
+#: templates/user/settings.html:388
+msgid "Add a new category to better organize your datasets."
+msgstr ""
+
+#: templates/user/settings.html:400
+msgid "Category Features"
+msgstr ""
+
+#: templates/user/settings.html:406
+msgid "Custom colors for visual organization"
+msgstr ""
+
+#: templates/user/settings.html:410
+msgid "Descriptive text for each category"
+msgstr ""
+
+#: templates/user/settings.html:418
+msgid "Active/inactive status control"
+msgstr ""
+
+#: templates/user/settings.html:422
+msgid "Safe deletion with usage warnings"
+msgstr ""
+
+#: templates/user/settings.html:432
+msgid ""
+"Categories help users discover related datasets. Choose clear, descriptive "
+"names and use colors to make them visually distinct."
+msgstr ""
+
+#: templates/user/settings.html:450
+msgid "These actions are irreversible. Please proceed with caution."
+msgstr ""
+
+#: templates/user/settings.html:456 templates/user/settings.html:470
+msgid "Delete Account"
+msgstr ""
+
+#: templates/user/settings.html:458
+msgid ""
+"Permanently delete your account and all associated data. This action cannot "
+"be undone."
+msgstr ""
+
+#: templates/user/settings.html:460
+msgid "What will be deleted"
+msgstr ""
+
+#: templates/user/settings.html:462
+msgid "Your profile and personal information"
+msgstr ""
+
+#: templates/user/settings.html:463
+msgid "All datasets you've uploaded"
+msgstr ""
+
+#: templates/user/settings.html:464
+msgid "Download history and statistics"
+msgstr ""
+
+#: templates/user/settings.html:465
+msgid "Comments and contributions"
+msgstr ""
+
+#: user/forms.py:48
+msgid "Interface Language"
+msgstr ""
+
+#: user/forms.py:49
+msgid "Choose your preferred language for the interface"
+msgstr ""
+
+#: user/models.py:53
+msgid "Preferred language for the interface"
+msgstr ""

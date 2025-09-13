@@ -40,6 +40,10 @@
                         <i class="bi bi-person me-2"></i>
                         {% trans "Profile" %}
                     </a>
+                    <a href="#language" class="list-group-item list-group-item-action" data-bs-toggle="pill">
+                        <i class="bi bi-translate me-2"></i>
+                        {% trans "Language" %}
+                    </a>
                     <a href="#security" class="list-group-item list-group-item-action" data-bs-toggle="pill">
                         <i class="bi bi-shield-lock me-2"></i>
                         {% trans "Security" %}
@@ -77,46 +81,183 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="row mb-3">
-                                        <div class="col-sm-6">
-                                            <label class="form-label">{% trans "Username" %}</label>
-                                            <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                {% if profile_form.errors %}
+                                    <div class="alert alert-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        {% trans "Please correct the errors below." %}
+                                        {% for field in profile_form %}
+                                            {% for error in field.errors %}
+                                                <p class="mb-0">{{ field.label }}: {{ error }}</p>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% for error in profile_form.non_field_errors %}
+                                            <p class="mb-0">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="row mb-3">
+                                            <div class="col-sm-6">
+                                                <label class="form-label">{% trans "Username" %}</label>
+                                                <input type="text" class="form-control" value="{{ user.username }}" readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="form-label">{% trans "Email" %}</label>
+                                                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                            </div>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <label class="form-label">{% trans "Email" %}</label>
-                                            <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-6">
+                                                <label for="{{ profile_form.first_name.id_for_label }}" class="form-label">
+                                                    {{ profile_form.first_name.label }}
+                                                </label>
+                                                {{ profile_form.first_name }}
+                                                {% if profile_form.first_name.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ profile_form.first_name.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="{{ profile_form.last_name.id_for_label }}" class="form-label">
+                                                    {{ profile_form.last_name.label }}
+                                                </label>
+                                                {{ profile_form.last_name }}
+                                                {% if profile_form.last_name.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ profile_form.last_name.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-sm-6">
+                                                <label class="form-label">{% trans "Role" %}</label>
+                                                <input type="text" class="form-control" value="{{ user.role.name|default:'No role assigned' }}" readonly>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label class="form-label">{% trans "Member Since" %}</label>
+                                                <input type="text" class="form-control" value="{{ user.date_joined|date:'F d, Y' }}" readonly>
+                                            </div>
+                                        </div>
+                                        <button type="submit" name="profile_submit" class="btn btn-primary">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            {% trans "Save Changes" %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language Preferences Tab -->
+                <div class="tab-pane fade" id="language">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="bi bi-translate me-2"></i>
+                                {% trans "Language Preferences" %}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                {% if settings_form.errors %}
+                                    <div class="alert alert-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        {% trans "Please correct the errors below." %}
+                                        {% for field in settings_form %}
+                                            {% for error in field.errors %}
+                                                <p class="mb-0">{{ field.label }}: {{ error }}</p>
+                                            {% endfor %}
+                                        {% endfor %}
+                                        {% for error in settings_form.non_field_errors %}
+                                            <p class="mb-0">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ settings_form.language.id_for_label }}" class="form-label">
+                                                <i class="bi bi-globe me-1"></i>
+                                                {{ settings_form.language.label }}
+                                            </label>
+                                            {{ settings_form.language }}
+                                            {% if settings_form.language.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ settings_form.language.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                {{ settings_form.language.help_text }}
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="row mb-3">
-                                        <div class="col-sm-6">
-                                            <label class="form-label">{% trans "First Name" %}</label>
-                                            <input type="text" class="form-control" value="{{ user.first_name|default:'' }}">
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <label class="form-label">{% trans "Last Name" %}</label>
-                                            <input type="text" class="form-control" value="{{ user.last_name|default:'' }}">
+                                    <div class="col-md-6">
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>{% trans "Note" %}:</strong>
+                                            {% trans "Changing your language preference will update the interface language for your account. Some changes may require a page refresh to take effect." %}
                                         </div>
                                     </div>
-                                    <div class="row mb-3">
-                                        <div class="col-sm-6">
-                                            <label class="form-label">{% trans "Role" %}</label>
-                                            <input type="text" class="form-control" value="{{ user.role.name|default:'No role assigned' }}" readonly>
-                                        </div>
-                                        <div class="col-sm-6">
-                                            <label class="form-label">{% trans "Member Since" %}</label>
-                                            <input type="text" class="form-control" value="{{ user.date_joined|date:'F d, Y' }}" readonly>
-                                        </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>
+                                            {% trans "Current language" %}: 
+                                            <strong>{{ user.get_language_display|default:"English" }}</strong>
+                                        </small>
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">{% trans "Bio" %}</label>
-                                        <textarea class="form-control" rows="3" placeholder="{% trans 'Tell us about yourself...' %}"></textarea>
-                                    </div>
-                                    <button type="button" class="btn btn-primary">
-                                        <i class="bi bi-check-circle me-2"></i>
-                                        {% trans "Save Changes" %}
+                                    <button type="submit" name="language_submit" class="btn btn-primary">
+                                        <i class="bi bi-save me-2"></i>
+                                        {% trans "Save Language Preference" %}
                                     </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Available Languages Info -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="bi bi-info-circle me-2"></i>
+                                {% trans "Supported Languages" %}
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="badge bg-primary me-3">EN</span>
+                                        <div>
+                                            <strong>{% trans "English" %}</strong>
+                                            <br>
+                                            <small class="text-muted">{% trans "Default language" %}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <span class="badge bg-success me-3">DE</span>
+                                        <div>
+                                            <strong>{% trans "German" %}</strong>
+                                            <br>
+                                            <small class="text-muted">{% trans "Deutsch" %}</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -216,11 +357,11 @@
 
                             <div class="mb-4">
                                 <h6 class="text-primary mb-3">{% trans "Data Export" %}</h6>
-                                <p class="text-muted mb-3">{% trans "Download a copy of your personal data" %}</p>
-                                <button class="btn btn-outline-primary">
+                                <p class="text-muted mb-3">{% trans "Download a copy of your personal data for GDPR compliance" %}</p>
+                                <a href="{% url 'data-export' %}" class="btn btn-outline-primary">
                                     <i class="bi bi-download me-2"></i>
                                     {% trans "Request Data Export" %}
-                                </button>
+                                </a>
                             </div>
 
                             <button type="button" class="btn btn-primary">
