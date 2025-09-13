@@ -1,0 +1,312 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Add New Version" %} - {{ dataset.title }} - {% trans "ISR Datasets" %}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'datasets:dataset_list' %}">{% trans "Datasets" %}</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'datasets:dataset_detail' dataset.pk %}">{{ dataset.title }}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{% trans "Add New Version" %}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        {% trans "Add New Version" %}
+                    </h1>
+                    <p class="text-muted">{% trans "Create a new version for" %} <strong>{{ dataset.title }}</strong></p>
+                </div>
+            </div>
+
+            <!-- Version Form -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {% trans "Please correct the errors below." %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.version_number.id_for_label }}" class="form-label">
+                                <i class="bi bi-tag me-1"></i>
+                                {% trans "Version Number" %} <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                name="{{ form.version_number.name }}" 
+                                class="form-control {% if form.version_number.errors %}is-invalid{% endif %}"
+                                id="{{ form.version_number.id_for_label }}"
+                                value="{{ form.version_number.value|default:'' }}"
+                                placeholder="{% trans 'e.g., 1.1, 2.0, 1.2.3' %}"
+                                required
+                            >
+                            {% if form.version_number.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.version_number.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.version_number.help_text }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="bi bi-file-text me-1"></i>
+                                {% trans "Version Description" %}
+                            </label>
+                            <textarea 
+                                name="{{ form.description.name }}" 
+                                class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                id="{{ form.description.id_for_label }}"
+                                rows="4"
+                                placeholder="{% trans 'Describe the changes in this version...' %}"
+                            >{{ form.description.value|default:'' }}</textarea>
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.description.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.description.help_text }}
+                            </div>
+                        </div>
+
+                        <!-- File Input Method Selection -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="bi bi-gear me-1"></i>
+                                {% trans "File Input Method" %} <span class="text-danger">*</span>
+                            </label>
+                            <div class="form-check">
+                                <input 
+                                    type="radio" 
+                                    name="{{ form.input_method.name }}" 
+                                    value="upload" 
+                                    class="form-check-input" 
+                                    id="input_method_upload"
+                                    checked
+                                    onchange="toggleFileInput()"
+                                >
+                                <label class="form-check-label" for="input_method_upload">
+                                    <i class="bi bi-upload me-1"></i>
+                                    {% trans "Upload File" %}
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input 
+                                    type="radio" 
+                                    name="{{ form.input_method.name }}" 
+                                    value="url" 
+                                    class="form-check-input" 
+                                    id="input_method_url"
+                                    onchange="toggleFileInput()"
+                                >
+                                <label class="form-check-label" for="input_method_url">
+                                    <i class="bi bi-link-45deg me-1"></i>
+                                    {% trans "External URL" %}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- File Upload Section -->
+                        <div id="file-upload-section" class="mb-4">
+                            <label for="{{ form.file.id_for_label }}" class="form-label">
+                                <i class="bi bi-upload me-1"></i>
+                                {% trans "Version File" %} <span class="text-danger">*</span>
+                            </label>
+                            <input 
+                                type="file" 
+                                name="{{ form.file.name }}" 
+                                class="form-control {% if form.file.errors %}is-invalid{% endif %}"
+                                id="{{ form.file.id_for_label }}"
+                                accept=".csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz"
+                            >
+                            {% if form.file.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.file.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.file.help_text }}
+                            </div>
+                        </div>
+
+                        <!-- External URL Section -->
+                        <div id="url-section" class="mb-4" style="display: none;">
+                            <div class="mb-3">
+                                <label for="{{ form.file_url.id_for_label }}" class="form-label">
+                                    <i class="bi bi-link-45deg me-1"></i>
+                                    {% trans "File URL" %}
+                                </label>
+                                <input 
+                                    type="url" 
+                                    name="{{ form.file_url.name }}" 
+                                    class="form-control {% if form.file_url.errors %}is-invalid{% endif %}"
+                                    id="{{ form.file_url.id_for_label }}"
+                                    value="{{ form.file_url.value|default:'' }}"
+                                    placeholder="{% trans 'https://example.com/dataset.zip' %}"
+                                >
+                                {% if form.file_url.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.file_url.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    {{ form.file_url.help_text }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.file_url_description.id_for_label }}" class="form-label">
+                                    <i class="bi bi-file-text me-1"></i>
+                                    {% trans "File Location Description" %}
+                                </label>
+                                <textarea 
+                                    name="{{ form.file_url_description.name }}" 
+                                    class="form-control {% if form.file_url_description.errors %}is-invalid{% endif %}"
+                                    id="{{ form.file_url_description.id_for_label }}"
+                                    rows="3"
+                                    placeholder="{% trans 'Describe where the file is located (e.g., "GitHub repository", "University server", "Cloud storage")' %}"
+                                >{{ form.file_url_description.value|default:'' }}</textarea>
+                                {% if form.file_url_description.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.file_url_description.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    {{ form.file_url_description.help_text }}
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.file_size_text.id_for_label }}" class="form-label">
+                                    <i class="bi bi-hdd me-1"></i>
+                                    {% trans "File Size" %} <span class="text-danger">*</span>
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="{{ form.file_size_text.name }}" 
+                                    class="form-control {% if form.file_size_text.errors %}is-invalid{% endif %}"
+                                    id="{{ form.file_size_text.id_for_label }}"
+                                    value="{{ form.file_size_text.value|default:'' }}"
+                                    placeholder="{% trans 'e.g., 2.5 MB, 1.2 GB' %}"
+                                >
+                                {% if form.file_size_text.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.file_size_text.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    {{ form.file_size_text.help_text }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Create Version" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Version Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        {% trans "Version Guidelines" %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Use semantic versioning (e.g., 1.0, 1.1, 2.0)" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Describe significant changes in the version description" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Ensure the file format is consistent with previous versions" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Test the file before uploading" %}
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "The new version will become the current version automatically" %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFileInput() {
+    const uploadRadio = document.getElementById('input_method_upload');
+    const urlRadio = document.getElementById('input_method_url');
+    const fileUploadSection = document.getElementById('file-upload-section');
+    const urlSection = document.getElementById('url-section');
+    const fileInput = document.getElementById('{{ form.file.id_for_label }}');
+    const urlInput = document.getElementById('{{ form.file_url.id_for_label }}');
+    const urlDescInput = document.getElementById('{{ form.file_url_description.id_for_label }}');
+    const sizeInput = document.getElementById('{{ form.file_size_text.id_for_label }}');
+    
+    if (uploadRadio.checked) {
+        fileUploadSection.style.display = 'block';
+        urlSection.style.display = 'none';
+        fileInput.required = true;
+        urlInput.required = false;
+        urlDescInput.required = false;
+        sizeInput.required = false;
+    } else if (urlRadio.checked) {
+        fileUploadSection.style.display = 'none';
+        urlSection.style.display = 'block';
+        fileInput.required = false;
+        urlInput.required = false; // Either URL or description is required, handled by server-side validation
+        urlDescInput.required = false; // Either URL or description is required, handled by server-side validation
+        sizeInput.required = true;
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleFileInput();
+});
+</script>
+{% endblock content %}

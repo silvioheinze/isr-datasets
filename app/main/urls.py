@@ -24,6 +24,7 @@ urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('', include('pages.urls')),
     path('user/', include('user.urls')),
+    path('datasets/', include('datasets.urls')),
 ]
 
 # Serve static and media files during development

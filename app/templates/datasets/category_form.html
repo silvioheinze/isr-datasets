@@ -1,0 +1,249 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% if object %}
+        {% trans "Edit Category" %} - {{ object.name }} - {% trans "ISR Datasets" %}
+    {% else %}
+        {% trans "Add Category" %} - {% trans "ISR Datasets" %}
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'datasets:category_list' %}">{% trans "Categories" %}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                {% if object %}
+                                    {% trans "Edit" %}
+                                {% else %}
+                                    {% trans "Add" %}
+                                {% endif %}
+                            </li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-{% if object %}pencil{% else %}plus-circle{% endif %} me-2"></i>
+                        {% if object %}
+                            {% trans "Edit Category" %}
+                        {% else %}
+                            {% trans "Add Category" %}
+                        {% endif %}
+                    </h1>
+                    <p class="text-muted">
+                        {% if object %}
+                            {% trans "Update the category information below." %}
+                        {% else %}
+                            {% trans "Create a new dataset category with the information below." %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Category Form -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {% trans "Please correct the errors below." %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <p class="mb-0">{{ field.label }}: {{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <p class="mb-0">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Name -->
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">
+                                <i class="bi bi-tag me-1"></i>
+                                {% trans "Category Name" %} <span class="text-danger">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="{{ form.name.name }}"
+                                class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                id="{{ form.name.id_for_label }}"
+                                value="{{ form.name.value|default:'' }}"
+                                placeholder="{% trans 'Enter category name' %}"
+                                required
+                            >
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.name.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.name.help_text }}
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                <i class="bi bi-file-text me-1"></i>
+                                {% trans "Description" %}
+                            </label>
+                            <textarea
+                                name="{{ form.description.name }}"
+                                class="form-control {% if form.description.errors %}is-invalid{% endif %}"
+                                id="{{ form.description.id_for_label }}"
+                                rows="3"
+                                placeholder="{% trans 'Describe this category...' %}"
+                            >{{ form.description.value|default:'' }}</textarea>
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.description.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.description.help_text }}
+                            </div>
+                        </div>
+
+                        <!-- Color -->
+                        <div class="mb-3">
+                            <label for="{{ form.color.id_for_label }}" class="form-label">
+                                <i class="bi bi-palette me-1"></i>
+                                {% trans "Color" %}
+                            </label>
+                            <div class="input-group">
+                                <input
+                                    type="color"
+                                    name="{{ form.color.name }}"
+                                    class="form-control form-control-color {% if form.color.errors %}is-invalid{% endif %}"
+                                    id="{{ form.color.id_for_label }}"
+                                    value="{{ form.color.value|default:'#007bff' }}"
+                                    title="{% trans 'Choose color' %}"
+                                >
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ form.color.value|default:'#007bff' }}"
+                                    readonly
+                                    style="max-width: 100px;"
+                                >
+                            </div>
+                            {% if form.color.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.color.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.color.help_text }}
+                            </div>
+                        </div>
+
+                        <!-- Active Status -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    name="{{ form.is_active.name }}"
+                                    class="form-check-input {% if form.is_active.errors %}is-invalid{% endif %}"
+                                    id="{{ form.is_active.id_for_label }}"
+                                    {% if form.is_active.value %}checked{% endif %}
+                                >
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    {% trans "Active" %}
+                                </label>
+                                {% if form.is_active.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.is_active.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ form.is_active.help_text }}
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'datasets:category_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-{% if object %}check{% else %}plus-circle{% endif %} me-2"></i>
+                                {% if object %}
+                                    {% trans "Update Category" %}
+                                {% else %}
+                                    {% trans "Create Category" %}
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        {% trans "Category Guidelines" %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Choose a clear, descriptive name for the category" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Provide a helpful description to explain the category's purpose" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Select a color that represents the category visually" %}
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            {% trans "Only active categories will be available for dataset selection" %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Update text input when color picker changes
+document.getElementById('{{ form.color.id_for_label }}').addEventListener('input', function(e) {
+    const textInput = e.target.nextElementSibling;
+    textInput.value = e.target.value;
+});
+
+// Update color picker when text input changes
+document.querySelector('input[type="text"][readonly]').addEventListener('input', function(e) {
+    const colorInput = e.target.previousElementSibling;
+    if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+        colorInput.value = e.target.value;
+    }
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,319 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% if object %}
+        {% trans "Edit Dataset" %} - {% trans "ISR Datasets" %}
+    {% else %}
+        {% trans "Add Dataset" %} - {% trans "ISR Datasets" %}
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 class="h2 mb-1">
+                                {% if object %}
+                                    <i class="bi bi-pencil-square me-2"></i>
+                                    {% trans "Edit Dataset" %}
+                                {% else %}
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    {% trans "Add Dataset" %}
+                                {% endif %}
+                            </h1>
+                            <p class="text-muted">
+                                {% if object %}
+                                    {% trans "Update your dataset information" %}
+                                {% else %}
+                                    {% trans "Share your research data with the community" %}
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <a href="{% url 'datasets:dataset_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                {% trans "Back to Datasets" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="card">
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {% trans "Please correct the errors below." %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    {% trans "Basic Information" %}
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    {% trans "Dataset Title" %} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.title.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">
+                                    {% trans "Description" %} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.description.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.abstract.id_for_label }}" class="form-label">
+                                    {% trans "Abstract" %}
+                                </label>
+                                {{ form.abstract }}
+                                {% if form.abstract.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.abstract.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "Brief summary of the dataset (optional)" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">
+                                    {% trans "Category" %}
+                                </label>
+                                {{ form.category }}
+                                {% if form.category.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.category.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                    {% trans "Tags" %}
+                                </label>
+                                {{ form.tags }}
+                                {% if form.tags.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tags.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "Separate tags with commas" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="{{ form.keywords.id_for_label }}" class="form-label">
+                                    {% trans "Keywords" %}
+                                </label>
+                                {{ form.keywords }}
+                                {% if form.keywords.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.keywords.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "Keywords for search (one per line)" %}</div>
+                            </div>
+                        </div>
+
+
+                        <!-- Access & Status -->
+                        <hr class="my-4">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-shield-lock me-2"></i>
+                                    {% trans "Access & Status" %}
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    {% trans "Status" %}
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.status.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.access_level.id_for_label }}" class="form-label">
+                                    {% trans "Access Level" %}
+                                </label>
+                                {{ form.access_level }}
+                                {% if form.access_level.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.access_level.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if user.is_superuser %}
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    {{ form.is_featured }}
+                                    <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
+                                        {% trans "Featured Dataset" %}
+                                    </label>
+                                    <div class="form-text">{% trans "Show this dataset in the featured section" %}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Attribution -->
+                        <hr class="my-4">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-award me-2"></i>
+                                    {% trans "Attribution & License" %}
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.license.id_for_label }}" class="form-label">
+                                    {% trans "License" %}
+                                </label>
+                                {{ form.license }}
+                                {% if form.license.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.license.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "e.g., CC BY 4.0, MIT License" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.citation.id_for_label }}" class="form-label">
+                                    {% trans "Citation" %}
+                                </label>
+                                {{ form.citation }}
+                                {% if form.citation.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.citation.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "How to cite this dataset" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.doi.id_for_label }}" class="form-label">
+                                    {% trans "DOI" %}
+                                </label>
+                                {{ form.doi }}
+                                {% if form.doi.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.doi.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "Digital Object Identifier (optional)" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="{{ form.contributors.id_for_label }}" class="form-label">
+                                    {% trans "Contributors" %}
+                                </label>
+                                {{ form.contributors }}
+                                {% if form.contributors.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.contributors.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "Select users who contributed to this dataset" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="{{ form.related_datasets.id_for_label }}" class="form-label">
+                                    {% trans "Related Datasets" %}
+                                </label>
+                                {{ form.related_datasets }}
+                                {% if form.related_datasets.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.related_datasets.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{% trans "Select other datasets that are related to this one" %}</div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'datasets:dataset_list' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-circle me-2"></i>
+                                        {% trans "Cancel" %}
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        {% if object %}
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            {% trans "Update Dataset" %}
+                                        {% else %}
+                                            <i class="bi bi-plus-circle me-2"></i>
+                                            {% trans "Add Dataset" %}
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

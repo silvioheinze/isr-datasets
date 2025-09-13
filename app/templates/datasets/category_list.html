@@ -1,9 +1,7 @@
 {% extends "_base.html" %}
 {% load i18n %}
-{% load static %}
-{% load humanize %}
 
-{% block title %}{% trans "Role Management" %} - {% trans "ISR Datasets" %}{% endblock title %}
+{% block title %}{% trans "Categories" %} - {% trans "ISR Datasets" %}{% endblock title %}
 
 {% block content %}
 <div class="container mt-4">
@@ -13,19 +11,15 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="h2 mb-1">
-                        <i class="bi bi-shield-check me-2"></i>
-                        {% trans "Role Management" %}
+                        <i class="bi bi-tags me-2"></i>
+                        {% trans "Dataset Categories" %}
                     </h1>
-                    <p class="text-muted">{% trans "Manage user roles and permissions" %}</p>
+                    <p class="text-muted">{% trans "Manage dataset categories and their properties" %}</p>
                 </div>
                 <div>
-                    <a href="{% url 'role-create' %}" class="btn btn-primary">
+                    <a href="{% url 'datasets:category_create' %}" class="btn btn-primary">
                         <i class="bi bi-plus-circle me-2"></i>
-                        {% trans "Add Role" %}
-                    </a>
-                    <a href="{% url 'user-management' %}" class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-left me-2"></i>
-                        {% trans "Back to Management" %}
+                        {% trans "Add Category" %}
                     </a>
                 </div>
             </div>
@@ -39,21 +33,16 @@
                 <div class="card-body">
                     <form method="get" class="row g-3">
                         <div class="col-md-6">
-                            <label for="search" class="form-label">
+                            <label for="{{ filter_form.search.id_for_label }}" class="form-label">
                                 {% trans "Search" %}
                             </label>
-                            <input type="text" class="form-control" id="search" name="search" 
-                                   value="{{ search_query }}" placeholder="{% trans 'Search by name or description' %}">
+                            {{ filter_form.search }}
                         </div>
                         <div class="col-md-4">
-                            <label for="status" class="form-label">
+                            <label for="{{ filter_form.is_active.id_for_label }}" class="form-label">
                                 {% trans "Status" %}
                             </label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="">{% trans "All" %}</option>
-                                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>{% trans "Active" %}</option>
-                                <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>{% trans "Inactive" %}</option>
-                            </select>
+                            {{ filter_form.is_active }}
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">&nbsp;</label>
@@ -70,10 +59,10 @@
         </div>
     </div>
 
-    <!-- Roles List -->
+    <!-- Categories List -->
     <div class="row">
         <div class="col-12">
-            {% if roles %}
+            {% if categories %}
                 <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -82,56 +71,57 @@
                                     <tr>
                                         <th>{% trans "Name" %}</th>
                                         <th>{% trans "Description" %}</th>
-                                        <th>{% trans "Users" %}</th>
+                                        <th>{% trans "Color" %}</th>
                                         <th>{% trans "Status" %}</th>
+                                        <th>{% trans "Datasets" %}</th>
                                         <th>{% trans "Created" %}</th>
                                         <th>{% trans "Actions" %}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for role in roles %}
+                                    {% for category in categories %}
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <i class="bi bi-shield-check text-secondary me-2"></i>
-                                                <strong>{{ role.name }}</strong>
+                                                <span class="badge me-2" style="background-color: {{ category.color }}; color: white;">
+                                                    {{ category.name }}
+                                                </span>
                                             </div>
                                         </td>
                                         <td>
-                                            {% if role.description %}
-                                                {{ role.description|truncatechars:50 }}
+                                            {% if category.description %}
+                                                {{ category.description|truncatechars:50 }}
                                             {% else %}
                                                 <span class="text-muted">{% trans "No description" %}</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <span class="badge bg-info">{{ role.users.count }}</span>
+                                            <div class="d-flex align-items-center">
+                                                <div class="color-preview me-2" style="width: 20px; height: 20px; background-color: {{ category.color }}; border-radius: 3px; border: 1px solid #ddd;"></div>
+                                                <code class="small">{{ category.color }}</code>
+                                            </div>
                                         </td>
                                         <td>
-                                            {% if role.is_active %}
+                                            {% if category.is_active %}
                                                 <span class="badge bg-success">{% trans "Active" %}</span>
                                             {% else %}
                                                 <span class="badge bg-secondary">{% trans "Inactive" %}</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <small class="text-muted">{{ role.created_at|date:"M d, Y" }}</small>
+                                            <span class="badge bg-info">{{ category.datasets.count }}</span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ category.created_at|date:"M d, Y" }}</small>
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm" role="group">
-                                                <a href="{% url 'role-edit' role.id %}" class="btn btn-outline-primary" title="{% trans 'Edit' %}">
+                                                <a href="{% url 'datasets:category_edit' category.pk %}" class="btn btn-outline-primary" title="{% trans 'Edit' %}">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                {% if role.users.count == 0 %}
-                                                    <a href="{% url 'role-delete' role.id %}" class="btn btn-outline-danger" title="{% trans 'Delete' %}">
-                                                        <i class="bi bi-trash"></i>
-                                                    </a>
-                                                {% else %}
-                                                    <button class="btn btn-outline-danger" disabled 
-                                                            title="{% trans 'Cannot delete role with assigned users' %}">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                {% endif %}
+                                                <a href="{% url 'datasets:category_delete' category.pk %}" class="btn btn-outline-danger" title="{% trans 'Delete' %}">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
@@ -146,16 +136,16 @@
                 {% if is_paginated %}
                 <div class="row mt-4">
                     <div class="col-12">
-                        <nav aria-label="{% trans 'Roles pagination' %}">
+                        <nav aria-label="{% trans 'Categories pagination' %}">
                             <ul class="pagination justify-content-center">
                                 {% if page_obj.has_previous %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&is_active={{ selected_status }}{% endif %}">
                                             {% trans "First" %}
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&is_active={{ selected_status }}{% endif %}">
                                             {% trans "Previous" %}
                                         </a>
                                     </li>
@@ -169,12 +159,12 @@
 
                                 {% if page_obj.has_next %}
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&is_active={{ selected_status }}{% endif %}">
                                             {% trans "Next" %}
                                         </a>
                                     </li>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_status %}&is_active={{ selected_status }}{% endif %}">
                                             {% trans "Last" %}
                                         </a>
                                     </li>
@@ -184,27 +174,28 @@
                     </div>
                 </div>
                 {% endif %}
+
             {% else %}
                 <!-- Empty State -->
                 <div class="text-center py-5">
                     <div class="mb-4">
-                        <i class="bi bi-shield-check text-muted" style="font-size: 4rem;"></i>
+                        <i class="bi bi-tags text-muted" style="font-size: 4rem;"></i>
                     </div>
-                    <h3 class="h4 text-muted mb-3">{% trans "No Roles Found" %}</h3>
+                    <h3 class="h4 text-muted mb-3">{% trans "No Categories Found" %}</h3>
                     <p class="text-muted mb-4">
-                        {% if search_query or status_filter %}
-                            {% trans "No roles match your current filters. Try adjusting your search criteria." %}
+                        {% if search_query or selected_status %}
+                            {% trans "No categories match your current filters. Try adjusting your search criteria." %}
                         {% else %}
-                            {% trans "Get started by creating your first role." %}
+                            {% trans "Get started by creating your first dataset category." %}
                         {% endif %}
                     </p>
-                    {% if not search_query and not status_filter %}
-                        <a href="{% url 'role-create' %}" class="btn btn-primary">
+                    {% if not search_query and not selected_status %}
+                        <a href="{% url 'datasets:category_create' %}" class="btn btn-primary">
                             <i class="bi bi-plus-circle me-2"></i>
-                            {% trans "Create First Role" %}
+                            {% trans "Create First Category" %}
                         </a>
                     {% else %}
-                        <a href="{% url 'role-list' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'datasets:category_list' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-2"></i>
                             {% trans "Clear Filters" %}
                         </a>

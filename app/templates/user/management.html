@@ -3,120 +3,157 @@
 {% load static %}
 {% load humanize %}
 
-{% block title %}{% trans "User Management" %}{% endblock title %}
+{% block title %}{% trans "User Management" %} - {% trans "ISR Datasets" %}{% endblock title %}
 
 {% block content %}
-<div class="container-fluid mt-4">
-    <div class="row">
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1><i class="bi bi-people-fill"></i> {% trans "User Management" %}</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-people me-2"></i>
+                        {% trans "User Management" %}
+                    </h1>
+                    <p class="text-muted">{% trans "Manage users, roles, and permissions" %}</p>
+                </div>
                 <div>
                     <a href="{% url 'user-list' %}" class="btn btn-primary">
-                        <i class="bi bi-list"></i> {% trans "View All Users" %}
+                        <i class="bi bi-list me-2"></i>
+                        {% trans "View All Users" %}
                     </a>
-                    <a href="{% url 'role-list' %}" class="btn btn-secondary">
-                        <i class="bi bi-shield-check"></i> {% trans "Manage Roles" %}
+                    <a href="{% url 'role-list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-shield-check me-2"></i>
+                        {% trans "Manage Roles" %}
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ total_users }}</h4>
-                            <p class="card-text">{% trans "Total Users" %}</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-people fs-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ active_users }}</h4>
-                            <p class="card-text">{% trans "Active Users" %}</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-check-circle fs-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ users_with_roles }}</h4>
-                            <p class="card-text">{% trans "Users with Roles" %}</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-shield-check fs-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-3 mb-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4 class="card-title">{{ total_roles }}</h4>
-                            <p class="card-text">{% trans "Total Roles" %}</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="bi bi-shield fs-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
+    <!-- Statistics Overview -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-lightning"></i> {% trans "Quick Actions" %}</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        {% trans "User Statistics" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-primary">{{ total_users }}</h3>
+                                <p class="text-muted mb-0">{% trans "Total Users" %}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-success">{{ active_users }}</h3>
+                                <p class="text-muted mb-0">{% trans "Active Users" %}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-warning">{{ users_with_roles }}</h3>
+                                <p class="text-muted mb-0">{% trans "Users with Roles" %}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h3 class="text-info">{{ total_roles }}</h3>
+                                <p class="text-muted mb-0">{% trans "Total Roles" %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Actions -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <i class="bi bi-people text-primary mb-3" style="font-size: 2rem;"></i>
+                    <h6 class="card-title">{% trans "User Management" %}</h6>
+                    <p class="card-text small text-muted">
+                        {% trans "View, edit, and manage user accounts and their permissions." %}
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'user-list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-list me-1"></i>
+                            {% trans "View All Users" %}
+                        </a>
+                        <a href="{% url 'user-signup' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-person-plus me-1"></i>
+                            {% trans "Add New User" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-secondary">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-check text-secondary mb-3" style="font-size: 2rem;"></i>
+                    <h6 class="card-title">{% trans "Role Management" %}</h6>
+                    <p class="card-text small text-muted">
+                        {% trans "Create and manage user roles and permissions." %}
+                    </p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'role-list' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-list me-1"></i>
+                            {% trans "View All Roles" %}
+                        </a>
+                        <a href="{% url 'role-create' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-shield-plus me-1"></i>
+                            {% trans "Create New Role" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel me-2"></i>
+                        {% trans "Quick Filters" %}
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-2">
-                            <a href="{% url 'user-signup' %}" class="btn btn-outline-primary w-100">
-                                <i class="bi bi-person-plus"></i> {% trans "Add New User" %}
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-2">
-                            <a href="{% url 'role-create' %}" class="btn btn-outline-secondary w-100">
-                                <i class="bi bi-shield-plus"></i> {% trans "Create New Role" %}
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-2">
                             <a href="{% url 'user-list' %}?status=inactive" class="btn btn-outline-warning w-100">
-                                <i class="bi bi-person-x"></i> {% trans "Inactive Users" %}
+                                <i class="bi bi-person-x me-1"></i>
+                                {% trans "Inactive Users" %}
                             </a>
                         </div>
                         <div class="col-md-3 mb-2">
                             <a href="{% url 'user-list' %}?role=" class="btn btn-outline-info w-100">
-                                <i class="bi bi-person-question"></i> {% trans "Users without Roles" %}
+                                <i class="bi bi-person-question me-1"></i>
+                                {% trans "Users without Roles" %}
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'user-list' %}?recent=true" class="btn btn-outline-success w-100">
+                                <i class="bi bi-clock-history me-1"></i>
+                                {% trans "Recent Users" %}
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{% url 'admin:index' %}" class="btn btn-outline-dark w-100" target="_blank">
+                                <i class="bi bi-gear me-1"></i>
+                                {% trans "Django Admin" %}
                             </a>
                         </div>
                     </div>
@@ -130,7 +167,10 @@
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> {% trans "Recent Users" %}</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>
+                        {% trans "Recent Users" %}
+                    </h5>
                 </div>
                 <div class="card-body">
                     {% if recent_users %}
@@ -145,31 +185,6 @@
                                             <br>
                                             <span class="badge bg-secondary">{{ user.role.name }}</span>
                                         {% endif %}
-                                        {% for membership in user.group_memberships.all %}
-                                            {% if membership.is_active %}
-                                                {% for role in membership.roles.all %}
-                                                    {% if role.name == 'Group Admin' %}
-                                                        <span class="badge bg-warning me-1">
-                                                            <i class="bi bi-shield-check"></i> {% trans "Group Admin" %}
-                                                        </span>
-                                                    {% elif role.name == 'Leader' %}
-                                                        <span class="badge bg-primary me-1">
-                                                            <i class="bi bi-star"></i> {% trans "Leader" %}
-                                                        </span>
-                                                    {% elif role.name == 'Deputy Leader' %}
-                                                        <span class="badge bg-info me-1">
-                                                            <i class="bi bi-star-half"></i> {% trans "Deputy Leader" %}
-                                                        </span>
-                                                    {% elif role.name == 'Board Member' %}
-                                                        <span class="badge bg-dark me-1">
-                                                            <i class="bi bi-people"></i> {% trans "Board Member" %}
-                                                        </span>
-                                                    {% else %}
-                                                        <span class="badge bg-secondary me-1">{{ role.name }}</span>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endfor %}
                                     </div>
                                     <div class="text-end">
                                         <small class="text-muted">{{ user.date_joined|date:"M d, Y" }}</small>
@@ -191,7 +206,10 @@
         <div class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-shield-check"></i> {% trans "Recent Roles" %}</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-check me-2"></i>
+                        {% trans "Recent Roles" %}
+                    </h5>
                 </div>
                 <div class="card-body">
                     {% if recent_roles %}
@@ -225,40 +243,58 @@
         </div>
     </div>
 
-    <!-- System Information -->
+    <!-- Management Tips -->
     <div class="row">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> {% trans "System Information" %}</h5>
+                    <h5 class="mb-0">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        {% trans "Management Tips" %}
+                    </h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4">
-                            <h6>{% trans "User Statistics" %}</h6>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">{% trans "User Management" %}</h6>
                             <ul class="list-unstyled">
-                                <li><strong>{% trans "Active Users" %}:</strong> {{ active_users }}</li>
-                                <li><strong>{% trans "Inactive Users" %}:</strong> {{ inactive_users }}</li>
-                                <li><strong>{% trans "Users with Roles" %}:</strong> {{ users_with_roles }}</li>
-                                <li><strong>{% trans "Users without Roles" %}:</strong> {{ users_without_roles }}</li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    {% trans "Regularly review inactive user accounts" %}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    {% trans "Assign appropriate roles to new users" %}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    {% trans "Keep user information up to date" %}
+                                </li>
                             </ul>
                         </div>
-                        <div class="col-md-4">
-                            <h6>{% trans "Role Statistics" %}</h6>
+                        <div class="col-md-6">
+                            <h6 class="mb-3">{% trans "Role Management" %}</h6>
                             <ul class="list-unstyled">
-                                <li><strong>{% trans "Total Roles" %}:</strong> {{ total_roles }}</li>
-                                <li><strong>{% trans "Active Roles" %}:</strong> {{ active_roles }}</li>
-                                <li><strong>{% trans "Inactive Roles" %}:</strong> {{ total_roles|add:"-"|add:active_roles }}</li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    {% trans "Create clear, descriptive role names" %}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    {% trans "Document role permissions and responsibilities" %}
+                                </li>
+                                <li class="mb-2">
+                                    <i class="bi bi-check-circle text-success me-2"></i>
+                                    {% trans "Regularly audit role assignments" %}
+                                </li>
                             </ul>
                         </div>
-                        <div class="col-md-4">
-                            <h6>{% trans "Quick Links" %}</h6>
-                            <ul class="list-unstyled">
-                                <li><a href="{% url 'user-list' %}">{% trans "View All Users" %}</a></li>
-                                <li><a href="{% url 'role-list' %}">{% trans "View All Roles" %}</a></li>
-                                <li><a href="{% url 'admin:index' %}">{% trans "Django Admin" %}</a></li>
-                            </ul>
-                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>{% trans "Tip" %}:</strong>
+                        {% trans "Use the Django Admin interface for advanced user management tasks and bulk operations." %}
                     </div>
                 </div>
             </div>

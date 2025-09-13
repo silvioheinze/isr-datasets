@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'auditlog',
     'pages',
     'user',
+    'datasets',
 ]
 
 MIDDLEWARE = [

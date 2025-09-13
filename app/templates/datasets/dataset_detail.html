@@ -1,0 +1,422 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{{ dataset.title }} - {% trans "ISR Datasets" %}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'datasets:dataset_list' %}">{% trans "Datasets" %}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ dataset.title }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 mb-2">{{ dataset.title }}</h1>
+                    {% if dataset.category %}
+                    <span class="badge" style="background-color: {{ dataset.category.color }};">
+                        {{ dataset.category.name }}
+                    </span>
+                    {% endif %}
+                    {% if dataset.is_featured %}
+                    <span class="badge bg-warning ms-2">
+                        <i class="bi bi-star-fill me-1"></i>
+                        {% trans "Featured" %}
+                    </span>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if can_edit %}
+                    <a href="{% url 'datasets:dataset_edit' dataset.pk %}" class="btn btn-outline-primary me-2">
+                        <i class="bi bi-pencil me-2"></i>
+                        {% trans "Edit" %}
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'datasets:dataset_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        {% trans "Back" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Description -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% trans "Description" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ dataset.description|linebreaks }}</p>
+                    {% if dataset.abstract %}
+                    <hr>
+                    <h6>{% trans "Abstract" %}</h6>
+                    <p class="text-muted">{{ dataset.abstract|linebreaks }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Dataset Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        {% trans "Dataset Statistics" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Downloads" %}:</strong> {{ dataset.download_count }}</p>
+                            <p><strong>{% trans "Versions" %}:</strong> {{ dataset.versions.count }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>{% trans "Views" %}:</strong> {{ dataset.view_count }}</p>
+                            <p><strong>{% trans "Status" %}:</strong> 
+                                <span class="badge bg-{% if dataset.status == 'published' %}success{% elif dataset.status == 'draft' %}warning{% else %}secondary{% endif %}">
+                                    {{ dataset.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags and Keywords -->
+            {% if dataset.get_tags_list or dataset.keywords %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tags me-2"></i>
+                        {% trans "Tags & Keywords" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if dataset.get_tags_list %}
+                    <div class="mb-3">
+                        <strong>{% trans "Tags" %}:</strong>
+                        {% for tag in dataset.get_tags_list %}
+                        <span class="badge bg-secondary me-1">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if dataset.keywords %}
+                    <div>
+                        <strong>{% trans "Keywords" %}:</strong>
+                        <p class="text-muted mb-0">{{ dataset.keywords|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Attribution -->
+            {% if dataset.license or dataset.citation or dataset.doi or dataset.contributors.exists %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-award me-2"></i>
+                        {% trans "Attribution & License" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if dataset.contributors.exists %}
+                    <div class="mb-3">
+                        <strong>{% trans "Contributors" %}:</strong>
+                        <div class="mt-2">
+                            {% for contributor in dataset.contributors.all %}
+                            <span class="badge bg-primary me-1 mb-1">
+                                <i class="bi bi-person me-1"></i>
+                                {{ contributor.get_full_name|default:contributor.username }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if dataset.license %}
+                    <div class="mb-3">
+                        <strong>{% trans "License" %}:</strong> 
+                        <span class="badge bg-success">{{ dataset.license }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if dataset.citation %}
+                    <div class="mb-3">
+                        <strong>{% trans "Citation" %}:</strong>
+                        <div class="mt-2 p-3 bg-light rounded">
+                            <code class="text-dark">{{ dataset.citation|linebreaks }}</code>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if dataset.doi %}
+                    <div class="mb-3">
+                        <strong>{% trans "DOI" %}:</strong> 
+                        <a href="https://doi.org/{{ dataset.doi }}" target="_blank" class="text-decoration-none">
+                            <span class="badge bg-info">
+                                <i class="bi bi-link-45deg me-1"></i>
+                                {{ dataset.doi }}
+                            </span>
+                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Dataset Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-square me-2"></i>
+                        {% trans "Dataset Information" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <strong>{% trans "Owner" %}:</strong>
+                        <p class="mb-0">{{ dataset.owner.get_full_name|default:dataset.owner.username }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong>{% trans "Created" %}:</strong>
+                        <p class="mb-0">{{ dataset.created_at|date:"F d, Y" }}</p>
+                    </div>
+                    {% if dataset.published_at %}
+                    <div class="mb-3">
+                        <strong>{% trans "Published" %}:</strong>
+                        <p class="mb-0">{{ dataset.published_at|date:"F d, Y" }}</p>
+                    </div>
+                    {% endif %}
+                    <div class="mb-3">
+                        <strong>{% trans "Status" %}:</strong>
+                        <span class="badge 
+                            {% if dataset.status == 'published' %}bg-success
+                            {% elif dataset.status == 'draft' %}bg-warning
+                            {% elif dataset.status == 'archived' %}bg-secondary
+                            {% else %}bg-info{% endif %}">
+                            {{ dataset.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>{% trans "Access Level" %}:</strong>
+                        <span class="badge 
+                            {% if dataset.access_level == 'public' %}bg-success
+                            {% elif dataset.access_level == 'restricted' %}bg-warning
+                            {% else %}bg-danger{% endif %}">
+                            {{ dataset.get_access_level_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contributors -->
+            {% if dataset.contributors.exists %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        {% trans "Contributors" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for contributor in dataset.contributors.all %}
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-person-circle me-2"></i>
+                        <span>{{ contributor.get_full_name|default:contributor.username }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Statistics -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-graph-up me-2"></i>
+                        {% trans "Statistics" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-1">{{ dataset.download_count }}</h4>
+                                <small class="text-muted">{% trans "Downloads" %}</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-1">{{ dataset.versions.count }}</h4>
+                            <small class="text-muted">{% trans "Versions" %}</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dataset Versions -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h4 mb-0">
+                    <i class="bi bi-collection me-2"></i>
+                    {% trans "Dataset Versions" %}
+                </h3>
+                {% if user.is_authenticated and user.is_superuser or user == dataset.owner or user in dataset.contributors.all %}
+                <a href="{% url 'datasets:dataset_version_create' dataset.pk %}" class="btn btn-outline-primary">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    {% trans "Add New Version" %}
+                </a>
+                {% endif %}
+            </div>
+    {% if dataset.versions.exists %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{% trans "Version" %}</th>
+                                    <th>{% trans "Description" %}</th>
+                                    <th>{% trans "File Size" %}</th>
+                                    <th>{% trans "File Source" %}</th>
+                                    <th>{% trans "Created By" %}</th>
+                                    <th>{% trans "Created At" %}</th>
+                                    <th>{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for version in dataset.versions.all %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">v{{ version.version_number }}</span>
+                                        {% if forloop.first %}
+                                        <span class="badge bg-success ms-1">{% trans "Latest" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if version.description %}
+                                            {{ version.description|truncatechars:100 }}
+                                        {% else %}
+                                            <span class="text-muted">{% trans "No description" %}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ version.get_file_size_display }}
+                                    </td>
+                                    <td>
+                                        {% if version.file %}
+                                            <span class="badge bg-primary">
+                                                <i class="bi bi-upload me-1"></i>
+                                                {% trans "Uploaded" %}
+                                            </span>
+                                        {% elif version.file_url or version.file_url_description %}
+                                            <div>
+                                                <span class="badge bg-info">
+                                                    <i class="bi bi-link-45deg me-1"></i>
+                                                    {% trans "External" %}
+                                                </span>
+                                                {% if version.file_url_description %}
+                                                    <div class="small text-muted mt-1">
+                                                        {{ version.file_url_description|truncatechars:50 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if version.created_by %}
+                                            {{ version.created_by.get_full_name|default:version.created_by.username }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ version.created_at|date:"M d, Y H:i" }}</small>
+                                    </td>
+                                    <td>
+                                        {% if version.file %}
+                                        <a href="{% url 'datasets:dataset_download' dataset.pk %}?version={{ version.id }}" 
+                                           class="btn btn-outline-primary btn-sm" 
+                                           title="{% trans 'Download this version' %}">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        {% elif version.file_url %}
+                                        <a href="{{ version.file_url }}" 
+                                           class="btn btn-outline-info btn-sm" 
+                                           target="_blank"
+                                           title="{% trans 'Open external URL' %}">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                        {% else %}
+                                        <span class="text-muted">{% trans "No file" %}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+    {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-collection text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">{% trans "No versions yet" %}</h5>
+                    <p class="text-muted">{% trans "This dataset doesn't have any versions yet." %}</p>
+                </div>
+            </div>
+    {% endif %}
+        </div>
+    </div>
+
+    <!-- Related Datasets -->
+    {% if related_datasets %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="h4 mb-3">{% trans "Related Datasets" %}</h3>
+            <div class="row">
+                {% for related in related_datasets %}
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ related.title|truncatechars:50 }}</h6>
+                            <p class="card-text small text-muted">{{ related.abstract|truncatechars:80 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ related.download_count }} downloads</small>
+                                <a href="{% url 'datasets:dataset_detail' related.pk %}" class="btn btn-outline-primary btn-sm">
+                                    {% trans "View" %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}

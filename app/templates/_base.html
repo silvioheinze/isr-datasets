@@ -202,11 +202,9 @@
                      <li class="nav-item">
                          <a class="nav-link" href="{% url 'home' %}">Dashboard</a>
                      </li>
-                     {% if user.is_superuser %}
                      <li class="nav-item">
-                         <a class="nav-link" href="{% url 'user-management' %}">Users</a>
+                         <a class="nav-link" href="{% url 'datasets:dataset_list' %}">Datasets</a>
                      </li>
-                     {% endif %}
                  </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
@@ -215,6 +213,9 @@
                         </a>
                          <ul class="dropdown-menu dropdown-menu-end">
                              <li><a class="dropdown-item" href="{% url 'user-settings' %}">Settings</a></li>
+                             {% if user.is_superuser %}
+                             <li><a class="dropdown-item" href="{% url 'user-management' %}">Users</a></li>
+                             {% endif %}
                              <li><hr class="dropdown-divider"></li>
                              <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                          </ul>
