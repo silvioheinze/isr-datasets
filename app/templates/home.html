@@ -25,17 +25,17 @@
         <div class="col-md-3 mb-3">
             <div class="card stats-card h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-collection fs-1 mb-3"></i>
-                    <h3 class="card-title">1,247</h3>
-                    <p class="card-text">{% trans "Total Datasets" %}</p>
+                    <i class="bi bi-collection fs-1 mb-3 text-primary"></i>
+                    <h3 class="card-title">{{ total_datasets|default:0 }}</h3>
+                    <p class="card-text">{% trans "Published Datasets" %}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="card stats-card h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-download fs-1 mb-3"></i>
-                    <h3 class="card-title">15.2TB</h3>
+                    <i class="bi bi-download fs-1 mb-3 text-success"></i>
+                    <h3 class="card-title">{{ data_volume_display|default:"0KB" }}</h3>
                     <p class="card-text">{% trans "Data Volume" %}</p>
                 </div>
             </div>
@@ -43,8 +43,8 @@
         <div class="col-md-3 mb-3">
             <div class="card stats-card h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-people fs-1 mb-3"></i>
-                    <h3 class="card-title">342</h3>
+                    <i class="bi bi-people fs-1 mb-3 text-info"></i>
+                    <h3 class="card-title">{{ total_users|default:0 }}</h3>
                     <p class="card-text">{% trans "Active Users" %}</p>
                 </div>
             </div>
@@ -52,9 +52,9 @@
         <div class="col-md-3 mb-3">
             <div class="card stats-card h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-graph-up fs-1 mb-3"></i>
-                    <h3 class="card-title">89%</h3>
-                    <p class="card-text">{% trans "Uptime" %}</p>
+                    <i class="bi bi-graph-up fs-1 mb-3 text-warning"></i>
+                    <h3 class="card-title">{{ uptime_percentage|default:0 }}%</h3>
+                    <p class="card-text">{% trans "System Uptime" %}</p>
                 </div>
             </div>
         </div>
@@ -73,27 +73,27 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 mb-3">
-                            <a href="#" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
                                 <i class="bi bi-plus-circle fs-2 mb-2"></i>
                                 <span>{% trans "Add Dataset" %}</span>
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="#" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                            <a href="{% url 'datasets:dataset_list' %}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
                                 <i class="bi bi-search fs-2 mb-2"></i>
-                                <span>{% trans "Search Datasets" %}</span>
+                                <span>{% trans "Browse Datasets" %}</span>
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="#" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
-                                <i class="bi bi-graph-up fs-2 mb-2"></i>
-                                <span>{% trans "View Analytics" %}</span>
+                            <a href="{% url 'datasets:category_list' %}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="bi bi-tags fs-2 mb-2"></i>
+                                <span>{% trans "Manage Categories" %}</span>
                             </a>
                         </div>
                         <div class="col-md-3 mb-3">
-                            <a href="#" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
-                                <i class="bi bi-book fs-2 mb-2"></i>
-                                <span>{% trans "Documentation" %}</span>
+                            <a href="{% url 'user-settings' %}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="bi bi-gear fs-2 mb-2"></i>
+                                <span>{% trans "Settings" %}</span>
                             </a>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
         </div>
     </div>
 
-    <!-- Recent Activity -->
+    <!-- Recent Activity & Popular Datasets -->
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -113,35 +113,42 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-upload text-success me-2"></i>
-                                <strong>{% trans "New dataset uploaded" %}</strong>
-                                <br>
-                                <small class="text-muted">{% trans "Climate Data 2023" %} • 2 hours ago</small>
+                    {% if recent_versions %}
+                        <div class="list-group list-group-flush">
+                            {% for version in recent_versions %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-{% if version.dataset.status == 'published' %}upload{% else %}pencil{% endif %} {% if version.dataset.status == 'published' %}text-success{% else %}text-warning{% endif %} me-2"></i>
+                                    <strong>
+                                        {% if version.dataset.status == 'published' %}
+                                            {% trans "New version added" %}
+                                        {% else %}
+                                            {% trans "Version updated" %}
+                                        {% endif %}
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <a href="{% url 'datasets:dataset_detail' version.dataset.pk %}" class="text-decoration-none">
+                                            {{ version.dataset.title }}
+                                        </a> • {{ version.created_at|timesince }} {% trans "ago" %}
+                                    </small>
+                                </div>
+                                <span class="badge {% if version.dataset.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
+                                    {% if version.dataset.status == 'published' %}{% trans "Published" %}{% else %}{% trans "Draft" %}{% endif %}
+                                </span>
                             </div>
-                            <span class="badge bg-success">{% trans "New" %}</span>
+                            {% endfor %}
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-download text-primary me-2"></i>
-                                <strong>{% trans "Dataset downloaded" %}</strong>
-                                <br>
-                                <small class="text-muted">{% trans "Population Statistics" %} • 4 hours ago</small>
-                            </div>
-                            <span class="badge bg-primary">{% trans "Download" %}</span>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-clock-history fs-1 text-muted mb-3"></i>
+                            <p class="text-muted">{% trans "No recent activity found" %}</p>
+                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Add First Dataset" %}
+                            </a>
                         </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-pencil text-warning me-2"></i>
-                                <strong>{% trans "Dataset updated" %}</strong>
-                                <br>
-                                <small class="text-muted">{% trans "Economic Indicators" %} • 1 day ago</small>
-                            </div>
-                            <span class="badge bg-warning">{% trans "Updated" %}</span>
-                        </div>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -154,35 +161,105 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{% trans "Climate Data 2023" %}</h6>
-                                <small class="text-muted">1.2K downloads</small>
+                    {% if popular_datasets %}
+                        <div class="list-group list-group-flush">
+                            {% for dataset in popular_datasets %}
+                            <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ dataset.title }}</h6>
+                                    <small class="text-muted">{{ dataset.download_count }} {% trans "downloads" %}</small>
+                                </div>
+                                <p class="mb-1">{{ dataset.description|truncatechars:60 }}</p>
+                                <small class="text-muted">
+                                    {% trans "by" %} {{ dataset.owner.username }} • {{ dataset.updated_at|timesince }} {% trans "ago" %}
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-star fs-1 text-muted mb-3"></i>
+                            <p class="text-muted">{% trans "No datasets available yet" %}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Overview & User's Datasets -->
+    {% if categories_with_counts or user_datasets %}
+    <div class="row mt-4">
+        {% if categories_with_counts %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tags me-2"></i>
+                        {% trans "Dataset Categories" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for category in categories_with_counts %}
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge me-2" style="background-color: {{ category.color }}; color: {% if category.color == '#ffffff' or category.color == '#fff' %}#000{% else %}#fff{% endif %};">
+                                    {{ category.name }}
+                                </span>
+                                <small class="text-muted">{{ category.dataset_count }} {% trans "datasets" %}</small>
                             </div>
-                            <p class="mb-1">{% trans "Comprehensive climate measurements" %}</p>
-                            <small class="text-muted">{% trans "Updated 2 days ago" %}</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{% trans "Population Statistics" %}</h6>
-                                <small class="text-muted">856 downloads</small>
-                            </div>
-                            <p class="mb-1">{% trans "Demographic data by region" %}</p>
-                            <small class="text-muted">{% trans "Updated 1 week ago" %}</small>
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{% trans "Economic Indicators" %}</h6>
-                                <small class="text-muted">642 downloads</small>
-                            </div>
-                            <p class="mb-1">{% trans "GDP, inflation, and trade data" %}</p>
-                            <small class="text-muted">{% trans "Updated 3 days ago" %}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'datasets:category_list' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-tags me-2"></i>
+                            {% trans "View All Categories" %}
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+        {% endif %}
+        
+        {% if user_datasets %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-person-circle me-2"></i>
+                        {% trans "Your Datasets" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        {% for dataset in user_datasets %}
+                        <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ dataset.title }}</h6>
+                                <span class="badge {% if dataset.status == 'published' %}bg-success{% elif dataset.status == 'draft' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                    {{ dataset.get_status_display }}
+                                </span>
+                            </div>
+                            <p class="mb-1">{{ dataset.description|truncatechars:50 }}</p>
+                            <small class="text-muted">
+                                {{ dataset.versions.count }} {% trans "versions" %} • {{ dataset.updated_at|timesince }} {% trans "ago" %}
+                            </small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{% url 'datasets:dataset_create' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            {% trans "Add New Dataset" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
+    {% endif %}
 </div>
 {% endblock %}
