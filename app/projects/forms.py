@@ -127,7 +127,6 @@ class ProjectFilterForm(forms.Form):
     """Form for filtering projects"""
     
     STATUS_CHOICES = [('', _('All Statuses'))] + Project.STATUS_CHOICES
-    ACCESS_LEVEL_CHOICES = [('', _('All Access Levels'))] + Project.ACCESS_LEVEL_CHOICES
     
     search = forms.CharField(
         required=False,
@@ -145,25 +144,3 @@ class ProjectFilterForm(forms.Form):
         }),
         label=_('Status')
     )
-    access_level = forms.ChoiceField(
-        choices=ACCESS_LEVEL_CHOICES,
-        required=False,
-        widget=forms.Select(attrs={
-            'class': 'form-select'
-        }),
-        label=_('Access Level')
-    )
-    owner = forms.ModelChoiceField(
-        queryset=User.objects.all(),
-        required=False,
-        empty_label=_('All Owners'),
-        widget=forms.Select(attrs={
-            'class': 'form-select'
-        }),
-        label=_('Owner')
-    )
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Order users by username
-        self.fields['owner'].queryset = User.objects.order_by('username')

@@ -36,8 +36,6 @@ class ProjectListView(LoginRequiredMixin, ListView):
         # Apply filters
         search = self.request.GET.get('search')
         status = self.request.GET.get('status')
-        access_level = self.request.GET.get('access_level')
-        owner = self.request.GET.get('owner')
         
         if search:
             queryset = queryset.filter(
@@ -51,12 +49,6 @@ class ProjectListView(LoginRequiredMixin, ListView):
         if status:
             queryset = queryset.filter(status=status)
         
-        if access_level:
-            queryset = queryset.filter(access_level=access_level)
-        
-        if owner:
-            queryset = queryset.filter(owner_id=owner)
-        
         return queryset.order_by('-created_at')
     
     def get_context_data(self, **kwargs):
@@ -64,8 +56,6 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context['filter_form'] = ProjectFilterForm(self.request.GET)
         context['search_query'] = self.request.GET.get('search', '')
         context['selected_status'] = self.request.GET.get('status', '')
-        context['selected_access_level'] = self.request.GET.get('access_level', '')
-        context['selected_owner'] = self.request.GET.get('owner', '')
         return context
 
 
@@ -142,10 +132,12 @@ class ProjectUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'projects/project_form.html'
     
     def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Project.objects.all()
         return Project.objects.filter(
             Q(owner=self.request.user) |
             Q(collaborators=self.request.user)
-        ) | Project.objects.filter() if self.request.user.is_superuser else Project.objects.none()
+        )
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
