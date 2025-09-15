@@ -44,7 +44,7 @@ Create a `.env` file in the project root with the following variables:
 
 ```env
 # Database Configuration
-POSTGRES_DB=isrfield
+POSTGRES_DB=isrdatasets
 POSTGRES_USER=isruser
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_HOST=db
@@ -160,13 +160,13 @@ The application uses PostgreSQL with PostGIS extension for geospatial data suppo
 
 ```bash
 # Access database shell
-docker-compose exec db psql -U isruser -d isrfield
+docker-compose exec db psql -U isruser -d isrdatasets
 
 # Create database backup
-docker-compose exec db pg_dump -U isruser isrfield > backup.sql
+docker-compose exec db pg_dump -U isruser isrdatasets > backup.sql
 
 # Restore database backup
-docker-compose exec -T db psql -U isruser -d isrfield < backup.sql
+docker-compose exec -T db psql -U isruser -d isrdatasets < backup.sql
 ```
 
 ### Database Admin (pgAdmin)
