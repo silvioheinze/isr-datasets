@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from .models import Dataset, DatasetCategory, DatasetVersion
+from projects.models import Project
 
 User = get_user_model()
 
@@ -95,7 +96,6 @@ class DatasetForm(forms.ModelForm):
         # Configure project queryset based on user access
         if user and user.is_authenticated:
             # Show projects the user owns or collaborates on
-            from projects.models import Project
             accessible_projects = Project.objects.filter(
                 Q(owner=user) | Q(collaborators=user) | Q(access_level='public')
             ).distinct()
