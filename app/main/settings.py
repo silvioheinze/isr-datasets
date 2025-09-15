@@ -184,6 +184,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For developm
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # For production
 
 # Login/Logout URLs
+LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
