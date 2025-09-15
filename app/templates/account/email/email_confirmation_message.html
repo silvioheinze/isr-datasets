@@ -1,17 +1,17 @@
 {% extends "account/email/base_message.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Password Reset" %} - {{ site_name }}{% endblock %}
+{% block title %}{% trans "Email Confirmation" %} - {{ site_name }}{% endblock %}
 
 {% block header %}
-<h1>{% trans "Password Reset Request" %}</h1>
+<h1>{% trans "Confirm Your Email Address" %}</h1>
 {% endblock %}
 
 {% block content %}
 <style>
-    .reset-button {
+    .confirm-button {
         display: inline-block;
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
         color: white;
         text-decoration: none;
         padding: 12px 30px;
@@ -21,8 +21,8 @@
         text-align: center;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .reset-button:hover {
-        background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+    .confirm-button:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
     }
     .info-box {
         background-color: #e9ecef;
@@ -43,24 +43,22 @@
 
 <p>{% trans "Hello" %}{% if username %}, {{ username }}{% endif %},</p>
 
-<p>{% blocktrans %}You're receiving this email because you or someone else has requested a password reset for your user account. It can be safely ignored if you did not request a password reset.{% endblocktrans %}</p>
-
-<p>{% trans "Click the button below to reset your password:" %}</p>
+<p>{% blocktrans %}You're receiving this email because you have created an account on {{ site_name }}. To complete your registration, please confirm your email address by clicking the button below.{% endblocktrans %}</p>
 
 <div style="text-align: center;">
-    <a href="{{ password_reset_url }}" class="reset-button">
-        {% trans "Reset My Password" %}
+    <a href="{{ activate_url }}" class="confirm-button">
+        {% trans "Confirm Email Address" %}
     </a>
 </div>
 
 <div class="warning">
-    <strong>{% trans "Security Notice:" %}</strong>
-    <p>{% trans "This link will expire in 1 hour for security reasons. If you didn't request this password reset, please ignore this email." %}</p>
+    <strong>{% trans "Important:" %}</strong>
+    <p>{% trans "This confirmation link will expire in 7 days. If you didn't create an account, please ignore this email." %}</p>
 </div>
 
 <p>{% trans "If the button doesn't work, you can copy and paste this link into your browser:" %}</p>
 <p style="word-break: break-all; color: #007bff;">
-    {{ password_reset_url }}
+    {{ activate_url }}
 </p>
 
 {% if username %}
@@ -68,4 +66,6 @@
     <strong>{% trans "Your username:" %}</strong> {{ username }}
 </div>
 {% endif %}
+
+<p>{% trans "Once confirmed, you'll be able to access all features of the ISR Datasets platform." %}</p>
 {% endblock content %}
