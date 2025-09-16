@@ -28,6 +28,13 @@ DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,0.0.0.0,isrdatasets.dataplexity.eu').split(',')
 
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    'https://isrdatasets.dataplexity.eu',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+
 
 # Application definition
 
