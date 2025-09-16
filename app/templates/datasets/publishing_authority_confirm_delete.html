@@ -1,0 +1,169 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete Publishing Authority" %} - {% trans "ISR Datasets" %}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'datasets:publishing_authority_list' %}">{% trans "Publishing Authorities" %}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{% trans "Delete" %}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-trash me-2"></i>
+                        {% trans "Delete Publishing Authority" %}
+                    </h1>
+                    <p class="text-muted">{% trans "Are you sure you want to delete this publishing authority?" %}</p>
+                </div>
+            </div>
+
+            <!-- Confirmation Card -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <!-- Publishing Authority Info -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="bi bi-building me-2"></i>
+                            {% trans "Publishing Authority Details" %}
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <strong>{% trans "Name" %}:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                {{ object.name }}
+                            </div>
+                        </div>
+                        
+                        {% if object.description %}
+                        <div class="row mt-2">
+                            <div class="col-sm-3">
+                                <strong>{% trans "Description" %}:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                {{ object.description }}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if object.website %}
+                        <div class="row mt-2">
+                            <div class="col-sm-3">
+                                <strong>{% trans "Website" %}:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <a href="{{ object.website }}" target="_blank" class="text-decoration-none">
+                                    <i class="bi bi-link-45deg me-1"></i>
+                                    {{ object.website }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mt-2">
+                            <div class="col-sm-3">
+                                <strong>{% trans "Status" %}:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                {% if object.is_active %}
+                                    <span class="badge bg-success">{% trans "Active" %}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                                {% endif %}
+                                
+                                {% if object.is_default %}
+                                    <span class="badge bg-primary ms-2">{% trans "Default" %}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-2">
+                            <div class="col-sm-3">
+                                <strong>{% trans "Created" %}:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                {{ object.created_at|date:"F d, Y \a\t g:i A" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Information -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            {% trans "Usage Information" %}
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <strong>{% trans "Datasets" %}:</strong>
+                            </div>
+                            <div class="col-sm-9">
+                                <span class="badge bg-secondary">{{ dataset_count }}</span>
+                                {% if dataset_count > 0 %}
+                                    <span class="text-muted ms-2">
+                                        {% trans "This publishing authority is used by" %} {{ dataset_count }} {% trans "dataset(s)" %}.
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted ms-2">
+                                        {% trans "This publishing authority is not used by any datasets." %}
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Messages -->
+                    {% if dataset_count > 0 %}
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>{% trans "Warning" %}:</strong>
+                            {% trans "This publishing authority cannot be deleted because it is used by" %} {{ dataset_count }} {% trans "dataset(s)" %}.
+                            {% trans "Please reassign or remove the datasets first." %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>{% trans "Warning" %}:</strong>
+                            {% trans "This action cannot be undone. The publishing authority will be permanently deleted." %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'datasets:publishing_authority_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>
+                            {% trans "Cancel" %}
+                        </a>
+                        
+                        {% if can_delete %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash me-2"></i>
+                                    {% trans "Delete Publishing Authority" %}
+                                </button>
+                            </form>
+                        {% else %}
+                            <button type="button" class="btn btn-danger" disabled>
+                                <i class="bi bi-trash me-2"></i>
+                                {% trans "Cannot Delete" %}
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

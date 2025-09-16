@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Dataset, DatasetCategory, DatasetVersion, Comment
+from .models import Dataset, DatasetCategory, DatasetVersion, Comment, PublishingAuthority
 from projects.models import Project
 
 User = get_user_model()
@@ -58,10 +58,9 @@ class DatasetForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Digital Object Identifier'
             }),
-            'publishing_authority': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'e.g., University of Vienna, Research Institute'
-            }),
+                'publishing_authority': forms.Select(attrs={
+                    'class': 'form-select'
+                }),
             'uri_ref': forms.URLInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'https://example.com/dataset-identifier'
@@ -92,6 +91,10 @@ class DatasetForm(forms.ModelForm):
         
         # Only show active categories
         self.fields['category'].queryset = DatasetCategory.objects.filter(is_active=True)
+        
+        # Only show active publishing authorities
+        self.fields['publishing_authority'].queryset = PublishingAuthority.objects.filter(is_active=True)
+        self.fields['publishing_authority'].empty_label = "Select a publishing authority..."
         
         # Configure related datasets queryset
         if self.instance.pk:
@@ -439,3 +442,63 @@ class CommentEditForm(forms.ModelForm):
         if content and len(content.strip()) < 10:
             raise forms.ValidationError('Comment must be at least 10 characters long.')
         return content.strip()
+
+
+class PublishingAuthorityForm(forms.ModelForm):
+    """Form for creating and editing publishing authorities"""
+    
+    class Meta:
+        model = PublishingAuthority
+        fields = ['name', 'description', 'website', 'is_active', 'is_default']
+        widgets = {
+            'name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g., University of Vienna, Research Institute'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional description of the publishing authority'
+            }),
+            'website': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'https://example.com'
+            }),
+            'is_active': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'is_default': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['name'].label = 'Name'
+        self.fields['description'].label = 'Description'
+        self.fields['website'].label = 'Website'
+        self.fields['is_active'].label = 'Active'
+        self.fields['is_default'].label = 'Default'
+        
+        # Add help text
+        self.fields['name'].help_text = 'Name of the publishing authority'
+        self.fields['description'].help_text = 'Optional description'
+        self.fields['website'].help_text = 'Official website URL'
+        self.fields['is_active'].help_text = 'Whether this authority is available for selection'
+        self.fields['is_default'].help_text = 'Whether this is the default authority for new datasets'
+
+
+class PublishingAuthorityFilterForm(forms.Form):
+    """Form for filtering publishing authorities"""
+    name = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Search publishing authorities...'
+        })
+    )
+    is_active = forms.ChoiceField(
+        choices=[('', 'All'), ('true', 'Active'), ('false', 'Inactive')],
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )

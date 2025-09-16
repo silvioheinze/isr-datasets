@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponse, Http404
@@ -10,8 +10,8 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db import transaction
 
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment
-from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, PublishingAuthority
+from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublishingAuthorityForm, PublishingAuthorityFilterForm
 
 
 class DatasetListView(ListView):
@@ -454,3 +454,118 @@ def send_comment_notification_email(comment):
     except Exception as e:
         # Log the error but don't break the comment creation
         print(f"Failed to send comment notification email: {e}")
+
+
+# Publishing Authority Views
+class PublishingAuthorityListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """List all publishing authorities"""
+    model = PublishingAuthority
+    context_object_name = 'publishing_authorities'
+    template_name = 'datasets/publishing_authority_list.html'
+    paginate_by = 20
+
+    def test_func(self):
+        # Allow access only if user is superuser
+        return self.request.user.is_superuser
+
+    def get_queryset(self):
+        queryset = PublishingAuthority.objects.all().order_by('name')
+        
+        # Filter by search query
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(name__icontains=search_query) |
+                Q(description__icontains=search_query)
+            )
+        
+        # Filter by active status
+        is_active_filter = self.request.GET.get('is_active', '')
+        if is_active_filter == 'true':
+            queryset = queryset.filter(is_active=True)
+        elif is_active_filter == 'false':
+            queryset = queryset.filter(is_active=False)
+        
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['is_active_filter'] = self.request.GET.get('is_active', '')
+        return context
+
+
+class PublishingAuthorityCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """Create a new publishing authority"""
+    model = PublishingAuthority
+    form_class = PublishingAuthorityForm
+    template_name = 'datasets/publishing_authority_form.html'
+    success_url = reverse_lazy('datasets:publishing_authority_list')
+
+    def test_func(self):
+        # Allow access only if user is superuser
+        return self.request.user.is_superuser
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Publishing authority created successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
+
+
+class PublishingAuthorityUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update an existing publishing authority"""
+    model = PublishingAuthority
+    form_class = PublishingAuthorityForm
+    template_name = 'datasets/publishing_authority_form.html'
+    success_url = reverse_lazy('datasets:publishing_authority_list')
+
+    def test_func(self):
+        # Allow access only if user is superuser
+        return self.request.user.is_superuser
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Publishing authority updated successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
+
+
+class PublishingAuthorityDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Delete a publishing authority"""
+    model = PublishingAuthority
+    template_name = 'datasets/publishing_authority_confirm_delete.html'
+    success_url = reverse_lazy('datasets:publishing_authority_list')
+
+    def test_func(self):
+        # Allow access only if user is superuser
+        return self.request.user.is_superuser
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        publishing_authority = self.get_object()
+        
+        # Check if publishing authority is used by any datasets
+        dataset_count = Dataset.objects.filter(publishing_authority=publishing_authority).count()
+        context['dataset_count'] = dataset_count
+        context['can_delete'] = dataset_count == 0
+        
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        publishing_authority = self.get_object()
+        dataset_count = Dataset.objects.filter(publishing_authority=publishing_authority).count()
+        
+        if dataset_count > 0:
+            messages.error(
+                request, 
+                f'Cannot delete "{publishing_authority.name}" because it is used by {dataset_count} dataset(s).'
+            )
+            return redirect('datasets:publishing_authority_list')
+        
+        messages.success(request, f'Publishing authority "{publishing_authority.name}" deleted successfully.')
+        return super().delete(request, *args, **kwargs)

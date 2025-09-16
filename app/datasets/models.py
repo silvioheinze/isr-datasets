@@ -8,6 +8,52 @@ from auditlog.models import AuditlogHistoryField
 User = get_user_model()
 
 
+class PublishingAuthority(models.Model):
+    """Model for dataset publishing authorities"""
+    name = models.CharField(
+        max_length=200, 
+        unique=True,
+        verbose_name=_('Name'),
+        help_text=_('Name of the publishing authority (e.g., University of Vienna, Research Institute)')
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name=_('Description'),
+        help_text=_('Optional description of the publishing authority')
+    )
+    website = models.URLField(
+        blank=True,
+        verbose_name=_('Website'),
+        help_text=_('Official website of the publishing authority')
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name=_('Active'),
+        help_text=_('Whether this publishing authority is active and available for selection')
+    )
+    is_default = models.BooleanField(
+        default=False,
+        verbose_name=_('Default'),
+        help_text=_('Whether this is the default publishing authority for new datasets')
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _('Publishing Authority')
+        verbose_name_plural = _('Publishing Authorities')
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        # Ensure only one default publishing authority
+        if self.is_default:
+            PublishingAuthority.objects.filter(is_default=True).update(is_default=False)
+        super().save(*args, **kwargs)
+
+
 class DatasetCategory(models.Model):
     """Category model for organizing datasets"""
     name = models.CharField(max_length=100, unique=True)
@@ -102,10 +148,14 @@ class Dataset(models.Model):
     doi = models.CharField(max_length=100, blank=True, help_text='Digital Object Identifier')
     
     # Publishing information
-    publishing_authority = models.CharField(
-        max_length=200, 
-        blank=True, 
-        help_text='The organization or institution that published this dataset'
+    publishing_authority = models.ForeignKey(
+        PublishingAuthority,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='datasets',
+        verbose_name=_('Publishing Authority'),
+        help_text=_('The organization or institution that published this dataset')
     )
     uri_ref = models.URLField(
         blank=True, 
@@ -297,6 +347,7 @@ class Comment(models.Model):
 
 
 # Register models for audit logging
+auditlog.register(PublishingAuthority)
 auditlog.register(Dataset)
 auditlog.register(DatasetCategory)
 auditlog.register(DatasetVersion)

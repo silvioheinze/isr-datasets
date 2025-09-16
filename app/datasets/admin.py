@@ -2,7 +2,44 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, PublishingAuthority
+
+
+@admin.register(PublishingAuthority)
+class PublishingAuthorityAdmin(admin.ModelAdmin):
+    list_display = ['name', 'website_display', 'dataset_count', 'is_active', 'is_default', 'created_at']
+    list_filter = ['is_active', 'is_default', 'created_at']
+    search_fields = ['name', 'description', 'website']
+    list_editable = ['is_active', 'is_default']
+    ordering = ['name']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'website')
+        }),
+        ('Settings', {
+            'fields': ('is_active', 'is_default')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    def website_display(self, obj):
+        if obj.website:
+            return format_html('<a href="{}" target="_blank">{}</a>', obj.website, obj.website)
+        return '-'
+    website_display.short_description = 'Website'
+    
+    def dataset_count(self, obj):
+        return obj.datasets.count()
+    dataset_count.short_description = 'Datasets'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('datasets')
 
 
 @admin.register(DatasetCategory)

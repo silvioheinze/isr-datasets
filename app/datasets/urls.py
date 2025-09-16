@@ -26,4 +26,10 @@ urlpatterns = [
     path('<int:dataset_id>/comment/add/', views.add_comment, name='add_comment'),
     path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
+    
+    # Publishing Authority views
+    path('publishing-authorities/', views.PublishingAuthorityListView.as_view(), name='publishing_authority_list'),
+    path('publishing-authorities/create/', views.PublishingAuthorityCreateView.as_view(), name='publishing_authority_create'),
+    path('publishing-authorities/<int:pk>/edit/', views.PublishingAuthorityUpdateView.as_view(), name='publishing_authority_edit'),
+    path('publishing-authorities/<int:pk>/delete/', views.PublishingAuthorityDeleteView.as_view(), name='publishing_authority_delete'),
 ]

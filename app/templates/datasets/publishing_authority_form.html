@@ -1,0 +1,184 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% if object %}
+        {% trans "Edit Publishing Authority" %} - {% trans "ISR Datasets" %}
+    {% else %}
+        {% trans "Add Publishing Authority" %} - {% trans "ISR Datasets" %}
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'datasets:publishing_authority_list' %}">{% trans "Publishing Authorities" %}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                {% if object %}
+                                    {% trans "Edit" %}
+                                {% else %}
+                                    {% trans "Add" %}
+                                {% endif %}
+                            </li>
+                        </ol>
+                    </nav>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-building me-2"></i>
+                        {% if object %}
+                            {% trans "Edit Publishing Authority" %}
+                        {% else %}
+                            {% trans "Add Publishing Authority" %}
+                        {% endif %}
+                    </h1>
+                    <p class="text-muted">
+                        {% if object %}
+                            {% trans "Update the publishing authority information" %}
+                        {% else %}
+                            {% trans "Create a new publishing authority for datasets" %}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {% trans "Please correct the errors below." %}
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <p class="mb-0">{{ field.label }}: {{ error }}</p>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <p class="mb-0">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-info-circle me-2"></i>
+                                {% trans "Basic Information" %}
+                            </h5>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">
+                                    <i class="bi bi-building me-1"></i>
+                                    {{ form.name.label }}
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.name.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.name.help_text }}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">
+                                    <i class="bi bi-text-paragraph me-1"></i>
+                                    {{ form.description.label }}
+                                </label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.description.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.description.help_text }}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.website.id_for_label }}" class="form-label">
+                                    <i class="bi bi-link-45deg me-1"></i>
+                                    {{ form.website.label }}
+                                </label>
+                                {{ form.website }}
+                                {% if form.website.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.website.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.website.help_text }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Settings -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="bi bi-gear me-2"></i>
+                                {% trans "Settings" %}
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-3">
+                                        {{ form.is_active }}
+                                        <label for="{{ form.is_active.id_for_label }}" class="form-check-label">
+                                            <i class="bi bi-toggle-on me-1"></i>
+                                            {{ form.is_active.label }}
+                                        </label>
+                                        {% if form.is_active.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.is_active.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">{{ form.is_active.help_text }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-3">
+                                        {{ form.is_default }}
+                                        <label for="{{ form.is_default.id_for_label }}" class="form-check-label">
+                                            <i class="bi bi-star me-1"></i>
+                                            {{ form.is_default.label }}
+                                        </label>
+                                        {% if form.is_default.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.is_default.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="form-text">{{ form.is_default.help_text }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'datasets:publishing_authority_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                {% trans "Back to List" %}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save me-2"></i>
+                                {% if object %}
+                                    {% trans "Update Publishing Authority" %}
+                                {% else %}
+                                    {% trans "Create Publishing Authority" %}
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

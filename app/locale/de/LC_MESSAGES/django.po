@@ -2210,6 +2210,414 @@ msgstr "E-Mail-Benachrichtigungen:"
 msgid "You can manage your email notification preferences in your account settings."
 msgstr "Sie können Ihre E-Mail-Benachrichtigungseinstellungen in Ihren Kontoeinstellungen verwalten."
 
+#: datasets/models.py:13
+msgid "Name"
+msgstr "Name"
+
+#: datasets/models.py:17
+msgid "Name of the publishing authority (e.g., University of Vienna, Research Institute)"
+msgstr "Name der Veröffentlichungsbehörde (z.B. Universität Wien, Forschungsinstitut)"
+
+#: datasets/models.py:20
+msgid "Description"
+msgstr "Beschreibung"
+
+#: datasets/models.py:23
+msgid "Optional description of the publishing authority"
+msgstr "Optionale Beschreibung der Veröffentlichungsbehörde"
+
+#: datasets/models.py:25
+msgid "Website"
+msgstr "Website"
+
+#: datasets/models.py:27
+msgid "Official website of the publishing authority"
+msgstr "Offizielle Website der Veröffentlichungsbehörde"
+
+#: datasets/models.py:30
+msgid "Active"
+msgstr "Aktiv"
+
+#: datasets/models.py:32
+msgid "Whether this publishing authority is active and available for selection"
+msgstr "Ob diese Veröffentlichungsbehörde aktiv und zur Auswahl verfügbar ist"
+
+#: datasets/models.py:35
+msgid "Default"
+msgstr "Standard"
+
+#: datasets/models.py:37
+msgid "Whether this is the default publishing authority for new datasets"
+msgstr "Ob dies die Standard-Veröffentlichungsbehörde für neue Datensätze ist"
+
+#: datasets/models.py:43
+msgid "Publishing Authority"
+msgstr "Veröffentlichungsbehörde"
+
+#: datasets/models.py:44
+msgid "Publishing Authorities"
+msgstr "Veröffentlichungsbehörden"
+
+#: datasets/models.py:158
+msgid "Publishing Authority"
+msgstr "Veröffentlichungsbehörde"
+
+#: datasets/models.py:159
+msgid "The organization or institution that published this dataset"
+msgstr "Die Organisation oder Institution, die diesen Datensatz veröffentlicht hat"
+
+#: datasets/forms.py:484
+msgid "Name of the publishing authority"
+msgstr "Name der Veröffentlichungsbehörde"
+
+#: datasets/forms.py:485
+msgid "Optional description"
+msgstr "Optionale Beschreibung"
+
+#: datasets/forms.py:486
+msgid "Official website URL"
+msgstr "Offizielle Website-URL"
+
+#: datasets/forms.py:487
+msgid "Whether this authority is available for selection"
+msgstr "Ob diese Behörde zur Auswahl verfügbar ist"
+
+#: datasets/forms.py:488
+msgid "Whether this is the default authority for new datasets"
+msgstr "Ob dies die Standard-Behörde für neue Datensätze ist"
+
+#: templates/datasets/dataset_list.html:29
+msgid "Manage Publishing Authorities"
+msgstr "Veröffentlichungsbehörden verwalten"
+
+#: templates/datasets/publishing_authority_list.html:6
+msgid "Publishing Authorities"
+msgstr "Veröffentlichungsbehörden"
+
+#: templates/datasets/publishing_authority_list.html:12
+msgid "Manage publishing authorities for datasets"
+msgstr "Veröffentlichungsbehörden für Datensätze verwalten"
+
+#: templates/datasets/publishing_authority_list.html:18
+msgid "Add Publishing Authority"
+msgstr "Veröffentlichungsbehörde hinzufügen"
+
+#: templates/datasets/publishing_authority_list.html:26
+msgid "Search"
+msgstr "Suchen"
+
+#: templates/datasets/publishing_authority_list.html:28
+msgid "Search by name or description..."
+msgstr "Nach Name oder Beschreibung suchen..."
+
+#: templates/datasets/publishing_authority_list.html:32
+msgid "Status"
+msgstr "Status"
+
+#: templates/datasets/publishing_authority_list.html:33
+msgid "All"
+msgstr "Alle"
+
+#: templates/datasets/publishing_authority_list.html:34
+msgid "Active"
+msgstr "Aktiv"
+
+#: templates/datasets/publishing_authority_list.html:35
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: templates/datasets/publishing_authority_list.html:40
+msgid "Filter"
+msgstr "Filtern"
+
+#: templates/datasets/publishing_authority_list.html:50
+msgid "Name"
+msgstr "Name"
+
+#: templates/datasets/publishing_authority_list.html:51
+msgid "Website"
+msgstr "Website"
+
+#: templates/datasets/publishing_authority_list.html:52
+msgid "Datasets"
+msgstr "Datensätze"
+
+#: templates/datasets/publishing_authority_list.html:54
+msgid "Default"
+msgstr "Standard"
+
+#: templates/datasets/publishing_authority_list.html:55
+msgid "Created"
+msgstr "Erstellt"
+
+#: templates/datasets/publishing_authority_list.html:56
+msgid "Actions"
+msgstr "Aktionen"
+
+#: templates/datasets/publishing_authority_list.html:75
+msgid "Website"
+msgstr "Website"
+
+#: templates/datasets/publishing_authority_list.html:85
+msgid "Active"
+msgstr "Aktiv"
+
+#: templates/datasets/publishing_authority_list.html:87
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: templates/datasets/publishing_authority_list.html:91
+msgid "Default"
+msgstr "Standard"
+
+#: templates/datasets/publishing_authority_list.html:99
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: templates/datasets/publishing_authority_list.html:103
+msgid "Delete"
+msgstr "Löschen"
+
+#: templates/datasets/publishing_authority_list.html:110
+msgid "Publishing authorities pagination"
+msgstr "Veröffentlichungsbehörden-Seitennummerierung"
+
+#: templates/datasets/publishing_authority_list.html:112
+msgid "First"
+msgstr "Erste"
+
+#: templates/datasets/publishing_authority_list.html:118
+msgid "Previous"
+msgstr "Vorherige"
+
+#: templates/datasets/publishing_authority_list.html:123
+msgid "Page"
+msgstr "Seite"
+
+#: templates/datasets/publishing_authority_list.html:123
+msgid "of"
+msgstr "von"
+
+#: templates/datasets/publishing_authority_list.html:128
+msgid "Next"
+msgstr "Nächste"
+
+#: templates/datasets/publishing_authority_list.html:134
+msgid "Last"
+msgstr "Letzte"
+
+#: templates/datasets/publishing_authority_list.html:145
+msgid "No publishing authorities found"
+msgstr "Keine Veröffentlichungsbehörden gefunden"
+
+#: templates/datasets/publishing_authority_list.html:147
+msgid "Try adjusting your search criteria or"
+msgstr "Versuchen Sie, Ihre Suchkriterien anzupassen oder"
+
+#: templates/datasets/publishing_authority_list.html:147
+msgid "clear all filters"
+msgstr "alle Filter löschen"
+
+#: templates/datasets/publishing_authority_list.html:150
+msgid "Get started by creating your first publishing authority."
+msgstr "Beginnen Sie mit der Erstellung Ihrer ersten Veröffentlichungsbehörde."
+
+#: templates/datasets/publishing_authority_list.html:153
+msgid "Add Publishing Authority"
+msgstr "Veröffentlichungsbehörde hinzufügen"
+
+#: templates/datasets/publishing_authority_form.html:6
+msgid "Edit Publishing Authority"
+msgstr "Veröffentlichungsbehörde bearbeiten"
+
+#: templates/datasets/publishing_authority_form.html:8
+msgid "Add Publishing Authority"
+msgstr "Veröffentlichungsbehörde hinzufügen"
+
+#: templates/datasets/publishing_authority_form.html:18
+msgid "Publishing Authorities"
+msgstr "Veröffentlichungsbehörden"
+
+#: templates/datasets/publishing_authority_form.html:20
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: templates/datasets/publishing_authority_form.html:20
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: templates/datasets/publishing_authority_form.html:25
+msgid "Edit Publishing Authority"
+msgstr "Veröffentlichungsbehörde bearbeiten"
+
+#: templates/datasets/publishing_authority_form.html:27
+msgid "Add Publishing Authority"
+msgstr "Veröffentlichungsbehörde hinzufügen"
+
+#: templates/datasets/publishing_authority_form.html:30
+msgid "Update the publishing authority information"
+msgstr "Aktualisieren Sie die Informationen der Veröffentlichungsbehörde"
+
+#: templates/datasets/publishing_authority_form.html:32
+msgid "Create a new publishing authority for datasets"
+msgstr "Erstellen Sie eine neue Veröffentlichungsbehörde für Datensätze"
+
+#: templates/datasets/publishing_authority_form.html:50
+msgid "Basic Information"
+msgstr "Grundinformationen"
+
+#: templates/datasets/publishing_authority_form.html:55
+msgid "Name"
+msgstr "Name"
+
+#: templates/datasets/publishing_authority_form.html:70
+msgid "Description"
+msgstr "Beschreibung"
+
+#: templates/datasets/publishing_authority_form.html:85
+msgid "Website"
+msgstr "Website"
+
+#: templates/datasets/publishing_authority_form.html:100
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: templates/datasets/publishing_authority_form.html:108
+msgid "Active"
+msgstr "Aktiv"
+
+#: templates/datasets/publishing_authority_form.html:120
+msgid "Default"
+msgstr "Standard"
+
+#: templates/datasets/publishing_authority_form.html:135
+msgid "Back to List"
+msgstr "Zurück zur Liste"
+
+#: templates/datasets/publishing_authority_form.html:140
+msgid "Update Publishing Authority"
+msgstr "Veröffentlichungsbehörde aktualisieren"
+
+#: templates/datasets/publishing_authority_form.html:142
+msgid "Create Publishing Authority"
+msgstr "Veröffentlichungsbehörde erstellen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:6
+msgid "Delete Publishing Authority"
+msgstr "Veröffentlichungsbehörde löschen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:18
+msgid "Publishing Authorities"
+msgstr "Veröffentlichungsbehörden"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:20
+msgid "Delete"
+msgstr "Löschen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:25
+msgid "Delete Publishing Authority"
+msgstr "Veröffentlichungsbehörde löschen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:28
+msgid "Are you sure you want to delete this publishing authority?"
+msgstr "Sind Sie sicher, dass Sie diese Veröffentlichungsbehörde löschen möchten?"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:36
+msgid "Publishing Authority Details"
+msgstr "Details der Veröffentlichungsbehörde"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:40
+msgid "Name"
+msgstr "Name"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:48
+msgid "Description"
+msgstr "Beschreibung"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:58
+msgid "Website"
+msgstr "Website"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:70
+msgid "Status"
+msgstr "Status"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:73
+msgid "Active"
+msgstr "Aktiv"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:75
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:78
+msgid "Default"
+msgstr "Standard"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:85
+msgid "Created"
+msgstr "Erstellt"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:92
+msgid "Usage Information"
+msgstr "Nutzungsinformationen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:96
+msgid "Datasets"
+msgstr "Datensätze"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:99
+msgid "This publishing authority is used by"
+msgstr "Diese Veröffentlichungsbehörde wird verwendet von"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:99
+msgid "dataset(s)"
+msgstr "Datensatz(en)"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:101
+msgid "This publishing authority is not used by any datasets."
+msgstr "Diese Veröffentlichungsbehörde wird von keinem Datensatz verwendet."
+
+#: templates/datasets/publishing_authority_confirm_delete.html:107
+msgid "Warning"
+msgstr "Warnung"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:108
+msgid "This publishing authority cannot be deleted because it is used by"
+msgstr "Diese Veröffentlichungsbehörde kann nicht gelöscht werden, da sie verwendet wird von"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:108
+msgid "dataset(s)"
+msgstr "Datensatz(en)"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:108
+msgid "Please reassign or remove the datasets first."
+msgstr "Bitte weisen Sie die Datensätze neu zu oder entfernen Sie sie zuerst."
+
+#: templates/datasets/publishing_authority_confirm_delete.html:112
+msgid "Warning"
+msgstr "Warnung"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:113
+msgid "This action cannot be undone. The publishing authority will be permanently deleted."
+msgstr "Diese Aktion kann nicht rückgängig gemacht werden. Die Veröffentlichungsbehörde wird dauerhaft gelöscht."
+
+#: templates/datasets/publishing_authority_confirm_delete.html:119
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:125
+msgid "Delete Publishing Authority"
+msgstr "Veröffentlichungsbehörde löschen"
+
+#: templates/datasets/publishing_authority_confirm_delete.html:130
+msgid "Cannot Delete"
+msgstr "Kann nicht gelöscht werden"
+
+#: templates/datasets/dataset_list.html:160
+msgid "No authority"
+msgstr "Keine Behörde"
+
 #: templates/user/list.html:6 templates/user/list.html:17
 #: templates/user/role_list.html:85
 msgid "Users"

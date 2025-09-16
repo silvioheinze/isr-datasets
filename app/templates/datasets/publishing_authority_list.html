@@ -1,0 +1,206 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Publishing Authorities" %} - {% trans "ISR Datasets" %}{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-building me-2"></i>
+                        {% trans "Publishing Authorities" %}
+                    </h1>
+                    <p class="text-muted">{% trans "Manage publishing authorities for datasets" %}</p>
+                </div>
+                <a href="{% url 'datasets:publishing_authority_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    {% trans "Add Publishing Authority" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="search" class="form-label">{% trans "Search" %}</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search_query }}" placeholder="{% trans 'Search by name or description...' %}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="is_active" class="form-label">{% trans "Status" %}</label>
+                            <select class="form-select" id="is_active" name="is_active">
+                                <option value="">{% trans "All" %}</option>
+                                <option value="true" {% if is_active_filter == 'true' %}selected{% endif %}>{% trans "Active" %}</option>
+                                <option value="false" {% if is_active_filter == 'false' %}selected{% endif %}>{% trans "Inactive" %}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="bi bi-search me-1"></i>
+                                    {% trans "Filter" %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Publishing Authorities List -->
+    <div class="row">
+        <div class="col-12">
+            {% if publishing_authorities %}
+                <div class="card">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{% trans "Name" %}</th>
+                                        <th>{% trans "Website" %}</th>
+                                        <th>{% trans "Datasets" %}</th>
+                                        <th>{% trans "Status" %}</th>
+                                        <th>{% trans "Default" %}</th>
+                                        <th>{% trans "Created" %}</th>
+                                        <th>{% trans "Actions" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for authority in publishing_authorities %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>{{ authority.name }}</strong>
+                                                {% if authority.description %}
+                                                    <br><small class="text-muted">{{ authority.description|truncatechars:100 }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if authority.website %}
+                                                <a href="{{ authority.website }}" target="_blank" class="text-decoration-none">
+                                                    <i class="bi bi-link-45deg me-1"></i>
+                                                    {% trans "Website" %}
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ authority.datasets.count }}</span>
+                                        </td>
+                                        <td>
+                                            {% if authority.is_active %}
+                                                <span class="badge bg-success">{% trans "Active" %}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if authority.is_default %}
+                                                <span class="badge bg-primary">{% trans "Default" %}</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ authority.created_at|date:"M d, Y" }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'datasets:publishing_authority_edit' authority.pk %}" 
+                                                   class="btn btn-outline-secondary btn-sm" title="{% trans 'Edit' %}">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'datasets:publishing_authority_delete' authority.pk %}" 
+                                                   class="btn btn-outline-danger btn-sm" title="{% trans 'Delete' %}">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="{% trans 'Publishing authorities pagination' %}" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if is_active_filter %}&is_active={{ is_active_filter }}{% endif %}">
+                                    {% trans "First" %}
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if is_active_filter %}&is_active={{ is_active_filter }}{% endif %}">
+                                    {% trans "Previous" %}
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if is_active_filter %}&is_active={{ is_active_filter }}{% endif %}">
+                                    {% trans "Next" %}
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if is_active_filter %}&is_active={{ is_active_filter }}{% endif %}">
+                                    {% trans "Last" %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <!-- Empty State -->
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">{% trans "No publishing authorities found" %}</h5>
+                        <p class="text-muted">
+                            {% if search_query or is_active_filter %}
+                                {% trans "Try adjusting your search criteria or" %}
+                                <a href="{% url 'datasets:publishing_authority_list' %}">{% trans "clear all filters" %}</a>.
+                            {% else %}
+                                {% trans "Get started by creating your first publishing authority." %}
+                            {% endif %}
+                        </p>
+                        {% if not search_query and not is_active_filter %}
+                            <a href="{% url 'datasets:publishing_authority_create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Add Publishing Authority" %}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
