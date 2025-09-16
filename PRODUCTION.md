@@ -2,6 +2,20 @@
 
 This guide explains how to deploy ISR Datasets in production using Docker Compose.
 
+## 📋 Table of Contents
+
+- [🚀 Quick Start](#-quick-start)
+- [📋 Environment Configuration](#-environment-configuration)
+- [🐳 Docker Compose Files](#-docker-compose-files)
+- [🔧 Deployment Options](#-deployment-options)
+- [🌐 Network Configuration](#-network-configuration)
+- [📊 Service Management](#-service-management)
+- [🔒 Security Considerations](#-security-considerations)
+- [🚨 Troubleshooting](#-troubleshooting)
+- [📝 Maintenance](#-maintenance)
+- [📁 Large File Upload Configuration](#-large-file-upload-configuration)
+- [🆘 Support](#-support)
+
 ## 🚀 Quick Start
 
 ### Option 1: Using the Deploy Script (Recommended)
@@ -311,6 +325,110 @@ docker system prune -f
    curl -f https://isrdatasets.dataplexity.eu/
    ```
 
+## 📁 Large File Upload Configuration
+
+### Upload Limits
+
+The application is configured to handle large file uploads up to 1GB:
+
+- **Nginx**: `client_max_body_size 1G`
+- **Django**: Optimized memory settings for large files
+- **Timeouts**: Extended to 300s (5 minutes) for large uploads
+- **Proxy**: Buffering disabled for better performance
+
+### Configuration Details
+
+**Nginx Settings** (`nginx/nginx.conf`):
+```nginx
+# Allow large file uploads up to 1GB
+client_max_body_size 1G;
+
+# Increase timeouts for large file uploads
+client_body_timeout 300s;
+client_header_timeout 300s;
+proxy_connect_timeout 300s;
+proxy_send_timeout 300s;
+proxy_read_timeout 300s;
+send_timeout 300s;
+
+# Additional proxy settings for large uploads
+proxy_request_buffering off;
+proxy_buffering off;
+```
+
+**Django Settings** (`app/main/settings.py`):
+```python
+# File Upload Settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024  # 100MB
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
+
+# Large file upload settings
+FILE_UPLOAD_PERMISSIONS = 0o644
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
+```
+
+### Updating Upload Limits
+
+If you need to update the nginx configuration for upload limits:
+
+```bash
+# Option 1: Using the update script
+./update-nginx.sh
+
+# Option 2: Manual update
+docker build -t isr-datasets-nginx:latest ./nginx
+docker tag isr-datasets-nginx:latest ghcr.io/silvioheinze/isr-datasets-nginx:latest
+docker push ghcr.io/silvioheinze/isr-datasets-nginx:latest
+
+# Deploy to production
+docker compose -f docker-compose.prod.yml pull nginx
+docker compose -f docker-compose.prod.yml restart nginx
+```
+
+### Upload Limits Summary
+
+| Component | Limit | Timeout | Status |
+|-----------|-------|---------|---------|
+| **Nginx** | 1GB | 300s | ✅ Configured |
+| **Django Memory** | 100MB | - | ✅ Configured |
+| **Django Data** | 100MB | - | ✅ Configured |
+| **Proxy Buffering** | Disabled | - | ✅ Optimized |
+
+### Troubleshooting Upload Issues
+
+**Common Upload Errors**:
+
+1. **413 Request Entity Too Large**
+   - **Cause**: File exceeds nginx `client_max_body_size`
+   - **Solution**: Check nginx configuration and restart service
+
+2. **504 Gateway Timeout**
+   - **Cause**: Upload takes longer than timeout settings
+   - **Solution**: Increase timeout values in nginx configuration
+
+3. **500 Internal Server Error**
+   - **Cause**: Django or disk space issues
+   - **Solution**: Check Django logs and available disk space
+
+**Debug Commands**:
+```bash
+# Check nginx configuration
+docker compose -f docker-compose.prod.yml exec nginx nginx -T | grep client_max_body_size
+
+# Check Django settings
+docker compose -f docker-compose.prod.yml exec app python manage.py shell -c "
+from django.conf import settings
+print('FILE_UPLOAD_MAX_MEMORY_SIZE:', settings.FILE_UPLOAD_MAX_MEMORY_SIZE)
+"
+
+# Check disk space
+docker compose -f docker-compose.prod.yml exec app df -h
+
+# Monitor upload logs
+docker compose -f docker-compose.prod.yml logs -f nginx
+```
+
 ## 🆘 Support
 
 For issues and support:
@@ -320,3 +438,4 @@ For issues and support:
 3. Verify environment configuration
 4. Check network connectivity
 5. Ensure all required services are running
+6. For upload issues, see [Large File Upload Configuration](#-large-file-upload-configuration)
