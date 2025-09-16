@@ -104,7 +104,27 @@
                                             </div>
                                             <div class="col-sm-6">
                                                 <label class="form-label">{% trans "Email" %}</label>
-                                                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                                <div class="input-group">
+                                                    <input type="email" class="form-control" value="{{ user.email }}" readonly>
+                                                    <span class="input-group-text">
+                                                        {% if user.is_email_verified %}
+                                                            <i class="bi bi-check-circle-fill text-success" title="{% trans 'Email verified' %}"></i>
+                                                        {% else %}
+                                                            <i class="bi bi-exclamation-circle-fill text-warning" title="{% trans 'Email not verified' %}"></i>
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                                {% if not user.is_email_verified %}
+                                                    <div class="form-text text-warning">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        {% trans "Your email address is not verified. Please check your email for a verification link." %}
+                                                    </div>
+                                                {% else %}
+                                                    <div class="form-text text-success">
+                                                        <i class="bi bi-check-circle me-1"></i>
+                                                        {% trans "Your email address is verified." %}
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="row mb-3">

@@ -2018,6 +2018,22 @@ msgstr ""
 msgid "Password Reset - %(site_name)s"
 msgstr ""
 
+#: templates/user/settings.html:111
+msgid "Email verified"
+msgstr "E-Mail verifiziert"
+
+#: templates/user/settings.html:113
+msgid "Email not verified"
+msgstr "E-Mail nicht verifiziert"
+
+#: templates/user/settings.html:120
+msgid "Your email address is not verified. Please check your email for a verification link."
+msgstr "Ihre E-Mail-Adresse ist nicht verifiziert. Bitte überprüfen Sie Ihre E-Mails auf einen Verifizierungslink."
+
+#: templates/user/settings.html:125
+msgid "Your email address is verified."
+msgstr "Ihre E-Mail-Adresse ist verifiziert."
+
 #: templates/user/list.html:6 templates/user/list.html:17
 #: templates/user/role_list.html:85
 msgid "Users"

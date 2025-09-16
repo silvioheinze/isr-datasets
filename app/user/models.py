@@ -119,6 +119,17 @@ class CustomUser(AbstractUser):
         """Check if user is a group admin of any group"""
         return self.get_group_admin_groups().exists()
 
+    def is_email_verified(self):
+        """Check if the user's email is verified"""
+        try:
+            from allauth.account.models import EmailAddress
+            email_address = EmailAddress.objects.get(user=self, email=self.email)
+            return email_address.verified
+        except (ImportError, EmailAddress.DoesNotExist):
+            # If allauth is not available or no EmailAddress record exists,
+            # assume email is verified (for backwards compatibility)
+            return True
+
 
 # Register models for audit logging
 auditlog.register(CustomUser)
