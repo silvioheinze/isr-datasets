@@ -2,7 +2,7 @@ from django.urls import path, include
 
 from user.views import (
     AccountDeleteView, SettingsView, SignupPageView, 
-    UsersUpdateView, UsersListView, RoleListView, RoleCreateView, 
+    UsersUpdateView, UsersListView, UserCreateView, RoleListView, RoleCreateView, 
     RoleUpdateView, RoleDeleteView, user_management_view, data_export_view
 )
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path('data-export/', data_export_view, name='data-export'),
     path("signup/", SignupPageView.as_view(), name="user-signup"),
     path('list/', UsersListView.as_view(), name='user-list'),
+    path('create/', UserCreateView.as_view(), name='user-create'),
     path('edit/<int:user_id>/', UsersUpdateView.as_view(), name='user-edit'),
     
     # Role Management

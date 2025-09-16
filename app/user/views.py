@@ -359,6 +359,25 @@ class UsersListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return context
 
 
+class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    model = get_user_model()
+    form_class = CustomUserCreationForm
+    template_name = 'user/user_form.html'
+    success_url = reverse_lazy('user-list')
+
+    def test_func(self):
+        # Allow access only if user is superuser
+        return self.request.user.is_superuser
+
+    def form_valid(self, form):
+        messages.success(self.request, 'User created successfully.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
+
+
 # Role Management Views
 class RoleListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = Role
