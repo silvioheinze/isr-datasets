@@ -49,7 +49,7 @@ else
     USE_REGISTRY=false
 fi
 
-# Set environment variables for docker-compose
+# Set environment variables for docker compose
 if [ "$USE_REGISTRY" = false ]; then
     echo ""
     echo "🔨 Building images locally..."
@@ -70,26 +70,26 @@ else
     echo "   Proxy network already exists"
 fi
 
-# Deploy with docker-compose
+# Deploy with docker compose
 echo ""
 echo "🚀 Deploying application..."
 if [ "$USE_REGISTRY" = true ]; then
     # Use registry images
-    docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d
+    docker compose -f docker compose.prod.yml --env-file .env.prod up -d
 else
     # Build locally
-    docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+    docker compose -f docker compose.prod.yml --env-file .env.prod up -d --build
 fi
 
 echo ""
 echo "✅ Deployment completed!"
 echo ""
 echo "📊 Service Status:"
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker compose.prod.yml ps
 
 echo ""
 echo "📝 Useful commands:"
-echo "   View logs: docker-compose -f docker-compose.prod.yml logs -f"
-echo "   Stop services: docker-compose -f docker-compose.prod.yml down"
-echo "   Restart services: docker-compose -f docker-compose.prod.yml restart"
-echo "   Update services: docker-compose -f docker-compose.prod.yml pull && docker-compose -f docker-compose.prod.yml up -d"
+echo "   View logs: docker compose -f docker compose.prod.yml logs -f"
+echo "   Stop services: docker compose -f docker compose.prod.yml down"
+echo "   Restart services: docker compose -f docker compose.prod.yml restart"
+echo "   Update services: docker compose -f docker compose.prod.yml pull && docker compose -f docker compose.prod.yml up -d"

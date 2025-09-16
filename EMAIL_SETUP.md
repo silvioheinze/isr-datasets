@@ -77,7 +77,7 @@ EMAIL_HOST_PASSWORD=your_password
 
 ### 1. Run the Test Script
 ```bash
-docker-compose exec app python test_email.py
+docker compose exec app python test_email.py
 ```
 
 ### 2. Test Password Reset
@@ -89,7 +89,7 @@ docker-compose exec app python test_email.py
 ### 3. Check Logs
 ```bash
 # Development (emails printed to console)
-docker-compose logs app
+docker compose logs app
 
 # Production (check email delivery)
 # Check your email provider's sent items
@@ -131,10 +131,10 @@ docker-compose logs app
 
 ```bash
 # Test email configuration
-docker-compose exec app python test_email.py
+docker compose exec app python test_email.py
 
 # Check Django settings
-docker-compose exec app python manage.py shell -c "
+docker compose exec app python manage.py shell -c "
 from django.conf import settings
 print('EMAIL_BACKEND:', settings.EMAIL_BACKEND)
 print('EMAIL_HOST:', settings.EMAIL_HOST)
@@ -142,7 +142,7 @@ print('EMAIL_PORT:', settings.EMAIL_PORT)
 "
 
 # Test email sending
-docker-compose exec app python manage.py shell -c "
+docker compose exec app python manage.py shell -c "
 from django.core.mail import send_mail
 send_mail('Test', 'Test message', 'noreply@example.com', ['test@example.com'])
 "
@@ -195,13 +195,13 @@ export DEFAULT_FROM_EMAIL=noreply@isrdatasets.dataplexity.eu
 ### 2. Test in Production
 ```bash
 # Test email sending
-docker-compose -f docker-compose.prod.yml exec app python test_email.py
+docker compose -f docker compose.prod.yml exec app python test_email.py
 ```
 
 ### 3. Monitor Logs
 ```bash
 # Check for email errors
-docker-compose -f docker-compose.prod.yml logs app | grep -i email
+docker compose -f docker compose.prod.yml logs app | grep -i email
 ```
 
 ## 📞 Support

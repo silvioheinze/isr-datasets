@@ -30,7 +30,7 @@ nano .env.prod
 docker network create proxy
 
 # 4. Deploy with local build
-docker-compose -f docker-compose.prod.local.yml --env-file .env.prod up -d --build
+docker compose -f docker compose.prod.local.yml --env-file .env.prod up -d --build
 ```
 
 ## 📋 Environment Configuration
@@ -66,7 +66,7 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 
 ## 🐳 Docker Compose Files
 
-### docker-compose.prod.yml
+### docker compose.prod.yml
 - **Purpose**: Production deployment with registry images
 - **Use Case**: When images are available in GitHub Container Registry
 - **Features**: 
@@ -74,7 +74,7 @@ python -c "from django.core.management.utils import get_random_secret_key; print
   - Falls back to local build if registry images unavailable
   - Configurable image registry and tags
 
-### docker-compose.prod.local.yml
+### docker compose.prod.local.yml
 - **Purpose**: Production deployment with local builds
 - **Use Case**: When registry images are not available or for development
 - **Features**:
@@ -96,7 +96,7 @@ export IMAGE_NAME=isr-datasets
 export IMAGE_TAG=latest
 
 # Deploy
-docker-compose -f docker-compose.prod.yml --env-file .env.prod up -d
+docker compose -f docker compose.prod.yml --env-file .env.prod up -d
 ```
 
 ### 2. Local Build (Fallback)
@@ -105,7 +105,7 @@ If registry images are not available:
 
 ```bash
 # Deploy with local build
-docker-compose -f docker-compose.prod.local.yml --env-file .env.prod up -d --build
+docker compose -f docker compose.prod.local.yml --env-file .env.prod up -d --build
 ```
 
 ### 3. Mixed Approach (Automatic)
@@ -139,37 +139,37 @@ The nginx service is configured with Traefik labels for automatic HTTPS:
 ### View Service Status
 
 ```bash
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker compose.prod.yml ps
 ```
 
 ### View Logs
 
 ```bash
 # All services
-docker-compose -f docker-compose.prod.yml logs -f
+docker compose -f docker compose.prod.yml logs -f
 
 # Specific service
-docker-compose -f docker-compose.prod.yml logs -f app
-docker-compose -f docker-compose.prod.yml logs -f nginx
-docker-compose -f docker-compose.prod.yml logs -f db
+docker compose -f docker compose.prod.yml logs -f app
+docker compose -f docker compose.prod.yml logs -f nginx
+docker compose -f docker compose.prod.yml logs -f db
 ```
 
 ### Restart Services
 
 ```bash
 # All services
-docker-compose -f docker-compose.prod.yml restart
+docker compose -f docker compose.prod.yml restart
 
 # Specific service
-docker-compose -f docker-compose.prod.yml restart app
+docker compose -f docker compose.prod.yml restart app
 ```
 
 ### Update Services
 
 ```bash
 # Pull latest images and restart
-docker-compose -f docker-compose.prod.yml pull
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker compose.prod.yml pull
+docker compose -f docker compose.prod.yml up -d
 ```
 
 ## 🔒 Security Considerations
@@ -205,7 +205,7 @@ Error response from daemon: Head "https://ghcr.io/v2/...": unauthorized
 
 **Solution**: Use local build instead:
 ```bash
-docker-compose -f docker-compose.prod.local.yml --env-file .env.prod up -d --build
+docker compose -f docker compose.prod.local.yml --env-file .env.prod up -d --build
 ```
 
 #### 2. Environment Variable Warnings
@@ -235,12 +235,12 @@ docker network create proxy
 
 **Check database logs**:
 ```bash
-docker-compose -f docker-compose.prod.yml logs db
+docker compose -f docker compose.prod.yml logs db
 ```
 
 **Verify environment variables**:
 ```bash
-docker-compose -f docker-compose.prod.yml config
+docker compose -f docker compose.prod.yml config
 ```
 
 ### Health Checks
@@ -255,7 +255,7 @@ The application includes health checks for all services:
 
 ```bash
 # Check service health
-docker-compose -f docker-compose.prod.yml ps
+docker compose -f docker compose.prod.yml ps
 
 # Monitor resource usage
 docker stats
@@ -270,10 +270,10 @@ docker system df
 
 ```bash
 # Create backup
-docker-compose -f docker-compose.prod.yml exec db pg_dump -U isruser isrdatasets > backup.sql
+docker compose -f docker compose.prod.yml exec db pg_dump -U isruser isrdatasets > backup.sql
 
 # Restore backup
-docker-compose -f docker-compose.prod.yml exec -T db psql -U isruser isrdatasets < backup.sql
+docker compose -f docker compose.prod.yml exec -T db psql -U isruser isrdatasets < backup.sql
 ```
 
 ### Log Rotation
@@ -282,7 +282,7 @@ Configure log rotation to prevent disk space issues:
 
 ```bash
 # Check log sizes
-docker-compose -f docker-compose.prod.yml logs --tail=1000 | wc -l
+docker compose -f docker compose.prod.yml logs --tail=1000 | wc -l
 
 # Clean up old logs
 docker system prune -f
@@ -292,22 +292,22 @@ docker system prune -f
 
 1. **Pull latest images**:
    ```bash
-   docker-compose -f docker-compose.prod.yml pull
+   docker compose -f docker compose.prod.yml pull
    ```
 
 2. **Backup database**:
    ```bash
-   docker-compose -f docker-compose.prod.yml exec db pg_dump -U isruser isrdatasets > backup-$(date +%Y%m%d).sql
+   docker compose -f docker compose.prod.yml exec db pg_dump -U isruser isrdatasets > backup-$(date +%Y%m%d).sql
    ```
 
 3. **Update services**:
    ```bash
-   docker-compose -f docker-compose.prod.yml up -d
+   docker compose -f docker compose.prod.yml up -d
    ```
 
 4. **Verify deployment**:
    ```bash
-   docker-compose -f docker-compose.prod.yml ps
+   docker compose -f docker compose.prod.yml ps
    curl -f https://isrdatasets.dataplexity.eu/
    ```
 

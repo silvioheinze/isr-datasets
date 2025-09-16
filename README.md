@@ -67,13 +67,13 @@ EMAIL_HOST_PASSWORD=your-app-password
 
 ```bash
 # Build and start all services
-docker-compose up --build -d
+docker compose up --build -d
 
 # Check service status
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs app
+docker compose logs app
 ```
 
 ### 4. Access the Application
@@ -111,7 +111,7 @@ isr-datasets/
 ├── nginx/                        # Nginx configuration
 │   ├── Dockerfile               # Nginx Dockerfile
 │   └── nginx.conf               # Nginx configuration
-├── docker-compose.yml            # Docker Compose configuration
+├── docker compose.yml            # Docker Compose configuration
 ├── Dockerfile                    # Main application Dockerfile
 ├── entrypoint.sh                 # Container entrypoint script
 ├── requirements.txt              # Python dependencies
@@ -142,14 +142,14 @@ isr-datasets/
 
 ```bash
 # Build and run in development mode
-docker-compose up --build
+docker compose up --build
 
 # Run specific service
-docker-compose up app
+docker compose up app
 
 # Execute commands in container
-docker-compose exec app python manage.py migrate
-docker-compose exec app python manage.py createsuperuser
+docker compose exec app python manage.py migrate
+docker compose exec app python manage.py createsuperuser
 ```
 
 ## 🗄️ Database
@@ -160,13 +160,13 @@ The application uses PostgreSQL with PostGIS extension for geospatial data suppo
 
 ```bash
 # Access database shell
-docker-compose exec db psql -U isruser -d isrdatasets
+docker compose exec db psql -U isruser -d isrdatasets
 
 # Create database backup
-docker-compose exec db pg_dump -U isruser isrdatasets > backup.sql
+docker compose exec db pg_dump -U isruser isrdatasets > backup.sql
 
 # Restore database backup
-docker-compose exec -T db psql -U isruser -d isrdatasets < backup.sql
+docker compose exec -T db psql -U isruser -d isrdatasets < backup.sql
 ```
 
 ### Database Admin (pgAdmin)
@@ -209,16 +209,16 @@ Templates are located in `app/templates/` and use Django's template system with 
 
 ```bash
 # View application logs
-docker-compose logs app
+docker compose logs app
 
 # View database logs
-docker-compose logs db
+docker compose logs db
 
 # View nginx logs
-docker-compose logs nginx
+docker compose logs nginx
 
 # Follow logs in real-time
-docker-compose logs -f app
+docker compose logs -f app
 ```
 
 ### Health Checks
@@ -240,12 +240,12 @@ The application includes health checks for:
 
 2. **Static Files**:
    ```bash
-   docker-compose exec app python manage.py collectstatic
+   docker compose exec app python manage.py collectstatic
    ```
 
 3. **Database Migration**:
    ```bash
-   docker-compose exec app python manage.py migrate
+   docker compose exec app python manage.py migrate
    ```
 
 ### Scaling
@@ -283,11 +283,11 @@ To update the application:
 git pull origin main
 
 # Rebuild and restart
-docker-compose down
-docker-compose up --build -d
+docker compose down
+docker compose up --build -d
 
 # Run migrations if needed
-docker-compose exec app python manage.py migrate
+docker compose exec app python manage.py migrate
 ```
 
 ## 📈 Roadmap

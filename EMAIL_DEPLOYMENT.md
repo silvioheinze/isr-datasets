@@ -30,10 +30,10 @@ SERVER_EMAIL=noreply@isrdatasets.dataplexity.eu
 
 ```bash
 # Deploy with new email settings
-docker-compose -f docker-compose.prod.yml up -d
+docker compose -f docker compose.prod.yml up -d
 
 # Test email configuration
-docker-compose -f docker-compose.prod.yml exec app python manage.py shell -c "
+docker compose -f docker compose.prod.yml exec app python manage.py shell -c "
 from django.core.mail import send_mail
 send_mail('Test', 'Test message', 'noreply@isrdatasets.dataplexity.eu', ['your-email@example.com'])
 "
@@ -69,7 +69,7 @@ send_mail('Test', 'Test message', 'noreply@isrdatasets.dataplexity.eu', ['your-e
 
 ```bash
 # Check email settings
-docker-compose exec app python manage.py shell -c "
+docker compose exec app python manage.py shell -c "
 from django.conf import settings
 print('EMAIL_BACKEND:', settings.EMAIL_BACKEND)
 print('EMAIL_HOST:', settings.EMAIL_HOST)
@@ -77,7 +77,7 @@ print('EMAIL_PORT:', settings.EMAIL_PORT)
 "
 
 # Test email sending
-docker-compose exec app python manage.py shell -c "
+docker compose exec app python manage.py shell -c "
 from django.core.mail import send_mail
 send_mail('Test', 'Test message', 'noreply@example.com', ['test@example.com'])
 "
