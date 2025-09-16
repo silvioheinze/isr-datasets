@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Dataset, DatasetCategory, DatasetVersion
+from .models import Dataset, DatasetCategory, DatasetVersion, Comment
 from projects.models import Project
 
 User = get_user_model()
@@ -387,3 +387,55 @@ class DatasetCategoryFilterForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+
+class CommentForm(forms.ModelForm):
+    """Form for creating and editing comments"""
+    
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Share your thoughts about this dataset...',
+                'maxlength': 1000
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        self.dataset = kwargs.pop('dataset', None)
+        super().__init__(*args, **kwargs)
+        
+        # Add help text
+        self.fields['content'].help_text = 'Maximum 1000 characters'
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if content and len(content.strip()) < 10:
+            raise forms.ValidationError('Comment must be at least 10 characters long.')
+        return content.strip()
+
+
+class CommentEditForm(forms.ModelForm):
+    """Form for editing existing comments"""
+    
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Edit your comment...',
+                'maxlength': 1000
+            })
+        }
+    
+    def clean_content(self):
+        content = self.cleaned_data.get('content')
+        if content and len(content.strip()) < 10:
+            raise forms.ValidationError('Comment must be at least 10 characters long.')
+        return content.strip()

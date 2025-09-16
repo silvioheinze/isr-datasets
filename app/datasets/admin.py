@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment
 
 
 @admin.register(DatasetCategory)
@@ -104,3 +104,32 @@ class DatasetDownloadAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('dataset', 'user')
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['author', 'dataset', 'content_preview', 'is_approved', 'created_at']
+    list_filter = ['is_approved', 'created_at', 'updated_at']
+    search_fields = ['content', 'author__username', 'author__email', 'dataset__title']
+    list_editable = ['is_approved']
+    ordering = ['-created_at']
+    date_hierarchy = 'created_at'
+    
+    fieldsets = (
+        ('Comment Information', {
+            'fields': ('dataset', 'author', 'content', 'is_approved')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['created_at', 'updated_at']
+    
+    def content_preview(self, obj):
+        return obj.content[:100] + '...' if len(obj.content) > 100 else obj.content
+    content_preview.short_description = 'Content Preview'
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('author', 'dataset')

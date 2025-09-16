@@ -2034,6 +2034,182 @@ msgstr "Ihre E-Mail-Adresse ist nicht verifiziert. Bitte überprüfen Sie Ihre E
 msgid "Your email address is verified."
 msgstr "Ihre E-Mail-Adresse ist verifiziert."
 
+#: datasets/models.py:255
+msgid "Dataset"
+msgstr "Datensatz"
+
+#: datasets/models.py:262
+msgid "Author"
+msgstr "Autor"
+
+#: datasets/models.py:265
+msgid "Comment"
+msgstr "Kommentar"
+
+#: datasets/models.py:266
+msgid "Your comment about this dataset"
+msgstr "Ihr Kommentar zu diesem Datensatz"
+
+#: datasets/models.py:270
+msgid "Approved"
+msgstr "Genehmigt"
+
+#: datasets/models.py:271
+msgid "Whether this comment is approved and visible to others"
+msgstr "Ob dieser Kommentar genehmigt und für andere sichtbar ist"
+
+#: datasets/models.py:274
+msgid "Created at"
+msgstr "Erstellt am"
+
+#: datasets/models.py:279
+msgid "Updated at"
+msgstr "Aktualisiert am"
+
+#: datasets/models.py:285
+msgid "Comments"
+msgstr "Kommentare"
+
+#: user/models.py:58
+msgid "Email Notifications"
+msgstr "E-Mail-Benachrichtigungen"
+
+#: user/models.py:60
+msgid "Receive email notifications for comments on your datasets"
+msgstr "E-Mail-Benachrichtigungen für Kommentare zu Ihren Datensätzen erhalten"
+
+#: datasets/forms.py:413
+msgid "Maximum 1000 characters"
+msgstr "Maximal 1000 Zeichen"
+
+#: datasets/forms.py:418
+msgid "Comment must be at least 10 characters long."
+msgstr "Kommentar muss mindestens 10 Zeichen lang sein."
+
+#: datasets/forms.py:441
+msgid "Comment must be at least 10 characters long."
+msgstr "Kommentar muss mindestens 10 Zeichen lang sein."
+
+#: templates/datasets/dataset_detail.html:420
+msgid "Comments"
+msgstr "Kommentare"
+
+#: templates/datasets/dataset_detail.html:430
+msgid "Add a Comment"
+msgstr "Kommentar hinzufügen"
+
+#: templates/datasets/dataset_detail.html:447
+msgid "Post Comment"
+msgstr "Kommentar veröffentlichen"
+
+#: templates/datasets/dataset_detail.html:455
+msgid "Please"
+msgstr "Bitte"
+
+#: templates/datasets/dataset_detail.html:455
+msgid "log in"
+msgstr "anmelden"
+
+#: templates/datasets/dataset_detail.html:455
+msgid "to add a comment."
+msgstr "um einen Kommentar hinzuzufügen."
+
+#: templates/datasets/dataset_detail.html:471
+msgid "ago"
+msgstr "vor"
+
+#: templates/datasets/dataset_detail.html:481
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: templates/datasets/dataset_detail.html:485
+msgid "Delete"
+msgstr "Löschen"
+
+#: templates/datasets/dataset_detail.html:485
+msgid "Are you sure you want to delete this comment?"
+msgstr "Sind Sie sicher, dass Sie diesen Kommentar löschen möchten?"
+
+#: templates/datasets/dataset_detail.html:504
+msgid "No comments yet"
+msgstr "Noch keine Kommentare"
+
+#: templates/datasets/dataset_detail.html:505
+msgid "Be the first to share your thoughts about this dataset!"
+msgstr "Seien Sie der Erste, der seine Gedanken zu diesem Datensatz teilt!"
+
+#: templates/datasets/comment_edit.html:6
+msgid "Edit Comment"
+msgstr "Kommentar bearbeiten"
+
+#: templates/datasets/comment_edit.html:18
+msgid "Edit Comment"
+msgstr "Kommentar bearbeiten"
+
+#: templates/datasets/comment_edit.html:19
+msgid "Update your comment on this dataset"
+msgstr "Aktualisieren Sie Ihren Kommentar zu diesem Datensatz"
+
+#: templates/datasets/comment_edit.html:40
+msgid "Comment"
+msgstr "Kommentar"
+
+#: templates/datasets/comment_edit.html:55
+msgid "Back to Dataset"
+msgstr "Zurück zum Datensatz"
+
+#: templates/datasets/comment_edit.html:59
+msgid "Update Comment"
+msgstr "Kommentar aktualisieren"
+
+#: datasets/email/comment_notification.html:4
+msgid "New Comment on Your Dataset"
+msgstr "Neuer Kommentar zu Ihrem Datensatz"
+
+#: datasets/email/comment_notification.html:8
+msgid "New Comment on Your Dataset"
+msgstr "Neuer Kommentar zu Ihrem Datensatz"
+
+#: datasets/email/comment_notification.html:12
+msgid "Hello"
+msgstr "Hallo"
+
+#: datasets/email/comment_notification.html:14
+msgid "You have received a new comment on your dataset from %(commenter)s."
+msgstr "Sie haben einen neuen Kommentar zu Ihrem Datensatz von %(commenter)s erhalten."
+
+#: datasets/email/comment_notification.html:35
+msgid "View Dataset and Comment"
+msgstr "Datensatz und Kommentar anzeigen"
+
+#: datasets/email/comment_notification.html:40
+msgid "Quick Actions:"
+msgstr "Schnellaktionen:"
+
+#: datasets/email/comment_notification.html:42
+msgid "Reply to the comment directly on the dataset page"
+msgstr "Antworten Sie direkt auf der Datensatz-Seite auf den Kommentar"
+
+#: datasets/email/comment_notification.html:43
+msgid "Share your dataset with others"
+msgstr "Teilen Sie Ihren Datensatz mit anderen"
+
+#: datasets/email/comment_notification.html:44
+msgid "Update your dataset information if needed"
+msgstr "Aktualisieren Sie Ihre Datensatz-Informationen bei Bedarf"
+
+#: datasets/email/comment_notification.html:47
+msgid "Thank you for sharing your dataset with the community!"
+msgstr "Vielen Dank, dass Sie Ihren Datensatz mit der Community teilen!"
+
+#: datasets/email/comment_notification.html:50
+msgid "Email Notifications:"
+msgstr "E-Mail-Benachrichtigungen:"
+
+#: datasets/email/comment_notification.html:51
+msgid "You can manage your email notification preferences in your account settings."
+msgstr "Sie können Ihre E-Mail-Benachrichtigungseinstellungen in Ihren Kontoeinstellungen verwalten."
+
 #: templates/user/list.html:6 templates/user/list.html:17
 #: templates/user/role_list.html:85
 msgid "Users"

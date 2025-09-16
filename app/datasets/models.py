@@ -247,8 +247,58 @@ class DatasetDownload(models.Model):
         return f"{self.dataset.title} - {user_info}"
 
 
+class Comment(models.Model):
+    """Comment model for datasets"""
+    dataset = models.ForeignKey(
+        Dataset,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name=_('Dataset')
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='dataset_comments',
+        verbose_name=_('Author')
+    )
+    content = models.TextField(
+        verbose_name=_('Comment'),
+        help_text=_('Your comment about this dataset')
+    )
+    is_approved = models.BooleanField(
+        default=True,
+        verbose_name=_('Approved'),
+        help_text=_('Whether this comment is approved and visible to others')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created at')
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name=_('Updated at')
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _('Comment')
+        verbose_name_plural = _('Comments')
+
+    def __str__(self):
+        return f"Comment by {self.author.username} on {self.dataset.title}"
+
+    def can_edit(self, user):
+        """Check if user can edit this comment"""
+        return user == self.author or user.is_staff or user.is_superuser
+
+    def can_delete(self, user):
+        """Check if user can delete this comment"""
+        return user == self.author or user.is_staff or user.is_superuser
+
+
 # Register models for audit logging
 auditlog.register(Dataset)
 auditlog.register(DatasetCategory)
 auditlog.register(DatasetVersion)
+auditlog.register(Comment)
 auditlog.register(DatasetDownload)

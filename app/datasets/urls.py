@@ -21,4 +21,9 @@ urlpatterns = [
     path('categories/create/', views.DatasetCategoryCreateView.as_view(), name='category_create'),
     path('categories/<int:pk>/edit/', views.DatasetCategoryUpdateView.as_view(), name='category_edit'),
     path('categories/<int:pk>/delete/', views.DatasetCategoryDeleteView.as_view(), name='category_delete'),
+    
+    # Comment views
+    path('<int:dataset_id>/comment/add/', views.add_comment, name='add_comment'),
+    path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
+    path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
 ]

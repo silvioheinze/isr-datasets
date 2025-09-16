@@ -53,6 +53,13 @@ class CustomUser(AbstractUser):
         help_text=_('Preferred language for the interface')
     )
     
+    # Notification preferences
+    email_notifications = models.BooleanField(
+        default=True,
+        verbose_name=_('Email Notifications'),
+        help_text=_('Receive email notifications for comments on your datasets')
+    )
+    
     # Add related_name to avoid field clashes
     groups = models.ManyToManyField(
         'auth.Group',

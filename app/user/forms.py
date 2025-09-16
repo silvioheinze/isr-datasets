@@ -53,14 +53,17 @@ class UserProfileForm(forms.ModelForm):
 
 
 class UserSettingsForm(forms.ModelForm):
-    """Form for user account settings including language preference"""
+    """Form for user account settings including language preference and notifications"""
     
     class Meta:
         model = CustomUser
-        fields = ['language']
+        fields = ['language', 'email_notifications']
         widgets = {
             'language': forms.Select(attrs={
                 'class': 'form-select'
+            }),
+            'email_notifications': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
             })
         }
     
@@ -68,6 +71,8 @@ class UserSettingsForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['language'].label = _('Interface Language')
         self.fields['language'].help_text = _('Choose your preferred language for the interface')
+        self.fields['email_notifications'].label = _('Email Notifications')
+        self.fields['email_notifications'].help_text = _('Receive email notifications for comments on your datasets')
 
 
 class DataExportForm(forms.Form):

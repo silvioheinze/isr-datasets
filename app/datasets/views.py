@@ -10,8 +10,8 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db import transaction
 
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload
-from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment
+from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm
 
 
 class DatasetListView(ListView):
@@ -75,7 +75,7 @@ class DatasetDetailView(DetailView):
 
     def get_queryset(self):
         return Dataset.objects.select_related('owner', 'category').prefetch_related(
-            'contributors', 'versions', 'related_datasets'
+            'contributors', 'versions', 'related_datasets', 'comments__author'
         )
 
     def get_object(self, queryset=None):
@@ -106,6 +106,10 @@ class DatasetDetailView(DetailView):
             self.request.user.is_superuser
         )
         context['can_download'] = dataset.is_accessible_by(self.request.user)
+        
+        # Add comments to context
+        context['comments'] = dataset.comments.filter(is_approved=True).select_related('author')
+        context['comment_form'] = CommentForm(user=self.request.user, dataset=dataset)
         
         return context
 
@@ -341,3 +345,112 @@ class DatasetCategoryDeleteView(LoginRequiredMixin, DeleteView):
         context['can_delete'] = dataset_count == 0
         
         return context
+
+
+# Comment Views
+@login_required
+def add_comment(request, dataset_id):
+    """Add a comment to a dataset"""
+    dataset = get_object_or_404(Dataset, id=dataset_id)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, user=request.user, dataset=dataset)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.dataset = dataset
+            comment.author = request.user
+            comment.save()
+            
+            # Send email notification to dataset owner if enabled
+            if dataset.owner.email_notifications and dataset.owner != request.user:
+                send_comment_notification_email(comment)
+            
+            messages.success(request, 'Your comment has been added successfully.')
+            return redirect('datasets:dataset_detail', pk=dataset.id)
+    else:
+        form = CommentForm(user=request.user, dataset=dataset)
+    
+    return render(request, 'datasets/dataset_detail.html', {
+        'dataset': dataset,
+        'comment_form': form
+    })
+
+
+@login_required
+def edit_comment(request, comment_id):
+    """Edit a comment"""
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Check if user can edit this comment
+    if not comment.can_edit(request.user):
+        messages.error(request, 'You do not have permission to edit this comment.')
+        return redirect('datasets:dataset_detail', pk=comment.dataset.id)
+    
+    if request.method == 'POST':
+        form = CommentEditForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your comment has been updated successfully.')
+            return redirect('datasets:dataset_detail', pk=comment.dataset.id)
+    else:
+        form = CommentEditForm(instance=comment)
+    
+    return render(request, 'datasets/comment_edit.html', {
+        'form': form,
+        'comment': comment,
+        'dataset': comment.dataset
+    })
+
+
+@login_required
+def delete_comment(request, comment_id):
+    """Delete a comment"""
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Check if user can delete this comment
+    if not comment.can_delete(request.user):
+        messages.error(request, 'You do not have permission to delete this comment.')
+        return redirect('datasets:dataset_detail', pk=comment.dataset.id)
+    
+    dataset_id = comment.dataset.id
+    comment.delete()
+    messages.success(request, 'Your comment has been deleted successfully.')
+    return redirect('datasets:dataset_detail', pk=dataset_id)
+
+
+def send_comment_notification_email(comment):
+    """Send email notification to dataset owner about new comment"""
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.conf import settings
+    
+    dataset = comment.dataset
+    owner = dataset.owner
+    
+    # Prepare email context
+    context = {
+        'owner': owner,
+        'comment': comment,
+        'dataset': dataset,
+        'commenter': comment.author,
+        'site_name': getattr(settings, 'SITE_NAME', 'ISR Datasets'),
+        'site_url': getattr(settings, 'SITE_URL', 'http://localhost:8000'),
+    }
+    
+    # Render email templates
+    subject = f'New comment on your dataset: {dataset.title}'
+    html_message = render_to_string('datasets/email/comment_notification.html', context)
+    plain_message = render_to_string('datasets/email/comment_notification.txt', context)
+    
+    try:
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            html_message=html_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[owner.email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        # Log the error but don't break the comment creation
+        print(f"Failed to send comment notification email: {e}")

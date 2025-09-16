@@ -220,6 +220,29 @@
                                         </div>
                                     </div>
                                     <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                {{ settings_form.email_notifications }}
+                                                <label for="{{ settings_form.email_notifications.id_for_label }}" class="form-check-label">
+                                                    <i class="bi bi-envelope me-1"></i>
+                                                    {{ settings_form.email_notifications.label }}
+                                                </label>
+                                            </div>
+                                            {% if settings_form.email_notifications.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ settings_form.email_notifications.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                {{ settings_form.email_notifications.help_text }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
                                         <div class="alert alert-info">
                                             <i class="bi bi-info-circle me-2"></i>
                                             <strong>{% trans "Note" %}:</strong>
