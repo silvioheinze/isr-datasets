@@ -52,6 +52,9 @@ class DatasetAdmin(admin.ModelAdmin):
         ('Ownership & Attribution', {
             'fields': ('owner', 'contributors', 'related_datasets', 'project', 'license', 'citation', 'doi')
         }),
+        ('Publishing Information', {
+            'fields': ('publishing_authority', 'uri_ref')
+        }),
         ('Statistics', {
             'fields': ('download_count', 'view_count'),
             'classes': ('collapse',)

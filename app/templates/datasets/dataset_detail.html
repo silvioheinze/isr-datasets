@@ -123,7 +123,7 @@
             {% endif %}
 
             <!-- Attribution -->
-            {% if dataset.license or dataset.citation or dataset.doi or dataset.contributors.exists %}
+            {% if dataset.license or dataset.citation or dataset.doi or dataset.publishing_authority or dataset.uri_ref or dataset.contributors.exists %}
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
@@ -169,6 +169,26 @@
                             <span class="badge bg-info">
                                 <i class="bi bi-link-45deg me-1"></i>
                                 {{ dataset.doi }}
+                            </span>
+                            <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if dataset.publishing_authority %}
+                    <div class="mb-3">
+                        <strong>{% trans "Publishing Authority" %}:</strong>
+                        <p class="mb-0">{{ dataset.publishing_authority }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if dataset.uri_ref %}
+                    <div class="mb-3">
+                        <strong>{% trans "URI Reference" %}:</strong> 
+                        <a href="{{ dataset.uri_ref }}" target="_blank" class="text-decoration-none">
+                            <span class="badge bg-secondary">
+                                <i class="bi bi-link-45deg me-1"></i>
+                                {% trans "View Reference" %}
                             </span>
                             <i class="bi bi-box-arrow-up-right ms-1"></i>
                         </a>

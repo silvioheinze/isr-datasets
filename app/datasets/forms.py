@@ -15,7 +15,7 @@ class DatasetForm(forms.ModelForm):
         fields = [
             'title', 'description', 'abstract', 'category', 'tags', 'keywords',
             'status', 'access_level', 'is_featured', 'license',
-            'citation', 'doi', 'contributors', 'related_datasets', 'project'
+            'citation', 'doi', 'publishing_authority', 'uri_ref', 'contributors', 'related_datasets', 'project'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -57,6 +57,14 @@ class DatasetForm(forms.ModelForm):
             'doi': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Digital Object Identifier'
+            }),
+            'publishing_authority': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g., University of Vienna, Research Institute'
+            }),
+            'uri_ref': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'https://example.com/dataset-identifier'
             }),
             'contributors': forms.SelectMultiple(attrs={
                 'class': 'form-select',
@@ -219,7 +227,7 @@ class DatasetVersionForm(forms.ModelForm):
             }),
             'file': forms.FileInput(attrs={
                 'class': 'form-control',
-                'accept': '.csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz'
+                'accept': '.csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg'
             }),
             'file_url': forms.URLInput(attrs={
                 'class': 'form-control',
@@ -243,7 +251,7 @@ class DatasetVersionForm(forms.ModelForm):
         # Add help text for fields
         self.fields['version_number'].help_text = 'Use semantic versioning (e.g., 1.0, 1.1, 2.0)'
         self.fields['description'].help_text = 'Optional: Describe what changed in this version'
-        self.fields['file'].help_text = 'Upload the new version file'
+        self.fields['file'].help_text = 'Upload the new version file (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG formats supported)'
         self.fields['file_url'].help_text = 'External URL where the file can be accessed'
         self.fields['file_url_description'].help_text = 'Optional: Describe where the file is located'
         self.fields['file_size_text'].help_text = 'Human-readable file size (e.g., "2.5 MB", "1.2 GB")'

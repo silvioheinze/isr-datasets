@@ -101,6 +101,17 @@ class Dataset(models.Model):
     citation = models.TextField(blank=True, help_text='How to cite this dataset')
     doi = models.CharField(max_length=100, blank=True, help_text='Digital Object Identifier')
     
+    # Publishing information
+    publishing_authority = models.CharField(
+        max_length=200, 
+        blank=True, 
+        help_text='The organization or institution that published this dataset'
+    )
+    uri_ref = models.URLField(
+        blank=True, 
+        help_text='URI reference for the dataset (e.g., persistent identifier, institutional URL)'
+    )
+    
     
     # Statistics
     download_count = models.PositiveIntegerField(default=0)
