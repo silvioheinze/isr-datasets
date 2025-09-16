@@ -136,7 +136,13 @@ class DatasetUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'datasets/dataset_form.html'
 
     def get_queryset(self):
-        return Dataset.objects.filter(owner=self.request.user)
+        # Allow owners, contributors, and staff/superusers to edit
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Dataset.objects.all()
+        return Dataset.objects.filter(
+            Q(owner=self.request.user) | 
+            Q(contributors=self.request.user)
+        ).distinct()
 
     def form_valid(self, form):
         messages.success(self.request, 'Dataset updated successfully!')
@@ -153,7 +159,13 @@ class DatasetDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('datasets:dataset_list')
 
     def get_queryset(self):
-        return Dataset.objects.filter(owner=self.request.user)
+        # Allow owners, contributors, and staff/superusers to delete
+        if self.request.user.is_staff or self.request.user.is_superuser:
+            return Dataset.objects.all()
+        return Dataset.objects.filter(
+            Q(owner=self.request.user) | 
+            Q(contributors=self.request.user)
+        ).distinct()
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Dataset deleted successfully!')
