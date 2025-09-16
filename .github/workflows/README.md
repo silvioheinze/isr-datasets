@@ -24,6 +24,8 @@ This directory contains GitHub Actions workflows for the ISR Datasets project.
 - **Automatically tags with `latest` for default branch pushes**
 - Uses Docker Buildx for multi-platform builds
 - Implements build caching for faster builds
+- Provides build summary in GitHub Actions
+- **Combined latest-tag functionality for streamlined CI/CD**
 
 ### 3. Release (`release.yml`)
 **Trigger**: Version tags (v*), Manual dispatch
@@ -36,22 +38,12 @@ This directory contains GitHub Actions workflows for the ISR Datasets project.
 - Supports manual workflow dispatch
 - Includes proper OCI labels
 
-### 4. Latest Tag (`latest-tag.yml`)
-**Trigger**: Push to main/master branches
-**Purpose**: Ensures latest tag is always updated on main branch
-
-**Features**:
-- **Specifically focuses on `latest` tag**
-- Builds both main application and nginx images
-- Tags with both `latest` and commit SHA
-- Provides build summary in GitHub Actions
-
 ## Key Features
 
 ### Latest Tag Strategy
 All workflows ensure that the `latest` tag is properly maintained:
 
-1. **Main Branch**: `latest-tag.yml` updates `latest` on every push to main
+1. **Main Branch**: `docker-build.yml` updates `latest` on every push to main
 2. **Releases**: `release.yml` tags `latest` for all version releases
 3. **General Builds**: `docker-build.yml` tags `latest` for default branch
 
@@ -87,15 +79,13 @@ docker run -d ghcr.io/your-org/isr-datasets:latest
 ```mermaid
 graph TD
     A[Push to main] --> B[CI Tests]
-    A --> C[Latest Tag]
-    A --> D[Docker Build]
+    A --> C[Docker Build with Latest Tag]
     
     E[Create Tag] --> F[Release]
     
     B --> G[Tests Pass]
-    C --> H[Latest Tagged]
-    D --> I[Images Built]
-    F --> J[Release Created]
+    C --> H[Images Built & Latest Tagged]
+    F --> I[Release Created]
 ```
 
 ## Best Practices
