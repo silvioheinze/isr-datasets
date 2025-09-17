@@ -1,3 +1,4 @@
+import os
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -6,6 +7,28 @@ from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
 
 User = get_user_model()
+
+
+def dataset_version_upload_path(instance, filename):
+    """
+    Custom upload path for dataset version files.
+    Includes dataset ID in the filename to avoid conflicts.
+    Format: datasets/versions/YYYY/MM/DD/dataset_{id}_version_{version}_{filename}
+    """
+    # Get the current date for directory structure
+    now = timezone.now()
+    year = now.strftime('%Y')
+    month = now.strftime('%m')
+    day = now.strftime('%d')
+    
+    # Get file extension
+    _, ext = os.path.splitext(filename)
+    
+    # Create filename with dataset ID and version number
+    safe_filename = f"dataset_{instance.dataset.id}_version_{instance.version_number}_{filename}"
+    
+    # Return the full path
+    return f'datasets/versions/{year}/{month}/{day}/{safe_filename}'
 
 
 class Publisher(models.Model):
@@ -229,7 +252,7 @@ class DatasetVersion(models.Model):
     )
     version_number = models.CharField(max_length=20)
     description = models.TextField(blank=True, help_text='Changes in this version')
-    file = models.FileField(upload_to='datasets/versions/%Y/%m/%d/', blank=True, null=True)
+    file = models.FileField(upload_to=dataset_version_upload_path, blank=True, null=True)
     file_size = models.BigIntegerField(default=0)
     file_url = models.URLField(blank=True, help_text='External URL to the file')
     file_url_description = models.TextField(blank=True, help_text='Description of the external file location')
