@@ -10,8 +10,8 @@ from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db import transaction
 
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, PublishingAuthority
-from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublishingAuthorityForm, PublishingAuthorityFilterForm
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher
+from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm
 
 
 class DatasetListView(ListView):
@@ -468,12 +468,12 @@ def send_comment_notification_email(comment):
         print(f"Failed to send comment notification email: {e}")
 
 
-# Publishing Authority Views
-class PublishingAuthorityListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    """List all publishing authorities"""
-    model = PublishingAuthority
-    context_object_name = 'publishing_authorities'
-    template_name = 'datasets/publishing_authority_list.html'
+# Publisher Views
+class PublisherListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """List all publishers"""
+    model = Publisher
+    context_object_name = 'publishers'
+    template_name = 'datasets/publisher_list.html'
     paginate_by = 20
 
     def test_func(self):
@@ -481,7 +481,7 @@ class PublishingAuthorityListView(LoginRequiredMixin, UserPassesTestMixin, ListV
         return self.request.user.is_superuser
 
     def get_queryset(self):
-        queryset = PublishingAuthority.objects.all().order_by('name')
+        queryset = Publisher.objects.all().order_by('name')
         
         # Filter by search query
         search_query = self.request.GET.get('search', '')
@@ -507,12 +507,12 @@ class PublishingAuthorityListView(LoginRequiredMixin, UserPassesTestMixin, ListV
         return context
 
 
-class PublishingAuthorityCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
-    """Create a new publishing authority"""
-    model = PublishingAuthority
-    form_class = PublishingAuthorityForm
-    template_name = 'datasets/publishing_authority_form.html'
-    success_url = reverse_lazy('datasets:publishing_authority_list')
+class PublisherCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """Create a new publisher"""
+    model = Publisher
+    form_class = PublisherForm
+    template_name = 'datasets/publisher_form.html'
+    success_url = reverse_lazy('datasets:publisher_list')
 
     def test_func(self):
         # Allow access only if user is superuser
@@ -527,12 +527,12 @@ class PublishingAuthorityCreateView(LoginRequiredMixin, UserPassesTestMixin, Cre
         return super().form_invalid(form)
 
 
-class PublishingAuthorityUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    """Update an existing publishing authority"""
-    model = PublishingAuthority
-    form_class = PublishingAuthorityForm
-    template_name = 'datasets/publishing_authority_form.html'
-    success_url = reverse_lazy('datasets:publishing_authority_list')
+class PublisherUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Update an existing publisher"""
+    model = Publisher
+    form_class = PublisherForm
+    template_name = 'datasets/publisher_form.html'
+    success_url = reverse_lazy('datasets:publisher_list')
 
     def test_func(self):
         # Allow access only if user is superuser
@@ -547,11 +547,11 @@ class PublishingAuthorityUpdateView(LoginRequiredMixin, UserPassesTestMixin, Upd
         return super().form_invalid(form)
 
 
-class PublishingAuthorityDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    """Delete a publishing authority"""
-    model = PublishingAuthority
-    template_name = 'datasets/publishing_authority_confirm_delete.html'
-    success_url = reverse_lazy('datasets:publishing_authority_list')
+class PublisherDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Delete a publisher"""
+    model = Publisher
+    template_name = 'datasets/publisher_confirm_delete.html'
+    success_url = reverse_lazy('datasets:publisher_list')
 
     def test_func(self):
         # Allow access only if user is superuser

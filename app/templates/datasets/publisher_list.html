@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Publishing Authorities" %} - {% trans "ISR Datasets" %}{% endblock title %}
+{% block title %}{% trans "Publishers" %} - {% trans "ISR Datasets" %}{% endblock title %}
 
 {% block content %}
 <div class="container mt-4">
@@ -12,13 +12,13 @@
                 <div>
                     <h1 class="h2 mb-1">
                         <i class="bi bi-building me-2"></i>
-                        {% trans "Publishing Authorities" %}
+                        {% trans "Publishers" %}
                     </h1>
-                    <p class="text-muted">{% trans "Manage publishing authorities for datasets" %}</p>
+                    <p class="text-muted">{% trans "Manage publishers for datasets" %}</p>
                 </div>
-                <a href="{% url 'datasets:publishing_authority_create' %}" class="btn btn-primary">
+                <a href="{% url 'datasets:publisher_create' %}" class="btn btn-primary">
                     <i class="bi bi-plus-circle me-2"></i>
-                    {% trans "Add Publishing Authority" %}
+                    {% trans "Add Publisher" %}
                 </a>
             </div>
         </div>
@@ -58,10 +58,10 @@
         </div>
     </div>
 
-    <!-- Publishing Authorities List -->
+    <!-- Publishers List -->
     <div class="row">
         <div class="col-12">
-            {% if publishing_authorities %}
+            {% if publishers %}
                 <div class="card">
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -78,19 +78,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for authority in publishing_authorities %}
+                                    {% for publisher in publishers %}
                                     <tr>
                                         <td>
                                             <div>
-                                                <strong>{{ authority.name }}</strong>
-                                                {% if authority.description %}
-                                                    <br><small class="text-muted">{{ authority.description|truncatechars:100 }}</small>
+                                                <strong>{{ publisher.name }}</strong>
+                                                {% if publisher.description %}
+                                                    <br><small class="text-muted">{{ publisher.description|truncatechars:100 }}</small>
                                                 {% endif %}
                                             </div>
                                         </td>
                                         <td>
-                                            {% if authority.website %}
-                                                <a href="{{ authority.website }}" target="_blank" class="text-decoration-none">
+                                            {% if publisher.website %}
+                                                <a href="{{ publisher.website }}" target="_blank" class="text-decoration-none">
                                                     <i class="bi bi-link-45deg me-1"></i>
                                                     {% trans "Website" %}
                                                 </a>
@@ -99,32 +99,32 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <span class="badge bg-secondary">{{ authority.datasets.count }}</span>
+                                            <span class="badge bg-secondary">{{ publisher.datasets.count }}</span>
                                         </td>
                                         <td>
-                                            {% if authority.is_active %}
+                                            {% if publisher.is_active %}
                                                 <span class="badge bg-success">{% trans "Active" %}</span>
                                             {% else %}
                                                 <span class="badge bg-secondary">{% trans "Inactive" %}</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            {% if authority.is_default %}
+                                            {% if publisher.is_default %}
                                                 <span class="badge bg-primary">{% trans "Default" %}</span>
                                             {% else %}
                                                 <span class="text-muted">-</span>
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <small class="text-muted">{{ authority.created_at|date:"M d, Y" }}</small>
+                                            <small class="text-muted">{{ publisher.created_at|date:"M d, Y" }}</small>
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{% url 'datasets:publishing_authority_edit' authority.pk %}" 
+                                                <a href="{% url 'datasets:publisher_edit' publisher.pk %}" 
                                                    class="btn btn-outline-secondary btn-sm" title="{% trans 'Edit' %}">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <a href="{% url 'datasets:publishing_authority_delete' authority.pk %}" 
+                                                <a href="{% url 'datasets:publisher_delete' publisher.pk %}" 
                                                    class="btn btn-outline-danger btn-sm" title="{% trans 'Delete' %}">
                                                     <i class="bi bi-trash"></i>
                                                 </a>
@@ -140,7 +140,7 @@
 
                 <!-- Pagination -->
                 {% if is_paginated %}
-                <nav aria-label="{% trans 'Publishing authorities pagination' %}" class="mt-4">
+                <nav aria-label="{% trans 'Publishers pagination' %}" class="mt-4">
                     <ul class="pagination justify-content-center">
                         {% if page_obj.has_previous %}
                             <li class="page-item">
@@ -182,19 +182,19 @@
                 <div class="card">
                     <div class="card-body text-center py-5">
                         <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
-                        <h5 class="mt-3 text-muted">{% trans "No publishing authorities found" %}</h5>
+                        <h5 class="mt-3 text-muted">{% trans "No publishers found" %}</h5>
                         <p class="text-muted">
                             {% if search_query or is_active_filter %}
                                 {% trans "Try adjusting your search criteria or" %}
-                                <a href="{% url 'datasets:publishing_authority_list' %}">{% trans "clear all filters" %}</a>.
+                                <a href="{% url 'datasets:publisher_list' %}">{% trans "clear all filters" %}</a>.
                             {% else %}
-                                {% trans "Get started by creating your first publishing authority." %}
+                                {% trans "Get started by creating your first publisher." %}
                             {% endif %}
                         </p>
                         {% if not search_query and not is_active_filter %}
-                            <a href="{% url 'datasets:publishing_authority_create' %}" class="btn btn-primary">
+                            <a href="{% url 'datasets:publisher_create' %}" class="btn btn-primary">
                                 <i class="bi bi-plus-circle me-2"></i>
-                                {% trans "Add Publishing Authority" %}
+                                {% trans "Add Publisher" %}
                             </a>
                         {% endif %}
                     </div>

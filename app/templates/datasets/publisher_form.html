@@ -3,9 +3,9 @@
 
 {% block title %}
     {% if object %}
-        {% trans "Edit Publishing Authority" %} - {% trans "ISR Datasets" %}
+        {% trans "Edit Publisher" %} - {% trans "ISR Datasets" %}
     {% else %}
-        {% trans "Add Publishing Authority" %} - {% trans "ISR Datasets" %}
+        {% trans "Add Publisher" %} - {% trans "ISR Datasets" %}
     {% endif %}
 {% endblock title %}
 
@@ -19,7 +19,7 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{% url 'datasets:publishing_authority_list' %}">{% trans "Publishing Authorities" %}</a>
+                                <a href="{% url 'datasets:publisher_list' %}">{% trans "Publishers" %}</a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
                                 {% if object %}
@@ -33,16 +33,16 @@
                     <h1 class="h2 mb-1">
                         <i class="bi bi-building me-2"></i>
                         {% if object %}
-                            {% trans "Edit Publishing Authority" %}
+                            {% trans "Edit Publisher" %}
                         {% else %}
-                            {% trans "Add Publishing Authority" %}
+                            {% trans "Add Publisher" %}
                         {% endif %}
                     </h1>
                     <p class="text-muted">
                         {% if object %}
-                            {% trans "Update the publishing authority information" %}
+                            {% trans "Update the publisher information" %}
                         {% else %}
-                            {% trans "Create a new publishing authority for datasets" %}
+                            {% trans "Create a new publisher for datasets" %}
                         {% endif %}
                     </p>
                 </div>
@@ -162,16 +162,16 @@
 
                         <!-- Form Actions -->
                         <div class="d-flex justify-content-between">
-                            <a href="{% url 'datasets:publishing_authority_list' %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'datasets:publisher_list' %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>
                                 {% trans "Back to List" %}
                             </a>
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-save me-2"></i>
                                 {% if object %}
-                                    {% trans "Update Publishing Authority" %}
+                                    {% trans "Update Publisher" %}
                                 {% else %}
-                                    {% trans "Create Publishing Authority" %}
+                                    {% trans "Create Publisher" %}
                                 {% endif %}
                             </button>
                         </div>

@@ -123,7 +123,7 @@
             {% endif %}
 
             <!-- Attribution -->
-            {% if dataset.license or dataset.citation or dataset.doi or dataset.publishing_authority or dataset.uri_ref or dataset.contributors.exists %}
+            {% if dataset.license or dataset.citation or dataset.doi or dataset.publisher or dataset.uri_ref or dataset.contributors.exists %}
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
@@ -175,10 +175,10 @@
                     </div>
                     {% endif %}
                     
-                    {% if dataset.publishing_authority %}
+                    {% if dataset.publisher %}
                     <div class="mb-3">
-                        <strong>{% trans "Publishing Authority" %}:</strong>
-                        <p class="mb-0">{{ dataset.publishing_authority }}</p>
+                        <strong>{% trans "Publisher" %}:</strong>
+                        <p class="mb-0">{{ dataset.publisher.name }}</p>
                     </div>
                     {% endif %}
                     

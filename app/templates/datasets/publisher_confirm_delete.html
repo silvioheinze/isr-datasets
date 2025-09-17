@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Delete Publishing Authority" %} - {% trans "ISR Datasets" %}{% endblock title %}
+{% block title %}{% trans "Delete Publisher" %} - {% trans "ISR Datasets" %}{% endblock title %}
 
 {% block content %}
 <div class="container mt-4">
@@ -13,27 +13,27 @@
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item">
-                                <a href="{% url 'datasets:publishing_authority_list' %}">{% trans "Publishing Authorities" %}</a>
+                                <a href="{% url 'datasets:publisher_list' %}">{% trans "Publishers" %}</a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">{% trans "Delete" %}</li>
                         </ol>
                     </nav>
                     <h1 class="h2 mb-1">
                         <i class="bi bi-trash me-2"></i>
-                        {% trans "Delete Publishing Authority" %}
+                        {% trans "Delete Publisher" %}
                     </h1>
-                    <p class="text-muted">{% trans "Are you sure you want to delete this publishing authority?" %}</p>
+                    <p class="text-muted">{% trans "Are you sure you want to delete this publisher?" %}</p>
                 </div>
             </div>
 
             <!-- Confirmation Card -->
             <div class="card shadow">
                 <div class="card-body p-4">
-                    <!-- Publishing Authority Info -->
+                    <!-- Publisher Info -->
                     <div class="mb-4">
                         <h5 class="mb-3">
                             <i class="bi bi-building me-2"></i>
-                            {% trans "Publishing Authority Details" %}
+                            {% trans "Publisher Details" %}
                         </h5>
                         
                         <div class="row">
@@ -112,11 +112,11 @@
                                 <span class="badge bg-secondary">{{ dataset_count }}</span>
                                 {% if dataset_count > 0 %}
                                     <span class="text-muted ms-2">
-                                        {% trans "This publishing authority is used by" %} {{ dataset_count }} {% trans "dataset(s)" %}.
+                                        {% trans "This publisher is used by" %} {{ dataset_count }} {% trans "dataset(s)" %}.
                                     </span>
                                 {% else %}
                                     <span class="text-muted ms-2">
-                                        {% trans "This publishing authority is not used by any datasets." %}
+                                        {% trans "This publisher is not used by any datasets." %}
                                     </span>
                                 {% endif %}
                             </div>
@@ -128,20 +128,20 @@
                         <div class="alert alert-warning">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             <strong>{% trans "Warning" %}:</strong>
-                            {% trans "This publishing authority cannot be deleted because it is used by" %} {{ dataset_count }} {% trans "dataset(s)" %}.
+                            {% trans "This publisher cannot be deleted because it is used by" %} {{ dataset_count }} {% trans "dataset(s)" %}.
                             {% trans "Please reassign or remove the datasets first." %}
                         </div>
                     {% else %}
                         <div class="alert alert-danger">
                             <i class="bi bi-exclamation-triangle me-2"></i>
                             <strong>{% trans "Warning" %}:</strong>
-                            {% trans "This action cannot be undone. The publishing authority will be permanently deleted." %}
+                            {% trans "This action cannot be undone. The publisher will be permanently deleted." %}
                         </div>
                     {% endif %}
 
                     <!-- Form Actions -->
                     <div class="d-flex justify-content-between">
-                        <a href="{% url 'datasets:publishing_authority_list' %}" class="btn btn-outline-secondary">
+                        <a href="{% url 'datasets:publisher_list' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-2"></i>
                             {% trans "Cancel" %}
                         </a>
@@ -151,7 +151,7 @@
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-danger">
                                     <i class="bi bi-trash me-2"></i>
-                                    {% trans "Delete Publishing Authority" %}
+                                    {% trans "Delete Publisher" %}
                                 </button>
                             </form>
                         {% else %}

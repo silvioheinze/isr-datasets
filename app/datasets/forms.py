@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Dataset, DatasetCategory, DatasetVersion, Comment, PublishingAuthority
+from .models import Dataset, DatasetCategory, DatasetVersion, Comment, Publisher
 from projects.models import Project
 
 User = get_user_model()
@@ -15,7 +15,7 @@ class DatasetForm(forms.ModelForm):
         fields = [
             'title', 'description', 'abstract', 'category', 'tags', 'keywords',
             'status', 'access_level', 'is_featured', 'license',
-            'citation', 'doi', 'publishing_authority', 'uri_ref', 'contributors', 'related_datasets', 'project'
+            'citation', 'doi', 'publisher', 'uri_ref', 'contributors', 'related_datasets', 'project'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -58,7 +58,7 @@ class DatasetForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Digital Object Identifier'
             }),
-                'publishing_authority': forms.Select(attrs={
+                'publisher': forms.Select(attrs={
                     'class': 'form-select'
                 }),
             'uri_ref': forms.URLInput(attrs={
@@ -92,9 +92,9 @@ class DatasetForm(forms.ModelForm):
         # Only show active categories
         self.fields['category'].queryset = DatasetCategory.objects.filter(is_active=True)
         
-        # Only show active publishing authorities
-        self.fields['publishing_authority'].queryset = PublishingAuthority.objects.filter(is_active=True)
-        self.fields['publishing_authority'].empty_label = "Select a publishing authority..."
+        # Only show active publishers
+        self.fields['publisher'].queryset = Publisher.objects.filter(is_active=True)
+        self.fields['publisher'].empty_label = "Select a publisher..."
         
         # Configure related datasets queryset
         if self.instance.pk:
@@ -444,11 +444,11 @@ class CommentEditForm(forms.ModelForm):
         return content.strip()
 
 
-class PublishingAuthorityForm(forms.ModelForm):
-    """Form for creating and editing publishing authorities"""
+class PublisherForm(forms.ModelForm):
+    """Form for creating and editing publishers"""
     
     class Meta:
-        model = PublishingAuthority
+        model = Publisher
         fields = ['name', 'description', 'website', 'is_active', 'is_default']
         widgets = {
             'name': forms.TextInput(attrs={
@@ -458,7 +458,7 @@ class PublishingAuthorityForm(forms.ModelForm):
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
-                'placeholder': 'Optional description of the publishing authority'
+                'placeholder': 'Optional description of the publisher'
             }),
             'website': forms.URLInput(attrs={
                 'class': 'form-control',
@@ -481,20 +481,20 @@ class PublishingAuthorityForm(forms.ModelForm):
         self.fields['is_default'].label = 'Default'
         
         # Add help text
-        self.fields['name'].help_text = 'Name of the publishing authority'
+        self.fields['name'].help_text = 'Name of the publisher'
         self.fields['description'].help_text = 'Optional description'
         self.fields['website'].help_text = 'Official website URL'
-        self.fields['is_active'].help_text = 'Whether this authority is available for selection'
-        self.fields['is_default'].help_text = 'Whether this is the default authority for new datasets'
+        self.fields['is_active'].help_text = 'Whether this publisher is available for selection'
+        self.fields['is_default'].help_text = 'Whether this is the default publisher for new datasets'
 
 
-class PublishingAuthorityFilterForm(forms.Form):
-    """Form for filtering publishing authorities"""
+class PublisherFilterForm(forms.Form):
+    """Form for filtering publishers"""
     name = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Search publishing authorities...'
+            'placeholder': 'Search publishers...'
         })
     )
     is_active = forms.ChoiceField(

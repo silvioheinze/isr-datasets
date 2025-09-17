@@ -8,49 +8,49 @@ from auditlog.models import AuditlogHistoryField
 User = get_user_model()
 
 
-class PublishingAuthority(models.Model):
-    """Model for dataset publishing authorities"""
+class Publisher(models.Model):
+    """Model for dataset publishers"""
     name = models.CharField(
         max_length=200, 
         unique=True,
         verbose_name=_('Name'),
-        help_text=_('Name of the publishing authority (e.g., University of Vienna, Research Institute)')
+        help_text=_('Name of the publisher (e.g., University of Vienna, Research Institute)')
     )
     description = models.TextField(
         blank=True,
         verbose_name=_('Description'),
-        help_text=_('Optional description of the publishing authority')
+        help_text=_('Optional description of the publisher')
     )
     website = models.URLField(
         blank=True,
         verbose_name=_('Website'),
-        help_text=_('Official website of the publishing authority')
+        help_text=_('Official website of the publisher')
     )
     is_active = models.BooleanField(
         default=True,
         verbose_name=_('Active'),
-        help_text=_('Whether this publishing authority is active and available for selection')
+        help_text=_('Whether this publisher is active and available for selection')
     )
     is_default = models.BooleanField(
         default=False,
         verbose_name=_('Default'),
-        help_text=_('Whether this is the default publishing authority for new datasets')
+        help_text=_('Whether this is the default publisher for new datasets')
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = _('Publishing Authority')
-        verbose_name_plural = _('Publishing Authorities')
+        verbose_name = _('Publisher')
+        verbose_name_plural = _('Publishers')
         ordering = ['name']
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        # Ensure only one default publishing authority
+        # Ensure only one default publisher
         if self.is_default:
-            PublishingAuthority.objects.filter(is_default=True).update(is_default=False)
+            Publisher.objects.filter(is_default=True).update(is_default=False)
         super().save(*args, **kwargs)
 
 
@@ -148,13 +148,13 @@ class Dataset(models.Model):
     doi = models.CharField(max_length=100, blank=True, help_text='Digital Object Identifier')
     
     # Publishing information
-    publishing_authority = models.ForeignKey(
-        PublishingAuthority,
+    publisher = models.ForeignKey(
+        Publisher,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name='datasets',
-        verbose_name=_('Publishing Authority'),
+        verbose_name=_('Publisher'),
         help_text=_('The organization or institution that published this dataset')
     )
     uri_ref = models.URLField(
@@ -347,7 +347,7 @@ class Comment(models.Model):
 
 
 # Register models for audit logging
-auditlog.register(PublishingAuthority)
+auditlog.register(Publisher)
 auditlog.register(Dataset)
 auditlog.register(DatasetCategory)
 auditlog.register(DatasetVersion)

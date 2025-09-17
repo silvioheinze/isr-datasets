@@ -2,11 +2,11 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, PublishingAuthority
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher
 
 
-@admin.register(PublishingAuthority)
-class PublishingAuthorityAdmin(admin.ModelAdmin):
+@admin.register(Publisher)
+class PublisherAdmin(admin.ModelAdmin):
     list_display = ['name', 'website_display', 'dataset_count', 'is_active', 'is_default', 'created_at']
     list_filter = ['is_active', 'is_default', 'created_at']
     search_fields = ['name', 'description', 'website']
@@ -90,7 +90,7 @@ class DatasetAdmin(admin.ModelAdmin):
             'fields': ('owner', 'contributors', 'related_datasets', 'project', 'license', 'citation', 'doi')
         }),
         ('Publishing Information', {
-            'fields': ('publishing_authority', 'uri_ref')
+            'fields': ('publisher', 'uri_ref')
         }),
         ('Statistics', {
             'fields': ('download_count', 'view_count'),

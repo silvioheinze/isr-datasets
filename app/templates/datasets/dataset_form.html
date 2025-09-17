@@ -261,13 +261,13 @@
 
                         <div class="row mb-3">
                             <div class="col-12">
-                                <label for="{{ form.publishing_authority.id_for_label }}" class="form-label">
-                                    {% trans "Publishing Authority" %}
+                                <label for="{{ form.publisher.id_for_label }}" class="form-label">
+                                    {% trans "Publisher" %}
                                 </label>
-                                {{ form.publishing_authority }}
-                                {% if form.publishing_authority.errors %}
+                                {{ form.publisher }}
+                                {% if form.publisher.errors %}
                                     <div class="invalid-feedback d-block">
-                                        {{ form.publishing_authority.errors.0 }}
+                                        {{ form.publisher.errors.0 }}
                                     </div>
                                 {% endif %}
                                 <div class="form-text">{% trans "The organization or institution that published this dataset (optional)" %}</div>
