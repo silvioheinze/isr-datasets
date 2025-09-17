@@ -263,6 +263,10 @@ class DatasetVersionCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, f'Version {form.instance.version_number} created successfully!')
         return super().form_valid(form)
 
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
+
     def get_success_url(self):
         return reverse('datasets:dataset_detail', kwargs={'pk': self.dataset.pk})
 

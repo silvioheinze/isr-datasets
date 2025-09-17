@@ -254,7 +254,7 @@ class DatasetVersionForm(forms.ModelForm):
         # Add help text for fields
         self.fields['version_number'].help_text = 'Use semantic versioning (e.g., 1.0, 1.1, 2.0)'
         self.fields['description'].help_text = 'Optional: Describe what changed in this version'
-        self.fields['file'].help_text = 'Upload the new version file (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG formats supported)'
+        self.fields['file'].help_text = 'Upload the new version file (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG formats supported, max 1GB)'
         self.fields['file_url'].help_text = 'External URL where the file can be accessed'
         self.fields['file_url_description'].help_text = 'Optional: Describe where the file is located'
         self.fields['file_size_text'].help_text = 'Human-readable file size (e.g., "2.5 MB", "1.2 GB")'
@@ -292,9 +292,9 @@ class DatasetVersionForm(forms.ModelForm):
             if file_size_text:
                 raise forms.ValidationError('File size will be calculated automatically when uploading.')
                 
-            # Check file size (limit to 100MB)
-            if file.size > 100 * 1024 * 1024:
-                raise forms.ValidationError('File size cannot exceed 100MB.')
+            # Check file size (limit to 1GB)
+            if file.size > 1024 * 1024 * 1024:
+                raise forms.ValidationError('File size cannot exceed 1GB.')
             
             # Update file_size field
             self.instance.file_size = file.size
@@ -320,9 +320,9 @@ class DatasetVersionForm(forms.ModelForm):
         
         # Only validate file if upload method is selected
         if input_method == 'upload' and file:
-            # Check file size (limit to 100MB)
-            if file.size > 100 * 1024 * 1024:
-                raise forms.ValidationError('File size cannot exceed 100MB.')
+            # Check file size (limit to 1GB)
+            if file.size > 1024 * 1024 * 1024:
+                raise forms.ValidationError('File size cannot exceed 1GB.')
         
         return file
 
