@@ -38,6 +38,12 @@
                         {% trans "Edit" %}
                     </a>
                     {% endif %}
+                    {% if can_assign_project %}
+                    <a href="{% url 'datasets:assign_to_project' dataset.pk %}" class="btn btn-outline-info me-2">
+                        <i class="bi bi-folder-plus me-2"></i>
+                        {% trans "Manage Projects" %}
+                    </a>
+                    {% endif %}
                     <a href="{% url 'datasets:dataset_list' %}" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left me-2"></i>
                         {% trans "Back" %}
@@ -244,6 +250,21 @@
                             {{ dataset.get_access_level_display }}
                         </span>
                     </div>
+                    {% if dataset.projects.exists %}
+                    <div class="mb-3">
+                        <strong>{% trans "Projects" %}:</strong>
+                        <div class="mt-1">
+                            {% for project in dataset.projects.all %}
+                                <div class="mb-1">
+                                    <a href="{{ project.get_absolute_url }}" class="text-decoration-none">
+                                        <i class="bi bi-folder me-1"></i>
+                                        {{ project.title }}
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

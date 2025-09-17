@@ -14,8 +14,8 @@ class DatasetForm(forms.ModelForm):
         model = Dataset
         fields = [
             'title', 'description', 'abstract', 'category', 'tags', 'keywords',
-            'status', 'access_level', 'is_featured', 'license',
-            'citation', 'doi', 'publisher', 'uri_ref', 'contributors', 'related_datasets', 'project'
+            'status', 'access_level', 'license',
+            'citation', 'doi', 'publisher', 'uri_ref', 'contributors', 'related_datasets', 'projects'
         ]
         widgets = {
             'title': forms.TextInput(attrs={
@@ -44,7 +44,6 @@ class DatasetForm(forms.ModelForm):
             }),
             'status': forms.Select(attrs={'class': 'form-select'}),
             'access_level': forms.Select(attrs={'class': 'form-select'}),
-            'is_featured': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'license': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'e.g., CC BY 4.0, MIT License'
@@ -73,18 +72,15 @@ class DatasetForm(forms.ModelForm):
                 'class': 'form-select',
                 'size': 5
             }),
-            'project': forms.Select(attrs={
-                'class': 'form-select'
+            'projects': forms.SelectMultiple(attrs={
+                'class': 'form-select',
+                'size': 5
             })
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
-        
-        # Only show featured checkbox to superusers
-        if not (user and user.is_superuser):
-            self.fields['is_featured'].widget = forms.HiddenInput()
         
         # Limit contributors to active users
         self.fields['contributors'].queryset = User.objects.filter(is_active=True)
@@ -104,16 +100,19 @@ class DatasetForm(forms.ModelForm):
             # When creating, show all datasets
             self.fields['related_datasets'].queryset = Dataset.objects.all()
         
-        # Configure project queryset based on user access
+        # Configure projects queryset based on user access
         if user and user.is_authenticated:
-            # Show projects the user owns or collaborates on
-            accessible_projects = Project.objects.filter(
-                Q(owner=user) | Q(collaborators=user) | Q(access_level='public')
-            ).distinct()
-            self.fields['project'].queryset = accessible_projects
+            # Show all projects if superuser, otherwise show projects the user owns or collaborates on
+            if user.is_superuser:
+                self.fields['projects'].queryset = Project.objects.all()
+            else:
+                accessible_projects = Project.objects.filter(
+                    Q(owner=user) | Q(collaborators=user) | Q(access_level='public')
+                ).distinct()
+                self.fields['projects'].queryset = accessible_projects
         else:
             # No projects if user is not authenticated
-            self.fields['project'].queryset = Project.objects.none()
+            self.fields['projects'].queryset = Project.objects.none()
 
     def clean_tags(self):
         tags = self.cleaned_data.get('tags')
@@ -502,3 +501,34 @@ class PublisherFilterForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+
+
+class DatasetProjectAssignmentForm(forms.Form):
+    """Form for assigning datasets to projects"""
+    projects = forms.ModelMultipleChoiceField(
+        queryset=None,
+        widget=forms.CheckboxSelectMultiple(attrs={
+            'class': 'form-check-input'
+        }),
+        help_text="Choose one or more projects to associate this dataset with",
+        required=False
+    )
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        dataset = kwargs.pop('dataset', None)
+        super().__init__(*args, **kwargs)
+        
+        if user:
+            # Show projects where user is owner or collaborator, or all projects if superuser
+            from projects.models import Project
+            if user.is_superuser:
+                self.fields['projects'].queryset = Project.objects.all().order_by('title')
+            else:
+                self.fields['projects'].queryset = Project.objects.filter(
+                    Q(owner=user) | Q(collaborators=user)
+                ).distinct().order_by('title')
+            
+            # Pre-select current projects if editing
+            if dataset and dataset.pk:
+                self.fields['projects'].initial = dataset.projects.all()

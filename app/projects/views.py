@@ -67,7 +67,7 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     
     def get_queryset(self):
         return Project.objects.select_related('owner').prefetch_related(
-            'collaborators', 'datasets', 'datasets__owner'
+            'collaborators', 'datasets__owner', 'datasets__category', 'datasets__versions'
         )
     
     def get_object(self, queryset=None):
@@ -82,11 +82,6 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.get_object()
-        
-        # Add project datasets to context
-        context['project_datasets'] = project.datasets.filter(
-            status='published'
-        ).select_related('owner', 'category')[:10]
         
         context['can_edit'] = (
             self.request.user == project.owner or
@@ -175,27 +170,3 @@ class ProjectDeleteView(LoginRequiredMixin, DeleteView):
         )
         return response
 
-
-def project_datasets(request, pk):
-    """View all datasets associated with a project"""
-    project = get_object_or_404(Project, pk=pk)
-    
-    # Check access permissions
-    if not project.is_accessible_by(request.user):
-        raise Http404("Project not found or access denied")
-    
-    datasets = project.datasets.filter(status='published').select_related(
-        'owner', 'category'
-    ).order_by('-created_at')
-    
-    context = {
-        'project': project,
-        'datasets': datasets,
-        'can_edit': (
-            request.user == project.owner or
-            request.user in project.collaborators.all() or
-            request.user.is_superuser
-        )
-    }
-    
-    return render(request, 'projects/project_datasets.html', context)

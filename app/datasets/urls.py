@@ -11,6 +11,7 @@ urlpatterns = [
     path('<int:pk>/edit/', views.DatasetUpdateView.as_view(), name='dataset_edit'),
     path('<int:pk>/delete/', views.DatasetDeleteView.as_view(), name='dataset_delete'),
     path('<int:pk>/download/', views.dataset_download, name='dataset_download'),
+    path('<int:pk>/assign-project/', views.assign_dataset_to_project, name='assign_to_project'),
     path('<int:dataset_pk>/version/create/', views.DatasetVersionCreateView.as_view(), name='dataset_version_create'),
     
     # Statistics

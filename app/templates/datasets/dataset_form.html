@@ -189,19 +189,6 @@
                             </div>
                         </div>
 
-                        {% if user.is_superuser %}
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <div class="form-check">
-                                    {{ form.is_featured }}
-                                    <label class="form-check-label" for="{{ form.is_featured.id_for_label }}">
-                                        {% trans "Featured Dataset" %}
-                                    </label>
-                                    <div class="form-text">{% trans "Show this dataset in the featured section" %}</div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
 
                         <!-- Attribution -->
                         <hr class="my-4">

@@ -132,14 +132,12 @@ class Dataset(models.Model):
     )
     
     # Project association
-    project = models.ForeignKey(
+    projects = models.ManyToManyField(
         'projects.Project',
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
         related_name='datasets',
-        verbose_name=_("Project"),
-        help_text=_("The research project this dataset is associated with")
+        verbose_name=_("Projects"),
+        help_text=_("The research projects this dataset is associated with")
     )
     
     # License and citation

@@ -3139,3 +3139,27 @@ msgstr ""
 #: datasets/templates/datasets/dataset_version_form.html:270
 msgid "Maximum file size: 1GB (supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG)"
 msgstr "Maximale Dateigröße: 1GB (unterstützte Formate: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG)"
+
+#: datasets/templates/datasets/assign_to_project.html:10
+msgid "Assign Dataset to Project"
+msgstr "Dataset einem Projekt zuweisen"
+
+#: datasets/templates/datasets/assign_to_project.html:42
+msgid "No projects available. You need to be an owner or collaborator of a project to assign datasets to it."
+msgstr "Keine Projekte verfügbar. Sie müssen Eigentümer oder Mitarbeiter eines Projekts sein, um Datasets zuzuweisen."
+
+#: datasets/templates/datasets/assign_to_project.html:64
+msgid "Update Project Assignments"
+msgstr "Projektzuweisungen aktualisieren"
+
+#: datasets/templates/datasets/dataset_detail.html:44
+msgid "Manage Projects"
+msgstr "Projekte verwalten"
+
+#: datasets/templates/datasets/assign_to_project.html:43
+msgid "No projects available in the system."
+msgstr "Keine Projekte im System verfügbar."
+
+#: datasets/templates/datasets/assign_to_project.html:60
+msgid "As a superuser, you can assign datasets to any project in the system."
+msgstr "Als Superuser können Sie Datasets jedem Projekt im System zuweisen."

@@ -31,12 +31,6 @@
                         <span class="badge {% if project.access_level == 'public' %}bg-success{% elif project.access_level == 'restricted' %}bg-warning{% else %}bg-secondary{% endif %} fs-6">
                             {{ project.get_access_level_display }}
                         </span>
-                        {% if project.is_active %}
-                            <span class="badge bg-success fs-6">
-                                <i class="bi bi-play-circle me-1"></i>
-                                {% trans "Active" %}
-                            </span>
-                        {% endif %}
                     </div>
                 </div>
                 <div class="d-flex gap-2">
@@ -46,11 +40,6 @@
                             {% trans "Edit Project" %}
                         </a>
                     {% endif %}
-                    <a href="{% url 'projects:project_datasets' project.pk %}" class="btn btn-primary">
-                        <i class="bi bi-collection me-2"></i>
-                        {% trans "View Datasets" %}
-                        <span class="badge bg-light text-dark ms-2">{{ project.datasets.count }}</span>
-                    </a>
                 </div>
             </div>
         </div>
@@ -269,8 +258,7 @@
         </div>
     </div>
 
-    <!-- Associated Datasets -->
-    {% if project_datasets %}
+    <!-- Project Datasets -->
     <div class="row mt-4">
         <div class="col-12">
             <div class="card">
@@ -278,45 +266,121 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
                             <i class="bi bi-collection me-2"></i>
-                            {% trans "Associated Datasets" %}
+                            {% trans "Project Datasets" %}
                         </h5>
-                        <a href="{% url 'projects:project_datasets' project.pk %}" class="btn btn-outline-primary btn-sm">
-                            {% trans "View All" %}
-                            <span class="badge bg-primary ms-1">{{ project.datasets.count }}</span>
-                        </a>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i>
+                                {% trans "Add Dataset" %}
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for dataset in project_datasets %}
-                        <div class="col-md-6 mb-3">
-                            <div class="card border">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="text-decoration-none">
-                                            {{ dataset.title }}
-                                        </a>
-                                    </h6>
-                                    <p class="card-text small text-muted">
-                                        {{ dataset.description|truncatechars:100 }}
-                                    </p>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            {% trans "by" %} {{ dataset.owner.username }}
-                                        </small>
-                                        <span class="badge {% if dataset.status == 'published' %}bg-success{% else %}bg-warning{% endif %}">
-                                            {{ dataset.get_status_display }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="card-body p-0">
+                    {% if project.datasets.exists %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{% trans "Dataset" %}</th>
+                                        <th>{% trans "Category" %}</th>
+                                        <th>{% trans "Status" %}</th>
+                                        <th>{% trans "Versions" %}</th>
+                                        <th>{% trans "Downloads" %}</th>
+                                        <th>{% trans "Owner" %}</th>
+                                        <th>{% trans "Created" %}</th>
+                                        <th>{% trans "Actions" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dataset in project.datasets.all %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-database text-primary me-2"></i>
+                                                <div>
+                                                    <strong>
+                                                        <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="text-decoration-none">
+                                                            {{ dataset.title }}
+                                                        </a>
+                                                    </strong>
+                                                    {% if dataset.description %}
+                                                        <br>
+                                                        <small class="text-muted">{{ dataset.description|truncatechars:60 }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if dataset.category %}
+                                                <span class="badge" style="background-color: {{ dataset.category.color }}; color: {% if dataset.category.color == '#ffffff' or dataset.category.color == '#fff' %}#000{% else %}#fff{% endif %};">
+                                                    {{ dataset.category.name }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">{% trans "No category" %}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if dataset.status == 'published' %}bg-success{% elif dataset.status == 'draft' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                                {{ dataset.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ dataset.versions.count }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ dataset.download_count }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-person-circle text-secondary me-1"></i>
+                                                {{ dataset.owner.username }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ dataset.created_at|date:"M d, Y" }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="btn btn-outline-primary" title="{% trans 'View' %}">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                {% if dataset.owner == user or user.is_superuser %}
+                                                    <a href="{% url 'datasets:dataset_edit' dataset.pk %}" class="btn btn-outline-secondary" title="{% trans 'Edit' %}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                {% endif %}
+                                                {% if dataset.is_accessible_by %}
+                                                    <a href="{% url 'datasets:dataset_download' dataset.pk %}" class="btn btn-outline-success" title="{% trans 'Download' %}">
+                                                        <i class="bi bi-download"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        {% endfor %}
-                    </div>
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="bi bi-collection text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                            <h3 class="h4 text-muted mb-3">{% trans "No Datasets Found" %}</h3>
+                            <p class="text-muted mb-4">
+                                {% trans "This project doesn't have any associated datasets yet." %}
+                            </p>
+                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Add First Dataset" %}
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock content %}

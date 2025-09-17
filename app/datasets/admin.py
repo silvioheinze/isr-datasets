@@ -66,17 +66,17 @@ class DatasetCategoryAdmin(admin.ModelAdmin):
 @admin.register(Dataset)
 class DatasetAdmin(admin.ModelAdmin):
     list_display = [
-        'title', 'owner', 'category', 'project', 'status', 'access_level', 
+        'title', 'owner', 'category', 'projects_display', 'status', 'access_level', 
         'download_count', 'view_count', 'is_featured', 'created_at'
     ]
     list_filter = [
-        'status', 'access_level', 'category', 'project', 'is_featured', 
+        'status', 'access_level', 'category', 'projects', 'is_featured', 
         'created_at'
     ]
-    search_fields = ['title', 'description', 'abstract', 'tags', 'keywords', 'project__title']
+    search_fields = ['title', 'description', 'abstract', 'tags', 'keywords', 'projects__title']
     list_editable = ['status', 'access_level', 'is_featured']
     readonly_fields = ['download_count', 'view_count', 'created_at', 'updated_at', 'published_at']
-    filter_horizontal = ['contributors', 'related_datasets']
+    filter_horizontal = ['contributors', 'related_datasets', 'projects']
     ordering = ['-created_at']
     
     fieldsets = (
@@ -87,7 +87,7 @@ class DatasetAdmin(admin.ModelAdmin):
             'fields': ('status', 'access_level', 'is_featured')
         }),
         ('Ownership & Attribution', {
-            'fields': ('owner', 'contributors', 'related_datasets', 'project', 'license', 'citation', 'doi')
+            'fields': ('owner', 'contributors', 'related_datasets', 'projects', 'license', 'citation', 'doi')
         }),
         ('Publishing Information', {
             'fields': ('publisher', 'uri_ref')
@@ -103,7 +103,15 @@ class DatasetAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('owner', 'category').prefetch_related('contributors')
+        return super().get_queryset(request).select_related('owner', 'category').prefetch_related('contributors', 'projects')
+    
+    def projects_display(self, obj):
+        """Display projects as a comma-separated list"""
+        projects = obj.projects.all()
+        if projects:
+            return ', '.join([p.title for p in projects])
+        return '-'
+    projects_display.short_description = 'Projects'
 
 
 @admin.register(DatasetVersion)

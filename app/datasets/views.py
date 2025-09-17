@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.db import transaction
 
 from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher
-from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm
+from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm
 
 
 class DatasetListView(ListView):
@@ -74,8 +74,8 @@ class DatasetDetailView(DetailView):
     context_object_name = 'dataset'
 
     def get_queryset(self):
-        return Dataset.objects.select_related('owner', 'category').prefetch_related(
-            'contributors', 'versions', 'related_datasets', 'comments__author'
+        return Dataset.objects.select_related('owner', 'category', 'publisher').prefetch_related(
+            'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
         )
 
     def get_object(self, queryset=None):
@@ -106,6 +106,10 @@ class DatasetDetailView(DetailView):
             self.request.user.is_superuser
         )
         context['can_download'] = dataset.is_accessible_by(self.request.user)
+        context['can_assign_project'] = (
+            self.request.user == dataset.owner or 
+            self.request.user.is_superuser
+        )
         
         # Add comments to context
         context['comments'] = dataset.comments.filter(is_approved=True).select_related('author')
@@ -585,3 +589,36 @@ class PublisherDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         
         messages.success(request, f'Publishing authority "{publishing_authority.name}" deleted successfully.')
         return super().delete(request, *args, **kwargs)
+
+
+def assign_dataset_to_project(request, pk):
+    """Assign a dataset to projects"""
+    dataset = get_object_or_404(Dataset, pk=pk)
+    
+    # Check permissions - user must be dataset owner or superuser
+    if not (request.user == dataset.owner or request.user.is_superuser):
+        messages.error(request, 'You do not have permission to assign this dataset to projects.')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    if request.method == 'POST':
+        form = DatasetProjectAssignmentForm(request.POST, user=request.user, dataset=dataset)
+        if form.is_valid():
+            selected_projects = form.cleaned_data['projects']
+            
+            # Update the dataset's projects
+            dataset.projects.set(selected_projects)
+            
+            if selected_projects:
+                project_names = [p.title for p in selected_projects]
+                messages.success(request, f'Dataset "{dataset.title}" has been assigned to projects: {", ".join(project_names)}.')
+            else:
+                messages.success(request, f'Dataset "{dataset.title}" has been removed from all projects.')
+            
+            return redirect('datasets:dataset_detail', pk=pk)
+    else:
+        form = DatasetProjectAssignmentForm(user=request.user, dataset=dataset)
+    
+    return render(request, 'datasets/assign_to_project.html', {
+        'form': form,
+        'dataset': dataset
+    })
