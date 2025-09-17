@@ -3163,3 +3163,7 @@ msgstr "Keine Projekte im System verfügbar."
 #: datasets/templates/datasets/assign_to_project.html:60
 msgid "As a superuser, you can assign datasets to any project in the system."
 msgstr "Als Superuser können Sie Datasets jedem Projekt im System zuweisen."
+
+#: templates/home.html:57
+msgid "Active Projects"
+msgstr "Aktive Projekte"

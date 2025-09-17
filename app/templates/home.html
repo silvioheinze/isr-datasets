@@ -52,55 +52,14 @@
         <div class="col-md-3 mb-3">
             <div class="card stats-card h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-graph-up fs-1 mb-3 text-warning"></i>
-                    <h3 class="card-title">{{ uptime_percentage|default:0 }}%</h3>
-                    <p class="card-text">{% trans "System Uptime" %}</p>
+                    <i class="bi bi-folder fs-1 mb-3 text-warning"></i>
+                    <h3 class="card-title">{{ total_projects|default:0 }}</h3>
+                    <p class="card-text">{% trans "Active Projects" %}</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-lightning-charge me-2"></i>
-                        {% trans "Quick Actions" %}
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
-                                <i class="bi bi-plus-circle fs-2 mb-2"></i>
-                                <span>{% trans "Add Dataset" %}</span>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'datasets:dataset_list' %}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
-                                <i class="bi bi-search fs-2 mb-2"></i>
-                                <span>{% trans "Browse Datasets" %}</span>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'datasets:category_list' %}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
-                                <i class="bi bi-tags fs-2 mb-2"></i>
-                                <span>{% trans "Manage Categories" %}</span>
-                            </a>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <a href="{% url 'user-settings' %}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
-                                <i class="bi bi-gear fs-2 mb-2"></i>
-                                <span>{% trans "Settings" %}</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Recent Activity & Popular Datasets -->
     <div class="row">

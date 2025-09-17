@@ -24,10 +24,12 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         try:
             from datasets.models import Dataset, DatasetVersion, DatasetCategory
             from user.models import CustomUser
+            from projects.models import Project
             
             # Get basic statistics
             total_datasets = Dataset.objects.filter(status='published').count()
             total_users = CustomUser.objects.filter(is_active=True).count()
+            total_projects = Project.objects.count()
             
             # Calculate total data volume (sum of all file sizes)
             total_data_volume = DatasetVersion.objects.aggregate(
@@ -86,6 +88,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
             context.update({
                 'total_datasets': total_datasets,
                 'total_users': total_users,
+                'total_projects': total_projects,
                 'data_volume_display': data_volume_display,
                 'uptime_percentage': uptime_percentage,
                 'recent_datasets': recent_datasets,
@@ -102,6 +105,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
             context.update({
                 'total_datasets': 0,
                 'total_users': 0,
+                'total_projects': 0,
                 'data_volume_display': '0KB',
                 'uptime_percentage': 0,
                 'recent_datasets': [],
