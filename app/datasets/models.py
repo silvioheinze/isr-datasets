@@ -110,7 +110,7 @@ class Dataset(models.Model):
         ('private', 'Private'),
     ]
 
-    # Primary key as UUID (will be added via migration)
+    # Primary key as UUID (temporarily using integer ID until migration is complete)
     # id = models.UUIDField(
     #     primary_key=True,
     #     default=uuid.uuid4,
@@ -118,6 +118,14 @@ class Dataset(models.Model):
     #     verbose_name=_('ID'),
     #     help_text=_('Unique identifier for the dataset')
     # )
+    
+    # UUID field for future use
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        verbose_name=_('UUID'),
+        help_text=_('Unique identifier for the dataset')
+    )
     
     history = AuditlogHistoryField()
     
@@ -285,7 +293,8 @@ class DatasetVersion(models.Model):
     dataset = models.ForeignKey(
         Dataset, 
         on_delete=models.CASCADE, 
-        related_name='versions'
+        related_name='versions',
+        to_field='uuid'
     )
     version_number = models.CharField(max_length=20)
     description = models.TextField(blank=True, help_text='Changes in this version')
@@ -331,7 +340,8 @@ class DatasetDownload(models.Model):
     dataset = models.ForeignKey(
         Dataset, 
         on_delete=models.CASCADE, 
-        related_name='downloads'
+        related_name='downloads',
+        to_field='uuid'
     )
     user = models.ForeignKey(
         User, 
@@ -361,6 +371,7 @@ class Comment(models.Model):
         Dataset,
         on_delete=models.CASCADE,
         related_name='comments',
+        to_field='uuid',
         verbose_name=_('Dataset')
     )
     author = models.ForeignKey(
