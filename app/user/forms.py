@@ -57,12 +57,21 @@ class UserSettingsForm(forms.ModelForm):
     
     class Meta:
         model = CustomUser
-        fields = ['language', 'email_notifications']
+        fields = ['language', 'email_notifications', 'notify_dataset_updates', 'notify_new_versions', 'notify_comments']
         widgets = {
             'language': forms.Select(attrs={
                 'class': 'form-select'
             }),
             'email_notifications': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'notify_dataset_updates': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'notify_new_versions': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'notify_comments': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             })
         }
@@ -73,6 +82,12 @@ class UserSettingsForm(forms.ModelForm):
         self.fields['language'].help_text = _('Choose your preferred language for the interface')
         self.fields['email_notifications'].label = _('Email Notifications')
         self.fields['email_notifications'].help_text = _('Receive email notifications for comments on your datasets')
+        self.fields['notify_dataset_updates'].label = _('Dataset Updates')
+        self.fields['notify_dataset_updates'].help_text = _('Receive email notifications when datasets you follow are updated')
+        self.fields['notify_new_versions'].label = _('New Versions')
+        self.fields['notify_new_versions'].help_text = _('Receive email notifications when new versions of datasets you follow are published')
+        self.fields['notify_comments'].label = _('Comments')
+        self.fields['notify_comments'].help_text = _('Receive email notifications for comments on your datasets')
 
 
 class DataExportForm(forms.Form):

@@ -1,0 +1,40 @@
+{% load i18n %}
+{% trans "New Dataset Version Available" %} - {{ site_name }}
+
+{% trans "Hello" %}{% if user.first_name %}, {{ user.first_name }}{% endif %},
+
+{% blocktrans with dataset_title=dataset.title version=version.version_number %}A new version ({{ version }}) of the dataset "{{ dataset_title }}" is now available.{% endblocktrans %}
+
+{% trans "Dataset:" %} {{ dataset.title }}
+{{ dataset.description|truncatechars:150 }}
+
+{% trans "Category:" %} {{ dataset.category.name }}
+{% trans "Status:" %} {{ dataset.get_status_display }}
+
+{% trans "New Version Details:" %}
+{% trans "Version:" %} {{ version.version_number }}
+{% trans "Released:" %} {{ version.created_at|date:"F d, Y \a\t g:i A" }}
+{% if version.description %}
+{% trans "Changes:" %} {{ version.description|truncatechars:200 }}
+{% endif %}
+{% if version.file %}
+{% trans "File:" %} {{ version.file.name|slice:"-50:" }}
+{% trans "Size:" %} {{ version.get_file_size_display }}
+{% endif %}
+
+{% trans "View the dataset and download the new version:" %} {{ site_url }}{% url 'datasets:dataset_detail' dataset.pk %}
+
+{% trans "Quick Actions:" %}
+- {% trans "Download the new version of the dataset" %}
+- {% trans "Review the changes and updates" %}
+- {% trans "Update your research with the latest data" %}
+
+{% trans "Thank you for following this dataset!" %}
+
+{% if not user.notify_new_versions %}
+{% trans "Email Notifications:" %}
+{% trans "You can manage your email notification preferences in your account settings." %}
+{% endif %}
+
+---
+{% blocktranslate %}The {{ site_name }} team{% endblocktranslate %}

@@ -149,6 +149,8 @@ class DatasetUpdateView(LoginRequiredMixin, UpdateView):
         ).distinct()
 
     def form_valid(self, form):
+        # Send notification about dataset update
+        send_dataset_update_notification_email(self.object)
         messages.success(self.request, 'Dataset updated successfully!')
         return super().form_valid(form)
 
@@ -263,6 +265,9 @@ class DatasetVersionCreateView(LoginRequiredMixin, CreateView):
         
         # Set previous versions to not current
         DatasetVersion.objects.filter(dataset=self.dataset).update(is_current=False)
+        
+        # Send notification about new version
+        send_new_version_notification_email(self.dataset, form.instance)
         
         messages.success(self.request, f'Version {form.instance.version_number} created successfully!')
         return super().form_valid(form)
@@ -382,7 +387,7 @@ def add_comment(request, dataset_id):
             comment.save()
             
             # Send email notification to dataset owner if enabled
-            if dataset.owner.email_notifications and dataset.owner != request.user:
+            if dataset.owner.notify_comments and dataset.owner != request.user:
                 send_comment_notification_email(comment)
             
             messages.success(request, 'Your comment has been added successfully.')
@@ -447,6 +452,10 @@ def send_comment_notification_email(comment):
     dataset = comment.dataset
     owner = dataset.owner
     
+    # Check if owner wants to receive comment notifications
+    if not owner.notify_comments:
+        return
+    
     # Prepare email context
     context = {
         'owner': owner,
@@ -474,6 +483,97 @@ def send_comment_notification_email(comment):
     except Exception as e:
         # Log the error but don't break the comment creation
         print(f"Failed to send comment notification email: {e}")
+
+
+def send_dataset_update_notification_email(dataset):
+    """Send email notification to users following this dataset about updates"""
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.conf import settings
+    from user.models import CustomUser
+    
+    # Get users who want to receive dataset update notifications
+    # For now, we'll notify all users who have this preference enabled
+    # In a more advanced system, you might have a "following" relationship
+    users_to_notify = CustomUser.objects.filter(
+        notify_dataset_updates=True,
+        is_active=True
+    ).exclude(email='')
+    
+    if not users_to_notify.exists():
+        return
+    
+    # Prepare email context
+    context = {
+        'dataset': dataset,
+        'site_name': getattr(settings, 'SITE_NAME', 'ISR Datasets'),
+        'site_url': getattr(settings, 'SITE_URL', 'http://localhost:8000'),
+    }
+    
+    # Render email templates
+    subject = f'Dataset updated: {dataset.title}'
+    html_message = render_to_string('datasets/email/dataset_update_notification.html', context)
+    plain_message = render_to_string('datasets/email/dataset_update_notification.txt', context)
+    
+    # Send emails to all users
+    for user in users_to_notify:
+        try:
+            context['user'] = user
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                html_message=html_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Failed to send dataset update notification email to {user.email}: {e}")
+
+
+def send_new_version_notification_email(dataset, version):
+    """Send email notification to users following this dataset about new versions"""
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.conf import settings
+    from user.models import CustomUser
+    
+    # Get users who want to receive new version notifications
+    users_to_notify = CustomUser.objects.filter(
+        notify_new_versions=True,
+        is_active=True
+    ).exclude(email='')
+    
+    if not users_to_notify.exists():
+        return
+    
+    # Prepare email context
+    context = {
+        'dataset': dataset,
+        'version': version,
+        'site_name': getattr(settings, 'SITE_NAME', 'ISR Datasets'),
+        'site_url': getattr(settings, 'SITE_URL', 'http://localhost:8000'),
+    }
+    
+    # Render email templates
+    subject = f'New version available: {dataset.title} v{version.version_number}'
+    html_message = render_to_string('datasets/email/new_version_notification.html', context)
+    plain_message = render_to_string('datasets/email/new_version_notification.txt', context)
+    
+    # Send emails to all users
+    for user in users_to_notify:
+        try:
+            context['user'] = user
+            send_mail(
+                subject=subject,
+                message=plain_message,
+                html_message=html_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Failed to send new version notification email to {user.email}: {e}")
 
 
 # Publisher Views

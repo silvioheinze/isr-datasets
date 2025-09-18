@@ -1,0 +1,92 @@
+{% extends "account/email/base_message.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dataset Updated" %} - {{ site_name }}{% endblock %}
+
+{% block header %}
+<h1>{% trans "Dataset Has Been Updated" %}</h1>
+{% endblock %}
+
+{% block content %}
+<style>
+    .dataset-card {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+    }
+    .update-info {
+        background-color: #e7f3ff;
+        border-left: 4px solid #007bff;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+    }
+    .dataset-link {
+        display: inline-block;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        text-decoration: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 600;
+        margin: 20px 0;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .dataset-link:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    }
+</style>
+
+<p>{% trans "Hello" %}{% if user.first_name %}, {{ user.first_name }}{% endif %},</p>
+
+<p>{% blocktrans with dataset_title=dataset.title %}The dataset "{{ dataset_title }}" has been updated.{% endblocktrans %}</p>
+
+<div class="dataset-card">
+    <h3 style="margin-top: 0; color: #007bff;">{{ dataset.title }}</h3>
+    <p style="margin-bottom: 0; color: #6c757d;">{{ dataset.description|truncatechars:150 }}</p>
+    <div style="margin-top: 10px;">
+        <span class="badge" style="background-color: {{ dataset.category.color }}; color: {% if dataset.category.color == '#ffffff' or dataset.category.color == '#fff' %}#000{% else %}#fff{% endif %};">
+            {{ dataset.category.name }}
+        </span>
+        <span class="badge {% if dataset.status == 'published' %}bg-success{% elif dataset.status == 'draft' %}bg-warning{% else %}bg-secondary{% endif %}">
+            {{ dataset.get_status_display }}
+        </span>
+    </div>
+</div>
+
+<div class="update-info">
+    <strong>{% trans "What's New:" %}</strong>
+    <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+        <li>{% trans "Dataset information has been updated" %}</li>
+        <li>{% trans "Metadata and descriptions may have changed" %}</li>
+        <li>{% trans "Access permissions may have been modified" %}</li>
+    </ul>
+</div>
+
+<div style="text-align: center;">
+    <a href="{{ site_url }}{% url 'datasets:dataset_detail' dataset.pk %}" class="dataset-link">
+        {% trans "View Updated Dataset" %}
+    </a>
+</div>
+
+<div style="background-color: #e9ecef; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 4px;">
+    <strong>{% trans "Quick Actions:" %}</strong>
+    <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+        <li>{% trans "Review the updated dataset information" %}</li>
+        <li>{% trans "Check if you need to update your research" %}</li>
+        <li>{% trans "Download the latest version if available" %}</li>
+    </ul>
+</div>
+
+<p>{% trans "Thank you for following this dataset!" %}</p>
+
+{% if not user.notify_dataset_updates %}
+<div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 4px; padding: 15px; margin: 20px 0; color: #856404;">
+    <strong>{% trans "Email Notifications:" %}</strong>
+    <p style="margin: 5px 0 0 0;">{% trans "You can manage your email notification preferences in your account settings." %}</p>
+</div>
+{% endif %}
+{% endblock content %}
