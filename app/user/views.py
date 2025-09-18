@@ -13,7 +13,7 @@ from django.core.paginator import Paginator
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserProfileForm, DataExportForm
+from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserNotificationForm, UserProfileForm, DataExportForm
 from .models import Role
 
 CustomUser = get_user_model()
@@ -63,6 +63,7 @@ def SettingsView(request):
         # Initialize forms
         profile_form = UserProfileForm(instance=request.user)
         settings_form = UserSettingsForm(instance=request.user)
+        notification_form = UserNotificationForm(instance=request.user)
         
         # Handle form submissions
         if request.method == 'POST':
@@ -88,9 +89,9 @@ def SettingsView(request):
                     return redirect('user-settings')
             
             elif 'notifications_submit' in request.POST:
-                settings_form = UserSettingsForm(request.POST, instance=request.user)
-                if settings_form.is_valid():
-                    settings_form.save()
+                notification_form = UserNotificationForm(request.POST, instance=request.user)
+                if notification_form.is_valid():
+                    notification_form.save()
                     messages.success(request, 'Your notification preferences have been updated successfully.')
                     return redirect('user-settings')
         
@@ -98,6 +99,7 @@ def SettingsView(request):
             'user': request.user,
             'profile_form': profile_form,
             'settings_form': settings_form,
+            'notification_form': notification_form,
         }
         return render(request, "user/settings.html", context)
     else:

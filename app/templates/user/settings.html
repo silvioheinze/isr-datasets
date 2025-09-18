@@ -323,16 +323,16 @@
                             <form method="post">
                                 {% csrf_token %}
                                 
-                                {% if settings_form.errors %}
+                                {% if notification_form.errors %}
                                     <div class="alert alert-danger">
                                         <i class="bi bi-exclamation-triangle me-2"></i>
                                         {% trans "Please correct the errors below." %}
-                                        {% for field in settings_form %}
+                                        {% for field in notification_form %}
                                             {% for error in field.errors %}
                                                 <p class="mb-0">{{ field.label }}: {{ error }}</p>
                                             {% endfor %}
                                         {% endfor %}
-                                        {% for error in settings_form.non_field_errors %}
+                                        {% for error in notification_form.non_field_errors %}
                                             <p class="mb-0">{{ error }}</p>
                                         {% endfor %}
                                     </div>
@@ -348,60 +348,60 @@
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <div class="form-check">
-                                                    {{ settings_form.notify_comments }}
-                                                    <label for="{{ settings_form.notify_comments.id_for_label }}" class="form-check-label">
+                                                    {{ notification_form.notify_comments }}
+                                                    <label for="{{ notification_form.notify_comments.id_for_label }}" class="form-check-label">
                                                         <i class="bi bi-chat-dots me-1"></i>
-                                                        {{ settings_form.notify_comments.label }}
+                                                        {{ notification_form.notify_comments.label }}
                                                     </label>
                                                 </div>
-                                                {% if settings_form.notify_comments.errors %}
+                                                {% if notification_form.notify_comments.errors %}
                                                     <div class="invalid-feedback d-block">
-                                                        {{ settings_form.notify_comments.errors.0 }}
+                                                        {{ notification_form.notify_comments.errors.0 }}
                                                     </div>
                                                 {% endif %}
                                                 <div class="form-text">
                                                     <i class="bi bi-info-circle me-1"></i>
-                                                    {{ settings_form.notify_comments.help_text }}
+                                                    {{ notification_form.notify_comments.help_text }}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <div class="form-check">
-                                                    {{ settings_form.notify_dataset_updates }}
-                                                    <label for="{{ settings_form.notify_dataset_updates.id_for_label }}" class="form-check-label">
+                                                    {{ notification_form.notify_dataset_updates }}
+                                                    <label for="{{ notification_form.notify_dataset_updates.id_for_label }}" class="form-check-label">
                                                         <i class="bi bi-arrow-clockwise me-1"></i>
-                                                        {{ settings_form.notify_dataset_updates.label }}
+                                                        {{ notification_form.notify_dataset_updates.label }}
                                                     </label>
                                                 </div>
-                                                {% if settings_form.notify_dataset_updates.errors %}
+                                                {% if notification_form.notify_dataset_updates.errors %}
                                                     <div class="invalid-feedback d-block">
-                                                        {{ settings_form.notify_dataset_updates.errors.0 }}
+                                                        {{ notification_form.notify_dataset_updates.errors.0 }}
                                                     </div>
                                                 {% endif %}
                                                 <div class="form-text">
                                                     <i class="bi bi-info-circle me-1"></i>
-                                                    {{ settings_form.notify_dataset_updates.help_text }}
+                                                    {{ notification_form.notify_dataset_updates.help_text }}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
                                             <div class="mb-3">
                                                 <div class="form-check">
-                                                    {{ settings_form.notify_new_versions }}
-                                                    <label for="{{ settings_form.notify_new_versions.id_for_label }}" class="form-check-label">
+                                                    {{ notification_form.notify_new_versions }}
+                                                    <label for="{{ notification_form.notify_new_versions.id_for_label }}" class="form-check-label">
                                                         <i class="bi bi-plus-circle me-1"></i>
-                                                        {{ settings_form.notify_new_versions.label }}
+                                                        {{ notification_form.notify_new_versions.label }}
                                                     </label>
                                                 </div>
-                                                {% if settings_form.notify_new_versions.errors %}
+                                                {% if notification_form.notify_new_versions.errors %}
                                                     <div class="invalid-feedback d-block">
-                                                        {{ settings_form.notify_new_versions.errors.0 }}
+                                                        {{ notification_form.notify_new_versions.errors.0 }}
                                                     </div>
                                                 {% endif %}
                                                 <div class="form-text">
                                                     <i class="bi bi-info-circle me-1"></i>
-                                                    {{ settings_form.notify_new_versions.help_text }}
+                                                    {{ notification_form.notify_new_versions.help_text }}
                                                 </div>
                                             </div>
                                         </div>

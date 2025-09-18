@@ -139,6 +139,34 @@ class UserSettingsForm(forms.ModelForm):
         self.fields['notify_comments'].help_text = _('Receive email notifications for comments on your datasets')
 
 
+class UserNotificationForm(forms.ModelForm):
+    """Form for user notification preferences only"""
+    
+    class Meta:
+        model = CustomUser
+        fields = ['notify_dataset_updates', 'notify_new_versions', 'notify_comments']
+        widgets = {
+            'notify_dataset_updates': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'notify_new_versions': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'notify_comments': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['notify_dataset_updates'].label = _('Dataset Updates')
+        self.fields['notify_dataset_updates'].help_text = _('Receive email notifications when datasets you follow are updated')
+        self.fields['notify_new_versions'].label = _('New Versions')
+        self.fields['notify_new_versions'].help_text = _('Receive email notifications when new versions of datasets you follow are published')
+        self.fields['notify_comments'].label = _('Comments')
+        self.fields['notify_comments'].help_text = _('Receive email notifications for comments on your datasets')
+
+
 class DataExportForm(forms.Form):
     """Form for requesting data export"""
     
