@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext_lazy as _
 
 from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserProfileForm, DataExportForm
 from .models import Role
@@ -318,6 +319,37 @@ class UsersUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def test_func(self):
         # Allow access if user is superuser or has user.edit permission
         return self.request.user.is_superuser or self.request.user.has_role_permission('user.edit')
+    
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        # Only superusers can modify staff and superuser privileges
+        if not self.request.user.is_superuser:
+            form.fields['is_staff'].widget.attrs['disabled'] = True
+            form.fields['is_superuser'].widget.attrs['disabled'] = True
+            # Add help text to inform users why fields are disabled
+            form.fields['is_staff'].help_text = _('Only superusers can modify staff privileges.')
+            form.fields['is_superuser'].help_text = _('Only superusers can modify superuser privileges.')
+        return form
+    
+    def form_valid(self, form):
+        # Security check: Only superusers can assign superuser privileges
+        if form.cleaned_data.get('is_superuser') and not self.request.user.is_superuser:
+            form.add_error('is_superuser', _('Only superusers can assign superuser privileges.'))
+            return self.form_invalid(form)
+        
+        # Security check: Only superusers can assign staff privileges
+        if form.cleaned_data.get('is_staff') and not self.request.user.is_superuser:
+            form.add_error('is_staff', _('Only superusers can assign staff privileges.'))
+            return self.form_invalid(form)
+        
+        # Prevent users from removing their own superuser status
+        if (self.object == self.request.user and 
+            self.object.is_superuser and 
+            not form.cleaned_data.get('is_superuser')):
+            form.add_error('is_superuser', _('You cannot remove your own superuser privileges.'))
+            return self.form_invalid(form)
+        
+        return super().form_valid(form)
 
 
 class UsersListView(LoginRequiredMixin, UserPassesTestMixin, ListView):

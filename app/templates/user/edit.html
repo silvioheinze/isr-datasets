@@ -37,8 +37,36 @@
                             <div class="alert alert-danger">
                                 <i class="bi bi-exclamation-triangle me-2"></i>
                                 {% trans "Please correct the errors below." %}
+                                {% if form.non_field_errors %}
+                                    <ul class="mb-0 mt-2">
+                                        {% for error in form.non_field_errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
                             </div>
                         {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">
+                                <i class="bi bi-person me-1"></i>
+                                {% trans "Username" %}
+                            </label>
+                            <input 
+                                type="text" 
+                                name="{{ form.username.name }}" 
+                                class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                id="{{ form.username.id_for_label }}"
+                                value="{{ form.username.value|default:'' }}"
+                                placeholder="{% trans 'Enter username' %}"
+                                required
+                            >
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.username.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -133,31 +161,55 @@
                                 <div class="form-check">
                                     <input 
                                         type="checkbox" 
-                                        name="{{ form.is_active.name }}" 
-                                        class="form-check-input" 
-                                        id="{{ form.is_active.id_for_label }}"
-                                        {% if form.is_active.value %}checked{% endif %}
+                                        name="{{ form.is_staff.name }}" 
+                                        class="form-check-input {% if form.is_staff.field.widget.attrs.disabled %}text-muted{% endif %}" 
+                                        id="{{ form.is_staff.id_for_label }}"
+                                        {% if form.is_staff.value %}checked{% endif %}
+                                        {% if form.is_staff.field.widget.attrs.disabled %}disabled{% endif %}
                                     >
-                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
-                                        <i class="bi bi-check-circle me-1"></i>
-                                        {% trans "Active" %}
+                                    <label class="form-check-label {% if form.is_staff.field.widget.attrs.disabled %}text-muted{% endif %}" for="{{ form.is_staff.id_for_label }}">
+                                        <i class="bi bi-gear me-1"></i>
+                                        {{ form.is_staff.label }}
                                     </label>
+                                    {% if form.is_staff.help_text %}
+                                        <div class="form-text">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            {{ form.is_staff.help_text }}
+                                        </div>
+                                    {% endif %}
                                 </div>
+                                {% if form.is_staff.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.is_staff.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                             <div class="col-md-6">
                                 <div class="form-check">
                                     <input 
                                         type="checkbox" 
-                                        name="{{ form.is_staff.name }}" 
-                                        class="form-check-input" 
-                                        id="{{ form.is_staff.id_for_label }}"
-                                        {% if form.is_staff.value %}checked{% endif %}
+                                        name="{{ form.is_superuser.name }}" 
+                                        class="form-check-input {% if form.is_superuser.field.widget.attrs.disabled %}text-muted{% endif %}" 
+                                        id="{{ form.is_superuser.id_for_label }}"
+                                        {% if form.is_superuser.value %}checked{% endif %}
+                                        {% if form.is_superuser.field.widget.attrs.disabled %}disabled{% endif %}
                                     >
-                                    <label class="form-check-label" for="{{ form.is_staff.id_for_label }}">
-                                        <i class="bi bi-gear me-1"></i>
-                                        {% trans "Staff" %}
+                                    <label class="form-check-label {% if form.is_superuser.field.widget.attrs.disabled %}text-muted{% endif %}" for="{{ form.is_superuser.id_for_label }}">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        {{ form.is_superuser.label }}
                                     </label>
+                                    {% if form.is_superuser.help_text %}
+                                        <div class="form-text">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            {{ form.is_superuser.help_text }}
+                                        </div>
+                                    {% endif %}
                                 </div>
+                                {% if form.is_superuser.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.is_superuser.errors.0 }}
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 

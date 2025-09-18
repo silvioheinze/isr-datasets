@@ -25,10 +25,64 @@ class CustomUserEditForm(UserChangeForm):
         required=False,
         empty_label="No role assigned"
     )
+    
+    is_staff = forms.BooleanField(
+        required=False,
+        label=_('Staff'),
+        help_text=_('Designates whether the user can log into the admin site.')
+    )
+    
+    is_superuser = forms.BooleanField(
+        required=False,
+        label=_('Superuser'),
+        help_text=_('Designates that this user has all permissions without explicitly assigning them.')
+    )
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'role')
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff', 'is_superuser')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add Bootstrap classes to form fields
+        for field_name, field in self.fields.items():
+            if field_name == 'role':
+                field.widget.attrs.update({'class': 'form-select'})
+            elif field_name in ['is_staff', 'is_superuser']:
+                field.widget.attrs.update({'class': 'form-check-input'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username:
+            # Check if username is already taken by another user
+            existing_user = CustomUser.objects.filter(username=username).exclude(pk=self.instance.pk)
+            if existing_user.exists():
+                raise forms.ValidationError(_('A user with this username already exists.'))
+        return username
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            # Check if email is already taken by another user
+            existing_user = CustomUser.objects.filter(email=email).exclude(pk=self.instance.pk)
+            if existing_user.exists():
+                raise forms.ValidationError(_('A user with this email address already exists.'))
+        return email
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        is_superuser = cleaned_data.get('is_superuser')
+        is_staff = cleaned_data.get('is_staff')
+        
+        # If user is being made a superuser, they should also be staff
+        if is_superuser and not is_staff:
+            cleaned_data['is_staff'] = True
+            # Add a non-field error to inform the user
+            self.add_error('is_staff', _('Superusers must also be staff members. This has been automatically set.'))
+        
+        return cleaned_data
 
 
 class UserProfileForm(forms.ModelForm):
