@@ -183,6 +183,8 @@ class ProjectTransferOwnershipView(LoginRequiredMixin, UpdateView):
     
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        # Remove instance since this form doesn't need it
+        kwargs.pop('instance', None)
         kwargs['current_user'] = self.request.user
         kwargs['project'] = self.get_object()
         return kwargs
