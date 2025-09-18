@@ -159,3 +159,8 @@ class HomePageView(LoginRequiredMixin, TemplateView):
             context['councils_from_memberships'] = []
         
         return context
+
+
+class DocumentationView(TemplateView):
+    """Documentation page view"""
+    template_name = "documentation.html"

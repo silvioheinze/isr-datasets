@@ -1,0 +1,425 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Documentation" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="text-center">
+                <h1 class="display-4 fw-bold text-primary mb-3">
+                    <i class="bi bi-book me-3"></i>
+                    {% trans "Documentation" %}
+                </h1>
+                <p class="lead text-muted">
+                    {% trans "Complete guide to using the ISR Datasets platform" %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+            <!-- Table of Contents -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        {% trans "Table of Contents" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><a href="#getting-started" class="text-decoration-none">{% trans "Getting Started" %}</a></li>
+                                <li><a href="#user-management" class="text-decoration-none">{% trans "User Management" %}</a></li>
+                                <li><a href="#datasets" class="text-decoration-none">{% trans "Datasets" %}</a></li>
+                                <li><a href="#projects" class="text-decoration-none">{% trans "Projects" %}</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><a href="#publishers" class="text-decoration-none">{% trans "Publishers" %}</a></li>
+                                <li><a href="#categories" class="text-decoration-none">{% trans "Categories" %}</a></li>
+                                <li><a href="#notifications" class="text-decoration-none">{% trans "Email Notifications" %}</a></li>
+                                <li><a href="#settings" class="text-decoration-none">{% trans "Settings" %}</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Getting Started -->
+            <div class="card mb-4" id="getting-started">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-play-circle me-2"></i>
+                        {% trans "Getting Started" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Account Creation" %}</h5>
+                    <p>{% trans "To use the ISR Datasets platform, you need to create an account:" %}</p>
+                    <ol>
+                        <li>{% trans "Click on 'Sign Up' in the navigation menu" %}</li>
+                        <li>{% trans "Fill in your username, email address, and password" %}</li>
+                        <li>{% trans "Check your email for a confirmation link" %}</li>
+                        <li>{% trans "Click the confirmation link to activate your account" %}</li>
+                    </ol>
+
+                    <h5>{% trans "Login" %}</h5>
+                    <p>{% trans "After account activation, you can log in using your username/email and password." %}</p>
+
+                    <h5>{% trans "Dashboard" %}</h5>
+                    <p>{% trans "The dashboard provides an overview of:" %}</p>
+                    <ul>
+                        <li>{% trans "Published datasets count" %}</li>
+                        <li>{% trans "Total data volume" %}</li>
+                        <li>{% trans "Active users" %}</li>
+                        <li>{% trans "Active projects" %}</li>
+                        <li>{% trans "Recent activity" %}</li>
+                        <li>{% trans "Popular datasets" %}</li>
+                        <li>{% trans "Your datasets" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div class="card mb-4" id="user-management">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-people me-2"></i>
+                        {% trans "User Management" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "User Roles" %}</h5>
+                    <p>{% trans "The platform supports different user roles:" %}</p>
+                    <ul>
+                        <li><strong>{% trans "Regular Users" %}:</strong> {% trans "Can create and manage their own datasets and projects" %}</li>
+                        <li><strong>{% trans "Staff Users" %}:</strong> {% trans "Have additional administrative privileges" %}</li>
+                        <li><strong>{% trans "Superusers" %}:</strong> {% trans "Have full access to all platform features and data" %}</li>
+                    </ul>
+
+                    <h5>{% trans "User Settings" %}</h5>
+                    <p>{% trans "Access your settings through the user menu in the top navigation:" %}</p>
+                    <ul>
+                        <li><strong>{% trans "Language Preferences" %}:</strong> {% trans "Choose between English and German interface" %}</li>
+                        <li><strong>{% trans "Email Notifications" %}:</strong> {% trans "Control which email notifications you receive" %}</li>
+                        <li><strong>{% trans "Security Settings" %}:</strong> {% trans "Change your password" %}</li>
+                        <li><strong>{% trans "Privacy Settings" %}:</strong> {% trans "Control profile visibility and data sharing" %}</li>
+                        <li><strong>{% trans "Data Export" %}:</strong> {% trans "Download your personal data for GDPR compliance" %}</li>
+                    </ul>
+
+                    <h5>{% trans "User Administration" %}</h5>
+                    <p>{% trans "Staff and superusers can manage users through the admin interface:" %}</p>
+                    <ul>
+                        <li>{% trans "View all registered users" %}</li>
+                        <li>{% trans "Create new user accounts" %}</li>
+                        <li>{% trans "Assign roles and permissions" %}</li>
+                        <li>{% trans "Manage user settings" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Datasets -->
+            <div class="card mb-4" id="datasets">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-database me-2"></i>
+                        {% trans "Datasets" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Creating Datasets" %}</h5>
+                    <p>{% trans "To create a new dataset:" %}</p>
+                    <ol>
+                        <li>{% trans "Click 'Add Dataset' from the navigation or dashboard" %}</li>
+                        <li>{% trans "Fill in the required information:" %}
+                            <ul>
+                                <li>{% trans "Title and description" %}</li>
+                                <li>{% trans "Category and tags" %}</li>
+                                <li>{% trans "Access level (public, restricted, private)" %}</li>
+                                <li>{% trans "License and citation information" %}</li>
+                                <li>{% trans "Publisher information" %}</li>
+                            </ul>
+                        </li>
+                        <li>{% trans "Save the dataset" %}</li>
+                        <li>{% trans "Upload data files as versions" %}</li>
+                    </ol>
+
+                    <h5>{% trans "Dataset Versions" %}</h5>
+                    <p>{% trans "Each dataset can have multiple versions:" %}</p>
+                    <ul>
+                        <li>{% trans "Upload new data files as versions" %}</li>
+                        <li>{% trans "Supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG" %}</li>
+                        <li>{% trans "Maximum file size: 1GB" %}</li>
+                        <li>{% trans "Each version can have a description of changes" %}</li>
+                        <li>{% trans "The latest version becomes the current version automatically" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Dataset Management" %}</h5>
+                    <p>{% trans "Dataset owners and contributors can:" %}</p>
+                    <ul>
+                        <li>{% trans "Edit dataset information" %}</li>
+                        <li>{% trans "Add new versions" %}</li>
+                        <li>{% trans "Assign datasets to projects" %}</li>
+                        <li>{% trans "Manage contributors" %}</li>
+                        <li>{% trans "Delete datasets (if no versions exist)" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Dataset Access" %}</h5>
+                    <p>{% trans "Datasets have three access levels:" %}</p>
+                    <ul>
+                        <li><strong>{% trans "Public" %}:</strong> {% trans "Visible and downloadable by all users" %}</li>
+                        <li><strong>{% trans "Restricted" %}:</strong> {% trans "Visible to all users, but downloadable only by authenticated users" %}</li>
+                        <li><strong>{% trans "Private" %}:</strong> {% trans "Visible and downloadable only by the owner and contributors" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Comments and Interaction" %}</h5>
+                    <p>{% trans "Users can interact with datasets through:" %}</p>
+                    <ul>
+                        <li>{% trans "Adding comments and questions" %}</li>
+                        <li>{% trans "Viewing download statistics" %}</li>
+                        <li>{% trans "Following dataset updates" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Projects -->
+            <div class="card mb-4" id="projects">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-folder me-2"></i>
+                        {% trans "Projects" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Creating Projects" %}</h5>
+                    <p>{% trans "To create a new project:" %}</p>
+                    <ol>
+                        <li>{% trans "Navigate to the Projects section" %}</li>
+                        <li>{% trans "Click 'Add Project'" %}</li>
+                        <li>{% trans "Fill in project details:" %}
+                            <ul>
+                                <li>{% trans "Title and description" %}</li>
+                                <li>{% trans "Abstract and keywords" %}</li>
+                                <li>{% trans "Start and end dates" %}</li>
+                                <li>{% trans "Access level" %}</li>
+                                <li>{% trans "Funding information" %}</li>
+                            </ul>
+                        </li>
+                        <li>{% trans "Add collaborators" %}</li>
+                        <li>{% trans "Save the project" %}</li>
+                    </ol>
+
+                    <h5>{% trans "Project Management" %}</h5>
+                    <p>{% trans "Project owners and collaborators can:" %}</p>
+                    <ul>
+                        <li>{% trans "Edit project information" %}</li>
+                        <li>{% trans "Add or remove collaborators" %}</li>
+                        <li>{% trans "Assign datasets to the project" %}</li>
+                        <li>{% trans "View project statistics" %}</li>
+                        <li>{% trans "Delete projects" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Dataset Assignment" %}</h5>
+                    <p>{% trans "Datasets can be assigned to projects:" %}</p>
+                    <ul>
+                        <li>{% trans "From the dataset detail page, click 'Manage Projects'" %}</li>
+                        <li>{% trans "Select one or more projects to associate with the dataset" %}</li>
+                        <li>{% trans "Only project owners and collaborators can assign datasets" %}</li>
+                        <li>{% trans "Superusers can assign datasets to any project" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Publishers -->
+            <div class="card mb-4" id="publishers">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-building me-2"></i>
+                        {% trans "Publishers" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Publisher Management" %}</h5>
+                    <p>{% trans "Publishers represent organizations or institutions that publish datasets:" %}</p>
+                    <ul>
+                        <li>{% trans "Each publisher has a name, description, and website" %}</li>
+                        <li>{% trans "Publishers can be marked as active or inactive" %}</li>
+                        <li>{% trans "One publisher can be set as the default" %}</li>
+                        <li>{% trans "ISR is set as the default publisher" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Creating Publishers" %}</h5>
+                    <p>{% trans "Staff and superusers can create new publishers:" %}</p>
+                    <ol>
+                        <li>{% trans "Navigate to 'Manage Publishers' from the datasets section" %}</li>
+                        <li>{% trans "Click 'Add Publisher'" %}</li>
+                        <li>{% trans "Fill in publisher information" %}</li>
+                        <li>{% trans "Set as default if needed" %}</li>
+                        <li>{% trans "Save the publisher" %}</li>
+                    </ol>
+
+                    <h5>{% trans "Using Publishers" %}</h5>
+                    <p>{% trans "When creating or editing datasets, you can:" %}</p>
+                    <ul>
+                        <li>{% trans "Select a publisher from the dropdown list" %}</li>
+                        <li>{% trans "The publisher information will be displayed on the dataset page" %}</li>
+                        <li>{% trans "Publisher information is included in dataset citations" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="card mb-4" id="categories">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-tags me-2"></i>
+                        {% trans "Categories" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Dataset Categories" %}</h5>
+                    <p>{% trans "Categories help organize datasets by subject area:" %}</p>
+                    <ul>
+                        <li>{% trans "Each category has a name, description, and color" %}</li>
+                        <li>{% trans "Categories are displayed as colored badges on dataset cards" %}</li>
+                        <li>{% trans "Users can filter datasets by category" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Managing Categories" %}</h5>
+                    <p>{% trans "Staff and superusers can manage categories:" %}</p>
+                    <ul>
+                        <li>{% trans "Create new categories with custom names and colors" %}</li>
+                        <li>{% trans "Edit existing category information" %}</li>
+                        <li>{% trans "Delete categories (only if no datasets use them)" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Using Categories" %}</h5>
+                    <p>{% trans "When creating or editing datasets:" %}</p>
+                    <ul>
+                        <li>{% trans "Select a category from the dropdown list" %}</li>
+                        <li>{% trans "The category will be displayed as a colored badge" %}</li>
+                        <li>{% trans "Categories help users find relevant datasets" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Email Notifications -->
+            <div class="card mb-4" id="notifications">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-bell me-2"></i>
+                        {% trans "Email Notifications" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Notification Types" %}</h5>
+                    <p>{% trans "The platform sends email notifications for:" %}</p>
+                    <ul>
+                        <li><strong>{% trans "Comments" %}:</strong> {% trans "When someone comments on your datasets" %}</li>
+                        <li><strong>{% trans "Dataset Updates" %}:</strong> {% trans "When datasets you follow are updated" %}</li>
+                        <li><strong>{% trans "New Versions" %}:</strong> {% trans "When new versions of datasets you follow are published" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Managing Notifications" %}</h5>
+                    <p>{% trans "Control your email notifications in your account settings:" %}</p>
+                    <ol>
+                        <li>{% trans "Go to your user settings" %}</li>
+                        <li>{% trans "Navigate to the 'Email Notification Preferences' section" %}</li>
+                        <li>{% trans "Enable or disable specific notification types" %}</li>
+                        <li>{% trans "Save your preferences" %}</li>
+                    </ol>
+
+                    <h5>{% trans "Email Templates" %}</h5>
+                    <p>{% trans "All notification emails include:" %}</p>
+                    <ul>
+                        <li>{% trans "Professional HTML and text versions" %}</li>
+                        <li>{% trans "Direct links to relevant content" %}</li>
+                        <li>{% trans "Quick action suggestions" %}</li>
+                        <li>{% trans "Links to manage notification preferences" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <div class="card mb-4" id="settings">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-gear me-2"></i>
+                        {% trans "Settings" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Account Settings" %}</h5>
+                    <p>{% trans "Access your account settings through the user menu:" %}</p>
+                    <ul>
+                        <li><strong>{% trans "Language Preferences" %}:</strong> {% trans "Choose between English and German interface" %}</li>
+                        <li><strong>{% trans "Email Notifications" %}:</strong> {% trans "Control which email notifications you receive" %}</li>
+                        <li><strong>{% trans "Security Settings" %}:</strong> {% trans "Change your password" %}</li>
+                        <li><strong>{% trans "Privacy Settings" %}:</strong> {% trans "Control profile visibility and data sharing" %}</li>
+                        <li><strong>{% trans "Data Export" %}:</strong> {% trans "Download your personal data for GDPR compliance" %}</li>
+                    </ul>
+
+                    <h5>{% trans "System Settings" %}</h5>
+                    <p>{% trans "Administrative settings (staff and superusers only):" %}</p>
+                    <ul>
+                        <li>{% trans "User management and role assignment" %}</li>
+                        <li>{% trans "Publisher and category management" %}</li>
+                        <li>{% trans "System configuration" %}</li>
+                        <li>{% trans "Data backup and export" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Data Privacy" %}</h5>
+                    <p>{% trans "The platform complies with GDPR requirements:" %}</p>
+                    <ul>
+                        <li>{% trans "Users can export their personal data" %}</li>
+                        <li>{% trans "Users can delete their accounts and associated data" %}</li>
+                        <li>{% trans "Email notifications can be disabled" %}</li>
+                        <li>{% trans "Profile visibility can be controlled" %}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Support -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="h4 mb-0">
+                        <i class="bi bi-question-circle me-2"></i>
+                        {% trans "Support" %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>{% trans "Getting Help" %}</h5>
+                    <p>{% trans "If you need assistance with the platform:" %}</p>
+                    <ul>
+                        <li>{% trans "Check this documentation for common questions" %}</li>
+                        <li>{% trans "Contact your system administrator" %}</li>
+                        <li>{% trans "Report issues through the appropriate channels" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Best Practices" %}</h5>
+                    <ul>
+                        <li>{% trans "Use descriptive titles and descriptions for your datasets" %}</li>
+                        <li>{% trans "Choose appropriate categories and tags" %}</li>
+                        <li>{% trans "Set appropriate access levels for your data" %}</li>
+                        <li>{% trans "Provide clear version descriptions when updating datasets" %}</li>
+                        <li>{% trans "Use meaningful project names and descriptions" %}</li>
+                    </ul>
+
+                    <h5>{% trans "Technical Requirements" %}</h5>
+                    <ul>
+                        <li>{% trans "Supported file formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG" %}</li>
+                        <li>{% trans "Maximum file size: 1GB" %}</li>
+                        <li>{% trans "Modern web browser with JavaScript enabled" %}</li>
+                        <li>{% trans "Stable internet connection for file uploads" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

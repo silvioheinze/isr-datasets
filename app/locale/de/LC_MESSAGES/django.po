@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 09:15+0200\n"
+"POT-Creation-Date: 2025-09-18 09:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,13 +94,15 @@ msgstr ""
 #: datasets/models.py:67 templates/datasets/publisher_confirm_delete.html:16
 #: templates/datasets/publisher_form.html:22
 #: templates/datasets/publisher_list.html:4
-#: templates/datasets/publisher_list.html:15
+#: templates/datasets/publisher_list.html:15 templates/documentation.html:43
+#: templates/documentation.html:243
 msgid "Publishers"
 msgstr ""
 
 #: datasets/models.py:162 projects/models.py:124
 #: templates/datasets/assign_to_project.html:29
-#: templates/datasets/dataset_detail.html:255
+#: templates/datasets/dataset_detail.html:255 templates/documentation.html:38
+#: templates/documentation.html:195
 #: templates/projects/project_confirm_delete.html:16
 #: templates/projects/project_detail.html:16
 #: templates/projects/project_form.html:18
@@ -150,7 +152,7 @@ msgid "Updated at"
 msgstr ""
 
 #: datasets/models.py:356 templates/datasets/dataset_detail.html:441
-#: user/forms.py:89 user/models.py:78
+#: templates/documentation.html:323 user/forms.py:89 user/models.py:78
 msgid "Comments"
 msgstr ""
 
@@ -168,8 +170,8 @@ msgstr ""
 #: templates/datasets/dataset_list.html:4
 #: templates/datasets/dataset_version_form.html:16
 #: templates/datasets/publisher_confirm_delete.html:109
-#: templates/datasets/publisher_list.html:73
-#: templates/projects/project_detail.html:221
+#: templates/datasets/publisher_list.html:73 templates/documentation.html:37
+#: templates/documentation.html:131 templates/projects/project_detail.html:221
 #: templates/projects/project_list.html:77
 msgid "Datasets"
 msgstr ""
@@ -328,15 +330,15 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: projects/models.py:21
+#: projects/models.py:21 templates/documentation.html:175
 msgid "Public"
 msgstr ""
 
-#: projects/models.py:22
+#: projects/models.py:22 templates/documentation.html:176
 msgid "Restricted"
 msgstr ""
 
-#: projects/models.py:23
+#: projects/models.py:23 templates/documentation.html:177
 msgid "Private"
 msgstr ""
 
@@ -838,7 +840,8 @@ msgid "Change Password"
 msgstr ""
 
 #: templates/account/password_change.html:16
-#: templates/datasets/publisher_form.html:126 templates/user/settings.html:6
+#: templates/datasets/publisher_form.html:126 templates/documentation.html:46
+#: templates/documentation.html:353 templates/user/settings.html:6
 #: templates/user/settings.html:36
 msgid "Settings"
 msgstr ""
@@ -1089,7 +1092,8 @@ msgstr ""
 
 #: templates/datasets/category_confirm_delete.html:16
 #: templates/datasets/category_form.html:22
-#: templates/datasets/category_list.html:4
+#: templates/datasets/category_list.html:4 templates/documentation.html:44
+#: templates/documentation.html:281
 msgid "Categories"
 msgstr ""
 
@@ -1275,7 +1279,8 @@ msgstr ""
 msgid "Only active categories will be available for dataset selection"
 msgstr ""
 
-#: templates/datasets/category_list.html:15 templates/home.html:158
+#: templates/datasets/category_list.html:15 templates/documentation.html:285
+#: templates/home.html:179
 msgid "Dataset Categories"
 msgstr ""
 
@@ -1505,7 +1510,7 @@ msgstr ""
 msgid "Owner"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:230 templates/home.html:96
+#: templates/datasets/dataset_detail.html:230 templates/home.html:117
 msgid "Published"
 msgstr ""
 
@@ -1513,7 +1518,7 @@ msgstr ""
 msgid "Statistics"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:323
+#: templates/datasets/dataset_detail.html:323 templates/documentation.html:152
 msgid "Dataset Versions"
 msgstr ""
 
@@ -1598,8 +1603,8 @@ msgstr ""
 msgid "to add a comment."
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:492 templates/home.html:92
-#: templates/home.html:133 templates/home.html:206
+#: templates/datasets/dataset_detail.html:492 templates/home.html:113
+#: templates/home.html:154 templates/home.html:227
 msgid "ago"
 msgstr ""
 
@@ -1774,7 +1779,7 @@ msgstr ""
 msgid "No datasets match your search criteria."
 msgstr ""
 
-#: templates/datasets/dataset_list.html:231 templates/home.html:107
+#: templates/datasets/dataset_list.html:231 templates/home.html:128
 #: templates/projects/project_detail.html:377
 msgid "Add First Dataset"
 msgstr ""
@@ -2208,8 +2213,765 @@ msgstr ""
 msgid "Get started by creating your first publisher."
 msgstr ""
 
-#: templates/home.html:4
+#: templates/documentation.html:4 templates/documentation.html:14
+msgid "Documentation"
+msgstr ""
+
+#: templates/documentation.html:17
+msgid "Complete guide to using the ISR Datasets platform"
+msgstr ""
+
+#: templates/documentation.html:28
+msgid "Table of Contents"
+msgstr ""
+
+#: templates/documentation.html:35 templates/documentation.html:58
+msgid "Getting Started"
+msgstr ""
+
+#: templates/documentation.html:36 templates/documentation.html:93
+#: templates/user/edit.html:17 templates/user/management.html:6
+#: templates/user/management.html:17 templates/user/management.html:83
+#: templates/user/management.html:259 templates/user/role_form.html:98
+msgid "User Management"
+msgstr ""
+
+#: templates/documentation.html:45 templates/documentation.html:109
+#: templates/documentation.html:316 templates/documentation.html:361
+#: templates/user/settings.html:417 user/forms.py:83 user/models.py:59
+msgid "Email Notifications"
+msgstr ""
+
+#: templates/documentation.html:62
+msgid "Account Creation"
+msgstr ""
+
+#: templates/documentation.html:63
+msgid "To use the ISR Datasets platform, you need to create an account:"
+msgstr ""
+
+#: templates/documentation.html:65
+msgid "Click on 'Sign Up' in the navigation menu"
+msgstr ""
+
+#: templates/documentation.html:66
+msgid "Fill in your username, email address, and password"
+msgstr ""
+
+#: templates/documentation.html:67
+msgid "Check your email for a confirmation link"
+msgstr ""
+
+#: templates/documentation.html:68
+msgid "Click the confirmation link to activate your account"
+msgstr ""
+
+#: templates/documentation.html:71
+msgid "Login"
+msgstr ""
+
+#: templates/documentation.html:72
+msgid ""
+"After account activation, you can log in using your username/email and "
+"password."
+msgstr ""
+
+#: templates/documentation.html:74 templates/home.html:4
 msgid "Dashboard"
+msgstr ""
+
+#: templates/documentation.html:75
+msgid "The dashboard provides an overview of:"
+msgstr ""
+
+#: templates/documentation.html:77
+msgid "Published datasets count"
+msgstr ""
+
+#: templates/documentation.html:78
+msgid "Total data volume"
+msgstr ""
+
+#: templates/documentation.html:79
+msgid "Active users"
+msgstr ""
+
+#: templates/documentation.html:80
+msgid "Active projects"
+msgstr ""
+
+#: templates/documentation.html:81
+msgid "Recent activity"
+msgstr ""
+
+#: templates/documentation.html:82
+msgid "Popular datasets"
+msgstr ""
+
+#: templates/documentation.html:83
+msgid "Your datasets"
+msgstr ""
+
+#: templates/documentation.html:97
+msgid "User Roles"
+msgstr ""
+
+#: templates/documentation.html:98
+msgid "The platform supports different user roles:"
+msgstr ""
+
+#: templates/documentation.html:100
+msgid "Regular Users"
+msgstr ""
+
+#: templates/documentation.html:100
+msgid "Can create and manage their own datasets and projects"
+msgstr ""
+
+#: templates/documentation.html:101
+msgid "Staff Users"
+msgstr ""
+
+#: templates/documentation.html:101
+msgid "Have additional administrative privileges"
+msgstr ""
+
+#: templates/documentation.html:102
+msgid "Superusers"
+msgstr ""
+
+#: templates/documentation.html:102
+msgid "Have full access to all platform features and data"
+msgstr ""
+
+#: templates/documentation.html:105
+msgid "User Settings"
+msgstr ""
+
+#: templates/documentation.html:106
+msgid "Access your settings through the user menu in the top navigation:"
+msgstr ""
+
+#: templates/documentation.html:108 templates/documentation.html:360
+#: templates/user/settings.html:181
+msgid "Language Preferences"
+msgstr ""
+
+#: templates/documentation.html:108 templates/documentation.html:360
+msgid "Choose between English and German interface"
+msgstr ""
+
+#: templates/documentation.html:109 templates/documentation.html:361
+msgid "Control which email notifications you receive"
+msgstr ""
+
+#: templates/documentation.html:110 templates/documentation.html:362
+#: templates/user/settings.html:385
+msgid "Security Settings"
+msgstr ""
+
+#: templates/documentation.html:110 templates/documentation.html:362
+msgid "Change your password"
+msgstr ""
+
+#: templates/documentation.html:111 templates/documentation.html:363
+#: templates/user/settings.html:447
+msgid "Privacy Settings"
+msgstr ""
+
+#: templates/documentation.html:111 templates/documentation.html:363
+msgid "Control profile visibility and data sharing"
+msgstr ""
+
+#: templates/documentation.html:112 templates/documentation.html:364
+#: templates/user/data_export.html:5 templates/user/data_export.html:16
+#: templates/user/settings.html:471
+msgid "Data Export"
+msgstr ""
+
+#: templates/documentation.html:112 templates/documentation.html:364
+msgid "Download your personal data for GDPR compliance"
+msgstr ""
+
+#: templates/documentation.html:115
+msgid "User Administration"
+msgstr ""
+
+#: templates/documentation.html:116
+msgid "Staff and superusers can manage users through the admin interface:"
+msgstr ""
+
+#: templates/documentation.html:118
+msgid "View all registered users"
+msgstr ""
+
+#: templates/documentation.html:119
+msgid "Create new user accounts"
+msgstr ""
+
+#: templates/documentation.html:120
+msgid "Assign roles and permissions"
+msgstr ""
+
+#: templates/documentation.html:121
+msgid "Manage user settings"
+msgstr ""
+
+#: templates/documentation.html:135
+msgid "Creating Datasets"
+msgstr ""
+
+#: templates/documentation.html:136
+msgid "To create a new dataset:"
+msgstr ""
+
+#: templates/documentation.html:138
+msgid "Click 'Add Dataset' from the navigation or dashboard"
+msgstr ""
+
+#: templates/documentation.html:139
+msgid "Fill in the required information:"
+msgstr ""
+
+#: templates/documentation.html:141 templates/documentation.html:206
+msgid "Title and description"
+msgstr ""
+
+#: templates/documentation.html:142
+msgid "Category and tags"
+msgstr ""
+
+#: templates/documentation.html:143
+msgid "Access level (public, restricted, private)"
+msgstr ""
+
+#: templates/documentation.html:144
+msgid "License and citation information"
+msgstr ""
+
+#: templates/documentation.html:145
+msgid "Publisher information"
+msgstr ""
+
+#: templates/documentation.html:148
+msgid "Save the dataset"
+msgstr ""
+
+#: templates/documentation.html:149
+msgid "Upload data files as versions"
+msgstr ""
+
+#: templates/documentation.html:153
+msgid "Each dataset can have multiple versions:"
+msgstr ""
+
+#: templates/documentation.html:155
+msgid "Upload new data files as versions"
+msgstr ""
+
+#: templates/documentation.html:156
+msgid "Supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG"
+msgstr ""
+
+#: templates/documentation.html:157 templates/documentation.html:416
+msgid "Maximum file size: 1GB"
+msgstr ""
+
+#: templates/documentation.html:158
+msgid "Each version can have a description of changes"
+msgstr ""
+
+#: templates/documentation.html:159
+msgid "The latest version becomes the current version automatically"
+msgstr ""
+
+#: templates/documentation.html:162
+msgid "Dataset Management"
+msgstr ""
+
+#: templates/documentation.html:163
+msgid "Dataset owners and contributors can:"
+msgstr ""
+
+#: templates/documentation.html:165
+msgid "Edit dataset information"
+msgstr ""
+
+#: templates/documentation.html:166
+msgid "Add new versions"
+msgstr ""
+
+#: templates/documentation.html:167
+msgid "Assign datasets to projects"
+msgstr ""
+
+#: templates/documentation.html:168
+msgid "Manage contributors"
+msgstr ""
+
+#: templates/documentation.html:169
+msgid "Delete datasets (if no versions exist)"
+msgstr ""
+
+#: templates/documentation.html:172
+msgid "Dataset Access"
+msgstr ""
+
+#: templates/documentation.html:173
+msgid "Datasets have three access levels:"
+msgstr ""
+
+#: templates/documentation.html:175
+msgid "Visible and downloadable by all users"
+msgstr ""
+
+#: templates/documentation.html:176
+msgid "Visible to all users, but downloadable only by authenticated users"
+msgstr ""
+
+#: templates/documentation.html:177
+msgid "Visible and downloadable only by the owner and contributors"
+msgstr ""
+
+#: templates/documentation.html:180
+msgid "Comments and Interaction"
+msgstr ""
+
+#: templates/documentation.html:181
+msgid "Users can interact with datasets through:"
+msgstr ""
+
+#: templates/documentation.html:183
+msgid "Adding comments and questions"
+msgstr ""
+
+#: templates/documentation.html:184
+msgid "Viewing download statistics"
+msgstr ""
+
+#: templates/documentation.html:185
+msgid "Following dataset updates"
+msgstr ""
+
+#: templates/documentation.html:199
+msgid "Creating Projects"
+msgstr ""
+
+#: templates/documentation.html:200
+msgid "To create a new project:"
+msgstr ""
+
+#: templates/documentation.html:202
+msgid "Navigate to the Projects section"
+msgstr ""
+
+#: templates/documentation.html:203
+msgid "Click 'Add Project'"
+msgstr ""
+
+#: templates/documentation.html:204
+msgid "Fill in project details:"
+msgstr ""
+
+#: templates/documentation.html:207
+msgid "Abstract and keywords"
+msgstr ""
+
+#: templates/documentation.html:208
+msgid "Start and end dates"
+msgstr ""
+
+#: templates/documentation.html:209
+msgid "Access level"
+msgstr ""
+
+#: templates/documentation.html:210
+msgid "Funding information"
+msgstr ""
+
+#: templates/documentation.html:213
+msgid "Add collaborators"
+msgstr ""
+
+#: templates/documentation.html:214
+msgid "Save the project"
+msgstr ""
+
+#: templates/documentation.html:217
+msgid "Project Management"
+msgstr ""
+
+#: templates/documentation.html:218
+msgid "Project owners and collaborators can:"
+msgstr ""
+
+#: templates/documentation.html:220
+msgid "Edit project information"
+msgstr ""
+
+#: templates/documentation.html:221
+msgid "Add or remove collaborators"
+msgstr ""
+
+#: templates/documentation.html:222
+msgid "Assign datasets to the project"
+msgstr ""
+
+#: templates/documentation.html:223
+msgid "View project statistics"
+msgstr ""
+
+#: templates/documentation.html:224
+msgid "Delete projects"
+msgstr ""
+
+#: templates/documentation.html:227
+msgid "Dataset Assignment"
+msgstr ""
+
+#: templates/documentation.html:228
+msgid "Datasets can be assigned to projects:"
+msgstr ""
+
+#: templates/documentation.html:230
+msgid "From the dataset detail page, click 'Manage Projects'"
+msgstr ""
+
+#: templates/documentation.html:231
+msgid "Select one or more projects to associate with the dataset"
+msgstr ""
+
+#: templates/documentation.html:232
+msgid "Only project owners and collaborators can assign datasets"
+msgstr ""
+
+#: templates/documentation.html:233
+msgid "Superusers can assign datasets to any project"
+msgstr ""
+
+#: templates/documentation.html:247
+msgid "Publisher Management"
+msgstr ""
+
+#: templates/documentation.html:248
+msgid ""
+"Publishers represent organizations or institutions that publish datasets:"
+msgstr ""
+
+#: templates/documentation.html:250
+msgid "Each publisher has a name, description, and website"
+msgstr ""
+
+#: templates/documentation.html:251
+msgid "Publishers can be marked as active or inactive"
+msgstr ""
+
+#: templates/documentation.html:252
+msgid "One publisher can be set as the default"
+msgstr ""
+
+#: templates/documentation.html:253
+msgid "ISR is set as the default publisher"
+msgstr ""
+
+#: templates/documentation.html:256
+msgid "Creating Publishers"
+msgstr ""
+
+#: templates/documentation.html:257
+msgid "Staff and superusers can create new publishers:"
+msgstr ""
+
+#: templates/documentation.html:259
+msgid "Navigate to 'Manage Publishers' from the datasets section"
+msgstr ""
+
+#: templates/documentation.html:260
+msgid "Click 'Add Publisher'"
+msgstr ""
+
+#: templates/documentation.html:261
+msgid "Fill in publisher information"
+msgstr ""
+
+#: templates/documentation.html:262
+msgid "Set as default if needed"
+msgstr ""
+
+#: templates/documentation.html:263
+msgid "Save the publisher"
+msgstr ""
+
+#: templates/documentation.html:266
+msgid "Using Publishers"
+msgstr ""
+
+#: templates/documentation.html:267
+msgid "When creating or editing datasets, you can:"
+msgstr ""
+
+#: templates/documentation.html:269
+msgid "Select a publisher from the dropdown list"
+msgstr ""
+
+#: templates/documentation.html:270
+msgid "The publisher information will be displayed on the dataset page"
+msgstr ""
+
+#: templates/documentation.html:271
+msgid "Publisher information is included in dataset citations"
+msgstr ""
+
+#: templates/documentation.html:286
+msgid "Categories help organize datasets by subject area:"
+msgstr ""
+
+#: templates/documentation.html:288
+msgid "Each category has a name, description, and color"
+msgstr ""
+
+#: templates/documentation.html:289
+msgid "Categories are displayed as colored badges on dataset cards"
+msgstr ""
+
+#: templates/documentation.html:290
+msgid "Users can filter datasets by category"
+msgstr ""
+
+#: templates/documentation.html:293
+msgid "Managing Categories"
+msgstr ""
+
+#: templates/documentation.html:294
+msgid "Staff and superusers can manage categories:"
+msgstr ""
+
+#: templates/documentation.html:296
+msgid "Create new categories with custom names and colors"
+msgstr ""
+
+#: templates/documentation.html:297
+msgid "Edit existing category information"
+msgstr ""
+
+#: templates/documentation.html:298
+msgid "Delete categories (only if no datasets use them)"
+msgstr ""
+
+#: templates/documentation.html:301
+msgid "Using Categories"
+msgstr ""
+
+#: templates/documentation.html:302
+msgid "When creating or editing datasets:"
+msgstr ""
+
+#: templates/documentation.html:304
+msgid "Select a category from the dropdown list"
+msgstr ""
+
+#: templates/documentation.html:305
+msgid "The category will be displayed as a colored badge"
+msgstr ""
+
+#: templates/documentation.html:306
+msgid "Categories help users find relevant datasets"
+msgstr ""
+
+#: templates/documentation.html:320
+msgid "Notification Types"
+msgstr ""
+
+#: templates/documentation.html:321
+msgid "The platform sends email notifications for:"
+msgstr ""
+
+#: templates/documentation.html:323
+msgid "When someone comments on your datasets"
+msgstr ""
+
+#: templates/documentation.html:324 user/forms.py:85 user/models.py:66
+msgid "Dataset Updates"
+msgstr ""
+
+#: templates/documentation.html:324
+msgid "When datasets you follow are updated"
+msgstr ""
+
+#: templates/documentation.html:325 user/forms.py:87 user/models.py:72
+msgid "New Versions"
+msgstr ""
+
+#: templates/documentation.html:325
+msgid "When new versions of datasets you follow are published"
+msgstr ""
+
+#: templates/documentation.html:328
+msgid "Managing Notifications"
+msgstr ""
+
+#: templates/documentation.html:329
+msgid "Control your email notifications in your account settings:"
+msgstr ""
+
+#: templates/documentation.html:331
+msgid "Go to your user settings"
+msgstr ""
+
+#: templates/documentation.html:332
+msgid "Navigate to the 'Email Notification Preferences' section"
+msgstr ""
+
+#: templates/documentation.html:333
+msgid "Enable or disable specific notification types"
+msgstr ""
+
+#: templates/documentation.html:334
+msgid "Save your preferences"
+msgstr ""
+
+#: templates/documentation.html:337
+msgid "Email Templates"
+msgstr ""
+
+#: templates/documentation.html:338
+msgid "All notification emails include:"
+msgstr ""
+
+#: templates/documentation.html:340
+msgid "Professional HTML and text versions"
+msgstr ""
+
+#: templates/documentation.html:341
+msgid "Direct links to relevant content"
+msgstr ""
+
+#: templates/documentation.html:342
+msgid "Quick action suggestions"
+msgstr ""
+
+#: templates/documentation.html:343
+msgid "Links to manage notification preferences"
+msgstr ""
+
+#: templates/documentation.html:357 templates/user/settings.html:17
+msgid "Account Settings"
+msgstr ""
+
+#: templates/documentation.html:358
+msgid "Access your account settings through the user menu:"
+msgstr ""
+
+#: templates/documentation.html:367
+msgid "System Settings"
+msgstr ""
+
+#: templates/documentation.html:368
+msgid "Administrative settings (staff and superusers only):"
+msgstr ""
+
+#: templates/documentation.html:370
+msgid "User management and role assignment"
+msgstr ""
+
+#: templates/documentation.html:371
+msgid "Publisher and category management"
+msgstr ""
+
+#: templates/documentation.html:372
+msgid "System configuration"
+msgstr ""
+
+#: templates/documentation.html:373
+msgid "Data backup and export"
+msgstr ""
+
+#: templates/documentation.html:376
+msgid "Data Privacy"
+msgstr ""
+
+#: templates/documentation.html:377
+msgid "The platform complies with GDPR requirements:"
+msgstr ""
+
+#: templates/documentation.html:379
+msgid "Users can export their personal data"
+msgstr ""
+
+#: templates/documentation.html:380
+msgid "Users can delete their accounts and associated data"
+msgstr ""
+
+#: templates/documentation.html:381
+msgid "Email notifications can be disabled"
+msgstr ""
+
+#: templates/documentation.html:382
+msgid "Profile visibility can be controlled"
+msgstr ""
+
+#: templates/documentation.html:392
+msgid "Support"
+msgstr ""
+
+#: templates/documentation.html:396
+msgid "Getting Help"
+msgstr ""
+
+#: templates/documentation.html:397
+msgid "If you need assistance with the platform:"
+msgstr ""
+
+#: templates/documentation.html:399
+msgid "Check this documentation for common questions"
+msgstr ""
+
+#: templates/documentation.html:400
+msgid "Contact your system administrator"
+msgstr ""
+
+#: templates/documentation.html:401
+msgid "Report issues through the appropriate channels"
+msgstr ""
+
+#: templates/documentation.html:404
+msgid "Best Practices"
+msgstr ""
+
+#: templates/documentation.html:406
+msgid "Use descriptive titles and descriptions for your datasets"
+msgstr ""
+
+#: templates/documentation.html:407
+msgid "Choose appropriate categories and tags"
+msgstr ""
+
+#: templates/documentation.html:408
+msgid "Set appropriate access levels for your data"
+msgstr ""
+
+#: templates/documentation.html:409
+msgid "Provide clear version descriptions when updating datasets"
+msgstr ""
+
+#: templates/documentation.html:410
+msgid "Use meaningful project names and descriptions"
+msgstr ""
+
+#: templates/documentation.html:413
+msgid "Technical Requirements"
+msgstr ""
+
+#: templates/documentation.html:415
+msgid "Supported file formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG"
+msgstr ""
+
+#: templates/documentation.html:417
+msgid "Modern web browser with JavaScript enabled"
+msgstr ""
+
+#: templates/documentation.html:418
+msgid "Stable internet connection for file uploads"
 msgstr ""
 
 #: templates/home.html:14
@@ -2222,75 +2984,87 @@ msgid ""
 "datasets"
 msgstr ""
 
-#: templates/home.html:30
+#: templates/home.html:31
+msgid "Need help getting started?"
+msgstr ""
+
+#: templates/home.html:32
+msgid "Check out our comprehensive documentation for guides and tutorials."
+msgstr ""
+
+#: templates/home.html:36
+msgid "View Documentation"
+msgstr ""
+
+#: templates/home.html:51
 msgid "Published Datasets"
 msgstr ""
 
-#: templates/home.html:39
+#: templates/home.html:60
 msgid "Data Volume"
 msgstr ""
 
-#: templates/home.html:48 templates/user/management.html:56
+#: templates/home.html:69 templates/user/management.html:56
 msgid "Active Users"
 msgstr ""
 
-#: templates/home.html:57
+#: templates/home.html:78
 msgid "Active Projects"
 msgstr ""
 
-#: templates/home.html:71
+#: templates/home.html:92
 msgid "Recent Activity"
 msgstr ""
 
-#: templates/home.html:83
+#: templates/home.html:104
 msgid "New version added"
 msgstr ""
 
-#: templates/home.html:85
+#: templates/home.html:106
 msgid "Version updated"
 msgstr ""
 
-#: templates/home.html:96
+#: templates/home.html:117
 msgid "Draft"
 msgstr ""
 
-#: templates/home.html:104
+#: templates/home.html:125
 msgid "No recent activity found"
 msgstr ""
 
-#: templates/home.html:119
+#: templates/home.html:140
 msgid "Popular Datasets"
 msgstr ""
 
-#: templates/home.html:129
+#: templates/home.html:150
 msgid "downloads"
 msgstr ""
 
-#: templates/home.html:133
+#: templates/home.html:154
 msgid "by"
 msgstr ""
 
-#: templates/home.html:141
+#: templates/home.html:162
 msgid "No datasets available yet"
 msgstr ""
 
-#: templates/home.html:169
+#: templates/home.html:190
 msgid "datasets"
 msgstr ""
 
-#: templates/home.html:177
+#: templates/home.html:198
 msgid "View All Categories"
 msgstr ""
 
-#: templates/home.html:191
+#: templates/home.html:212
 msgid "Your Datasets"
 msgstr ""
 
-#: templates/home.html:206
+#: templates/home.html:227
 msgid "versions"
 msgstr ""
 
-#: templates/home.html:214
+#: templates/home.html:235
 msgid "Add New Dataset"
 msgstr ""
 
@@ -2544,11 +3318,6 @@ msgid ""
 "Are you sure you want to delete all your Data? This action cannot be undone."
 msgstr ""
 
-#: templates/user/data_export.html:5 templates/user/data_export.html:16
-#: templates/user/settings.html:471
-msgid "Data Export"
-msgstr ""
-
 #: templates/user/data_export.html:18 templates/user/settings.html:472
 msgid "Download a copy of your personal data for GDPR compliance"
 msgstr ""
@@ -2633,12 +3402,6 @@ msgstr ""
 #: templates/user/edit.html:5 templates/user/edit.html:19
 #: templates/user/edit.html:24
 msgid "Edit User"
-msgstr ""
-
-#: templates/user/edit.html:17 templates/user/management.html:6
-#: templates/user/management.html:17 templates/user/management.html:83
-#: templates/user/management.html:259 templates/user/role_form.html:98
-msgid "User Management"
 msgstr ""
 
 #: templates/user/edit.html:26
@@ -3026,10 +3789,6 @@ msgstr ""
 msgid "Create First Role"
 msgstr ""
 
-#: templates/user/settings.html:17
-msgid "Account Settings"
-msgstr ""
-
 #: templates/user/settings.html:19
 msgid "Manage your account preferences and security settings"
 msgstr ""
@@ -3088,10 +3847,6 @@ msgstr ""
 msgid "Member Since"
 msgstr ""
 
-#: templates/user/settings.html:181
-msgid "Language Preferences"
-msgstr ""
-
 #: templates/user/settings.html:249
 msgid "Email Notification Preferences"
 msgstr ""
@@ -3122,10 +3877,6 @@ msgstr ""
 msgid "Deutsch"
 msgstr ""
 
-#: templates/user/settings.html:385
-msgid "Security Settings"
-msgstr ""
-
 #: templates/user/settings.html:395
 msgid ""
 "Update your account password to keep your account secure. Choose a strong "
@@ -3134,10 +3885,6 @@ msgstr ""
 
 #: templates/user/settings.html:412
 msgid "Notification Preferences"
-msgstr ""
-
-#: templates/user/settings.html:417 user/forms.py:83 user/models.py:59
-msgid "Email Notifications"
 msgstr ""
 
 #: templates/user/settings.html:421
@@ -3150,10 +3897,6 @@ msgstr ""
 
 #: templates/user/settings.html:435
 msgid "Save Preferences"
-msgstr ""
-
-#: templates/user/settings.html:447
-msgid "Privacy Settings"
 msgstr ""
 
 #: templates/user/settings.html:452
@@ -3250,16 +3993,8 @@ msgstr ""
 msgid "Receive email notifications for comments on your datasets"
 msgstr ""
 
-#: user/forms.py:85 user/models.py:66
-msgid "Dataset Updates"
-msgstr ""
-
 #: user/forms.py:86 user/models.py:67
 msgid "Receive email notifications when datasets you follow are updated"
-msgstr ""
-
-#: user/forms.py:87 user/models.py:72
-msgid "New Versions"
 msgstr ""
 
 #: user/forms.py:88 user/models.py:73
