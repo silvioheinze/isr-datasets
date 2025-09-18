@@ -22,21 +22,25 @@ class DatasetListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        # Base queryset for published datasets with public/restricted access
-        queryset = Dataset.objects.filter(
-            status='published',
-            access_level__in=['public', 'restricted']
-        ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
-        
-        # Add private datasets that belong to the current user
-        if self.request.user.is_authenticated:
-            user_private_datasets = Dataset.objects.filter(
-                owner=self.request.user,
-                access_level='private'
+        # Superusers can see all datasets
+        if self.request.user and self.request.user.is_authenticated and self.request.user.is_superuser:
+            queryset = Dataset.objects.all().select_related('owner', 'category').prefetch_related('contributors', 'versions')
+        else:
+            # Base queryset for published datasets with public/restricted access
+            queryset = Dataset.objects.filter(
+                status='published',
+                access_level__in=['public', 'restricted']
             ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
             
-            # Combine the querysets
-            queryset = queryset.union(user_private_datasets)
+            # Add private datasets that belong to the current user
+            if self.request.user and self.request.user.is_authenticated:
+                user_private_datasets = Dataset.objects.filter(
+                    owner=self.request.user,
+                    access_level='private'
+                ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
+                
+                # Combine the querysets
+                queryset = queryset.union(user_private_datasets)
         
         # Filter by category
         category = self.request.GET.get('category')
@@ -68,22 +72,28 @@ class DatasetListView(ListView):
         context = super().get_context_data(**kwargs)
         context['categories'] = DatasetCategory.objects.filter(is_active=True)
         
-        # Featured datasets including user's private datasets
-        featured_queryset = Dataset.objects.filter(
-            status='published',
-            is_featured=True,
-            access_level__in=['public', 'restricted']
-        ).select_related('owner', 'category').prefetch_related('versions')
-        
-        # Add user's private featured datasets
-        if self.request.user.is_authenticated:
-            user_private_featured = Dataset.objects.filter(
-                owner=self.request.user,
+        # Featured datasets - superusers see all featured datasets
+        if self.request.user and self.request.user.is_authenticated and self.request.user.is_superuser:
+            featured_queryset = Dataset.objects.filter(
+                is_featured=True
+            ).select_related('owner', 'category').prefetch_related('versions')
+        else:
+            # Featured datasets including user's private datasets
+            featured_queryset = Dataset.objects.filter(
+                status='published',
                 is_featured=True,
-                access_level='private'
+                access_level__in=['public', 'restricted']
             ).select_related('owner', 'category').prefetch_related('versions')
             
-            featured_queryset = featured_queryset.union(user_private_featured)
+            # Add user's private featured datasets
+            if self.request.user and self.request.user.is_authenticated:
+                user_private_featured = Dataset.objects.filter(
+                    owner=self.request.user,
+                    is_featured=True,
+                    access_level='private'
+                ).select_related('owner', 'category').prefetch_related('versions')
+                
+                featured_queryset = featured_queryset.union(user_private_featured)
         
         context['featured_datasets'] = featured_queryset[:6]
         context['search_query'] = self.request.GET.get('search', '')
