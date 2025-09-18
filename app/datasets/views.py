@@ -22,10 +22,21 @@ class DatasetListView(ListView):
     paginate_by = 12
 
     def get_queryset(self):
+        # Base queryset for published datasets with public/restricted access
         queryset = Dataset.objects.filter(
             status='published',
             access_level__in=['public', 'restricted']
         ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
+        
+        # Add private datasets that belong to the current user
+        if self.request.user.is_authenticated:
+            user_private_datasets = Dataset.objects.filter(
+                owner=self.request.user,
+                access_level='private'
+            ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
+            
+            # Combine the querysets
+            queryset = queryset.union(user_private_datasets)
         
         # Filter by category
         category = self.request.GET.get('category')
@@ -56,11 +67,25 @@ class DatasetListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = DatasetCategory.objects.filter(is_active=True)
-        context['featured_datasets'] = Dataset.objects.filter(
+        
+        # Featured datasets including user's private datasets
+        featured_queryset = Dataset.objects.filter(
             status='published',
             is_featured=True,
             access_level__in=['public', 'restricted']
-        ).select_related('owner', 'category').prefetch_related('versions')[:6]
+        ).select_related('owner', 'category').prefetch_related('versions')
+        
+        # Add user's private featured datasets
+        if self.request.user.is_authenticated:
+            user_private_featured = Dataset.objects.filter(
+                owner=self.request.user,
+                is_featured=True,
+                access_level='private'
+            ).select_related('owner', 'category').prefetch_related('versions')
+            
+            featured_queryset = featured_queryset.union(user_private_featured)
+        
+        context['featured_datasets'] = featured_queryset[:6]
         context['search_query'] = self.request.GET.get('search', '')
         context['selected_category'] = self.request.GET.get('category', '')
         context['selected_tags'] = self.request.GET.get('tags', '')
