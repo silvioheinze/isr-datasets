@@ -40,6 +40,12 @@
                             {% trans "Edit Project" %}
                         </a>
                     {% endif %}
+                    {% if project.owner == user %}
+                        <a href="{% url 'projects:project_transfer_ownership' project.pk %}" class="btn btn-outline-warning">
+                            <i class="bi bi-arrow-repeat me-2"></i>
+                            {% trans "Transfer Ownership" %}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>

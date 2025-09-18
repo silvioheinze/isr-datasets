@@ -123,6 +123,61 @@ class ProjectForm(forms.ModelForm):
         return tags
 
 
+class ProjectTransferOwnershipForm(forms.Form):
+    """Form for transferring project ownership"""
+    
+    new_owner = forms.ModelChoiceField(
+        queryset=User.objects.none(),
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        }),
+        label=_('New Owner'),
+        help_text=_('Select the user who will become the new owner of this project')
+    )
+    
+    confirm_transfer = forms.BooleanField(
+        required=True,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input'
+        }),
+        label=_('I confirm that I want to transfer ownership'),
+        help_text=_('This action cannot be undone. You will become a collaborator instead of the owner.')
+    )
+    
+    def __init__(self, *args, **kwargs):
+        current_user = kwargs.pop('current_user', None)
+        project = kwargs.pop('project', None)
+        super().__init__(*args, **kwargs)
+        
+        if current_user and project:
+            # Exclude current owner and include current collaborators
+            excluded_users = [current_user.pk]
+            if project.owner:
+                excluded_users.append(project.owner.pk)
+            
+            # Get all users except current owner and current user
+            queryset = User.objects.exclude(pk__in=excluded_users).order_by('username')
+            self.fields['new_owner'].queryset = queryset
+            
+            # Add current collaborators to the top of the list
+            if project.collaborators.exists():
+                collaborator_ids = list(project.collaborators.values_list('pk', flat=True))
+                # Reorder queryset to show collaborators first
+                collaborators = User.objects.filter(pk__in=collaborator_ids).order_by('username')
+                other_users = queryset.exclude(pk__in=collaborator_ids)
+                # Combine and set as queryset
+                from django.db.models import QuerySet
+                combined_queryset = QuerySet(model=User)
+                combined_queryset._result_cache = list(collaborators) + list(other_users)
+                self.fields['new_owner'].queryset = combined_queryset
+    
+    def clean_new_owner(self):
+        new_owner = self.cleaned_data.get('new_owner')
+        if not new_owner:
+            raise forms.ValidationError(_('Please select a new owner for the project.'))
+        return new_owner
+
+
 class ProjectFilterForm(forms.Form):
     """Form for filtering projects"""
     

@@ -10,7 +10,7 @@ from django.http import Http404
 from django.contrib.auth import get_user_model
 
 from .models import Project
-from .forms import ProjectForm, ProjectFilterForm
+from .forms import ProjectForm, ProjectFilterForm, ProjectTransferOwnershipForm
 
 User = get_user_model()
 
@@ -169,4 +169,55 @@ class ProjectDeleteView(LoginRequiredMixin, DeleteView):
             f'Project "{project_title}" has been deleted successfully.'
         )
         return response
+
+
+class ProjectTransferOwnershipView(LoginRequiredMixin, UpdateView):
+    """Transfer project ownership to another user"""
+    model = Project
+    form_class = ProjectTransferOwnershipForm
+    template_name = 'projects/project_transfer_ownership.html'
+    
+    def get_queryset(self):
+        # Only project owners can transfer ownership
+        return Project.objects.filter(owner=self.request.user)
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['current_user'] = self.request.user
+        kwargs['project'] = self.get_object()
+        return kwargs
+    
+    def form_valid(self, form):
+        project = self.get_object()
+        new_owner = form.cleaned_data['new_owner']
+        current_owner = self.request.user
+        
+        # Store original owner for message
+        original_owner_name = current_owner.get_full_name() or current_owner.username
+        new_owner_name = new_owner.get_full_name() or new_owner.username
+        
+        # Transfer ownership
+        project.owner = new_owner
+        
+        # Add current owner as a collaborator if not already one
+        if current_owner not in project.collaborators.all():
+            project.collaborators.add(current_owner)
+        
+        # Remove new owner from collaborators if they were one
+        if new_owner in project.collaborators.all():
+            project.collaborators.remove(new_owner)
+        
+        project.save()
+        
+        # Send success message
+        messages.success(
+            self.request,
+            f'Project ownership has been successfully transferred from {original_owner_name} to {new_owner_name}. '
+            f'You are now a collaborator on this project.'
+        )
+        
+        return redirect('projects:project_detail', pk=project.pk)
+    
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
 
