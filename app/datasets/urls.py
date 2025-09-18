@@ -6,13 +6,13 @@ app_name = 'datasets'
 urlpatterns = [
     # Dataset views
     path('', views.DatasetListView.as_view(), name='dataset_list'),
-    path('<int:pk>/', views.DatasetDetailView.as_view(), name='dataset_detail'),
+    path('<uuid:pk>/', views.DatasetDetailView.as_view(), name='dataset_detail'),
     path('create/', views.DatasetCreateView.as_view(), name='dataset_create'),
-    path('<int:pk>/edit/', views.DatasetUpdateView.as_view(), name='dataset_edit'),
-    path('<int:pk>/delete/', views.DatasetDeleteView.as_view(), name='dataset_delete'),
-    path('<int:pk>/download/', views.dataset_download, name='dataset_download'),
-    path('<int:pk>/assign-project/', views.assign_dataset_to_project, name='assign_to_project'),
-    path('<int:dataset_pk>/version/create/', views.DatasetVersionCreateView.as_view(), name='dataset_version_create'),
+    path('<uuid:pk>/edit/', views.DatasetUpdateView.as_view(), name='dataset_edit'),
+    path('<uuid:pk>/delete/', views.DatasetDeleteView.as_view(), name='dataset_delete'),
+    path('<uuid:pk>/download/', views.dataset_download, name='dataset_download'),
+    path('<uuid:pk>/assign-project/', views.assign_dataset_to_project, name='assign_to_project'),
+    path('<uuid:dataset_pk>/version/create/', views.DatasetVersionCreateView.as_view(), name='dataset_version_create'),
     
     # Statistics
     path('statistics/', views.dataset_statistics, name='dataset_statistics'),
@@ -24,7 +24,7 @@ urlpatterns = [
     path('categories/<int:pk>/delete/', views.DatasetCategoryDeleteView.as_view(), name='category_delete'),
     
     # Comment views
-    path('<int:dataset_id>/comment/add/', views.add_comment, name='add_comment'),
+    path('<uuid:dataset_id>/comment/add/', views.add_comment, name='add_comment'),
     path('comment/<int:comment_id>/edit/', views.edit_comment, name='edit_comment'),
     path('comment/<int:comment_id>/delete/', views.delete_comment, name='delete_comment'),
     
