@@ -151,7 +151,7 @@
                                 </div>
                                 <p class="mb-1">{{ dataset.description|truncatechars:60 }}</p>
                                 <small class="text-muted">
-                                    {% trans "by" %} {{ dataset.owner.username }} • {{ dataset.updated_at|timesince }} {% trans "ago" %}
+                                    {% trans "by" %} {% if dataset.publisher %}{{ dataset.publisher.name }}{% else %}{{ dataset.owner.username }}{% endif %} • {{ dataset.updated_at|timesince }} {% trans "ago" %}
                                 </small>
                             </a>
                             {% endfor %}

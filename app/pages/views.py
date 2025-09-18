@@ -56,7 +56,7 @@ class HomePageView(LoginRequiredMixin, TemplateView):
             # Get popular datasets (by download count)
             popular_datasets = Dataset.objects.filter(
                 status='published'
-            ).select_related('owner', 'category').order_by('-download_count')[:5]
+            ).select_related('owner', 'category', 'publisher').order_by('-download_count')[:5]
             
             # Get recent activity (recent dataset versions)
             recent_versions = DatasetVersion.objects.filter(
