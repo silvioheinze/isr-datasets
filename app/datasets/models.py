@@ -1,4 +1,5 @@
 import os
+import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -109,6 +110,15 @@ class Dataset(models.Model):
         ('private', 'Private'),
     ]
 
+    # Primary key as UUID (will be added via migration)
+    # id = models.UUIDField(
+    #     primary_key=True,
+    #     default=uuid.uuid4,
+    #     editable=False,
+    #     verbose_name=_('ID'),
+    #     help_text=_('Unique identifier for the dataset')
+    # )
+    
     history = AuditlogHistoryField()
     
     # Basic information
