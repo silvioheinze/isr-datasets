@@ -60,6 +60,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Verify project structure
+      run: |
+        echo "Current directory contents:"
+        ls -la
+        echo "App directory contents:"
+        ls -la app/
+        echo "Checking for manage.py:"
+        ls -la app/manage.py
+
     - name: Set up environment variables
       run: |
         echo "DEBUG=True" >> $GITHUB_ENV
@@ -81,26 +90,36 @@ jobs:
 
     - name: Run database migrations
       run: |
+        cd app
         python manage.py migrate --noinput
 
     - name: Collect static files
       run: |
+        cd app
         python manage.py collectstatic --noinput
 
     - name: Run Django system checks
       run: |
+        cd app
         python manage.py check --deploy
 
     - name: Run all tests
       run: |
+        cd app
         python manage.py test --verbosity=2 --parallel
 
     - name: Run tests with coverage
       run: |
         pip install coverage
+        cd app
         coverage run --source='.' manage.py test
         coverage report
         coverage html
+        coverage xml
+        # Move coverage files to root for upload
+        mv .coverage ../.coverage
+        mv htmlcov ../htmlcov
+        mv coverage.xml ../coverage.xml
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v3
@@ -110,6 +129,7 @@ jobs:
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+        directory: ./
 
     - name: Test Summary
       if: always()
@@ -251,6 +271,15 @@ jobs:
         pip install -r requirements.txt
         pip install selenium pytest-django
 
+    - name: Verify project structure
+      run: |
+        echo "Current directory contents:"
+        ls -la
+        echo "App directory contents:"
+        ls -la app/
+        echo "Checking for manage.py:"
+        ls -la app/manage.py
+
     - name: Set up environment variables
       run: |
         echo "DEBUG=True" >> $GITHUB_ENV
@@ -269,10 +298,12 @@ jobs:
 
     - name: Run database migrations
       run: |
+        cd app
         python manage.py migrate --noinput
 
     - name: Create test superuser
       run: |
+        cd app
         python manage.py shell -c "
         from django.contrib.auth import get_user_model
         User = get_user_model()
@@ -282,10 +313,12 @@ jobs:
 
     - name: Run integration tests
       run: |
+        cd app
         python manage.py test --verbosity=2 --keepdb
 
     - name: Test email functionality
       run: |
+        cd app
         python manage.py shell -c "
         from django.core import mail
         from django.core.mail import send_mail
