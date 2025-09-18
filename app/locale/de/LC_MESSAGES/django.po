@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 09:33+0200\n"
+"POT-Creation-Date: 2025-09-18 09:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,7 +35,7 @@ msgstr ""
 #: templates/datasets/category_form.html:102
 #: templates/datasets/category_list.html:77
 #: templates/datasets/dataset_detail.html:64
-#: templates/datasets/dataset_detail.html:340
+#: templates/datasets/dataset_detail.html:350
 #: templates/datasets/dataset_form.html:88
 #: templates/datasets/publisher_confirm_delete.html:51
 #: templates/projects/project_confirm_delete.html:53
@@ -101,7 +101,7 @@ msgstr ""
 
 #: datasets/models.py:162 projects/models.py:124
 #: templates/datasets/assign_to_project.html:29
-#: templates/datasets/dataset_detail.html:255 templates/documentation.html:38
+#: templates/datasets/dataset_detail.html:265 templates/documentation.html:38
 #: templates/documentation.html:195
 #: templates/projects/project_confirm_delete.html:16
 #: templates/projects/project_detail.html:16
@@ -118,40 +118,40 @@ msgstr ""
 msgid "The organization or institution that published this dataset"
 msgstr ""
 
-#: datasets/models.py:327 templates/projects/project_detail.html:285
+#: datasets/models.py:354 templates/projects/project_detail.html:285
 msgid "Dataset"
 msgstr ""
 
-#: datasets/models.py:333
+#: datasets/models.py:360
 msgid "Author"
 msgstr ""
 
-#: datasets/models.py:336 datasets/models.py:355
+#: datasets/models.py:363 datasets/models.py:382
 #: templates/datasets/comment_edit.html:53
 msgid "Comment"
 msgstr ""
 
-#: datasets/models.py:337
+#: datasets/models.py:364
 msgid "Your comment about this dataset"
 msgstr ""
 
-#: datasets/models.py:341
+#: datasets/models.py:368
 msgid "Approved"
 msgstr ""
 
-#: datasets/models.py:342
+#: datasets/models.py:369
 msgid "Whether this comment is approved and visible to others"
 msgstr ""
 
-#: datasets/models.py:346
+#: datasets/models.py:373
 msgid "Created at"
 msgstr ""
 
-#: datasets/models.py:350
+#: datasets/models.py:377
 msgid "Updated at"
 msgstr ""
 
-#: datasets/models.py:356 templates/datasets/dataset_detail.html:441
+#: datasets/models.py:383 templates/datasets/dataset_detail.html:451
 #: templates/documentation.html:323 user/forms.py:89 user/models.py:78
 msgid "Comments"
 msgstr ""
@@ -1100,7 +1100,7 @@ msgstr ""
 #: templates/datasets/category_confirm_delete.html:18
 #: templates/datasets/category_list.html:126
 #: templates/datasets/dataset_confirm_delete.html:21
-#: templates/datasets/dataset_detail.html:508
+#: templates/datasets/dataset_detail.html:518
 #: templates/datasets/publisher_confirm_delete.html:18
 #: templates/datasets/publisher_list.html:128
 #: templates/projects/project_list.html:124 templates/user/role_list.html:126
@@ -1208,7 +1208,7 @@ msgstr ""
 #: templates/datasets/category_form.html:26
 #: templates/datasets/category_list.html:123
 #: templates/datasets/dataset_detail.html:38
-#: templates/datasets/dataset_detail.html:503
+#: templates/datasets/dataset_detail.html:513
 #: templates/datasets/publisher_form.html:26
 #: templates/datasets/publisher_list.html:124
 #: templates/projects/project_detail.html:349
@@ -1300,7 +1300,7 @@ msgid "Filter"
 msgstr ""
 
 #: templates/datasets/category_list.html:82
-#: templates/datasets/dataset_detail.html:345
+#: templates/datasets/dataset_detail.html:355
 #: templates/datasets/publisher_list.html:77
 #: templates/projects/project_detail.html:292
 #: templates/projects/project_list.html:78 templates/user/list.html:43
@@ -1309,7 +1309,7 @@ msgid "Actions"
 msgstr ""
 
 #: templates/datasets/category_list.html:99
-#: templates/datasets/dataset_detail.html:361 templates/user/role_list.html:104
+#: templates/datasets/dataset_detail.html:371 templates/user/role_list.html:104
 msgid "No description"
 msgstr ""
 
@@ -1318,42 +1318,42 @@ msgid "Categories pagination"
 msgstr ""
 
 #: templates/datasets/category_list.html:148
-#: templates/datasets/dataset_list.html:191
+#: templates/datasets/dataset_list.html:203
 #: templates/datasets/publisher_list.html:148
 #: templates/projects/project_list.html:147 templates/user/role_list.html:154
 msgid "First"
 msgstr ""
 
 #: templates/datasets/category_list.html:153
-#: templates/datasets/dataset_list.html:196
+#: templates/datasets/dataset_list.html:208
 #: templates/datasets/publisher_list.html:153
 #: templates/projects/project_list.html:152 templates/user/role_list.html:159
 msgid "Previous"
 msgstr ""
 
 #: templates/datasets/category_list.html:160
-#: templates/datasets/dataset_list.html:203
+#: templates/datasets/dataset_list.html:215
 #: templates/datasets/publisher_list.html:160
 #: templates/projects/project_list.html:159 templates/user/role_list.html:166
 msgid "Page"
 msgstr ""
 
 #: templates/datasets/category_list.html:160
-#: templates/datasets/dataset_list.html:203
+#: templates/datasets/dataset_list.html:215
 #: templates/datasets/publisher_list.html:160
 #: templates/projects/project_list.html:159 templates/user/role_list.html:166
 msgid "of"
 msgstr ""
 
 #: templates/datasets/category_list.html:167
-#: templates/datasets/dataset_list.html:210
+#: templates/datasets/dataset_list.html:222
 #: templates/datasets/publisher_list.html:167
 #: templates/projects/project_list.html:166 templates/user/role_list.html:173
 msgid "Next"
 msgstr ""
 
 #: templates/datasets/category_list.html:172
-#: templates/datasets/dataset_list.html:215
+#: templates/datasets/dataset_list.html:227
 #: templates/datasets/publisher_list.html:172
 #: templates/projects/project_list.html:171 templates/user/role_list.html:178
 msgid "Last"
@@ -1432,14 +1432,14 @@ msgstr ""
 
 #: templates/datasets/dataset_confirm_delete.html:51
 #: templates/datasets/dataset_detail.html:88
-#: templates/datasets/dataset_detail.html:304
+#: templates/datasets/dataset_detail.html:314
 #: templates/projects/project_detail.html:289
 msgid "Downloads"
 msgstr ""
 
 #: templates/datasets/dataset_confirm_delete.html:52
 #: templates/datasets/dataset_detail.html:89
-#: templates/datasets/dataset_detail.html:309
+#: templates/datasets/dataset_detail.html:319
 #: templates/projects/project_detail.html:288
 msgid "Versions"
 msgstr ""
@@ -1474,7 +1474,7 @@ msgid "Attribution & License"
 msgstr ""
 
 #: templates/datasets/dataset_detail.html:143
-#: templates/datasets/dataset_detail.html:277
+#: templates/datasets/dataset_detail.html:287
 #: templates/datasets/dataset_form.html:282
 msgid "Contributors"
 msgstr ""
@@ -1514,119 +1514,123 @@ msgstr ""
 msgid "Published"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:296
+#: templates/datasets/dataset_detail.html:255
+msgid "Available Formats"
+msgstr ""
+
+#: templates/datasets/dataset_detail.html:306
 msgid "Statistics"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:323 templates/documentation.html:152
+#: templates/datasets/dataset_detail.html:333 templates/documentation.html:152
 msgid "Dataset Versions"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:328
+#: templates/datasets/dataset_detail.html:338
 #: templates/datasets/dataset_version_form.html:4
 #: templates/datasets/dataset_version_form.html:21
 #: templates/datasets/dataset_version_form.html:26
 msgid "Add New Version"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:339
+#: templates/datasets/dataset_detail.html:349
 msgid "Version"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:341
+#: templates/datasets/dataset_detail.html:351
 #: templates/datasets/dataset_version_form.html:206
 msgid "File Size"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:342
+#: templates/datasets/dataset_detail.html:352
 msgid "File Source"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:343
+#: templates/datasets/dataset_detail.html:353
 msgid "Created By"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:344
+#: templates/datasets/dataset_detail.html:354
 #: templates/projects/project_confirm_delete.html:77
 msgid "Created At"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:354
+#: templates/datasets/dataset_detail.html:364
 msgid "Latest"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:371
+#: templates/datasets/dataset_detail.html:381
 msgid "Uploaded"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:377
+#: templates/datasets/dataset_detail.html:387
 msgid "External"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:403
+#: templates/datasets/dataset_detail.html:413
 msgid "Download this version"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:410
+#: templates/datasets/dataset_detail.html:420
 msgid "Open external URL"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:414
+#: templates/datasets/dataset_detail.html:424
 msgid "No file"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:428
+#: templates/datasets/dataset_detail.html:438
 msgid "No versions yet"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:429
+#: templates/datasets/dataset_detail.html:439
 msgid "This dataset doesn't have any versions yet."
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:451
+#: templates/datasets/dataset_detail.html:461
 msgid "Add a Comment"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:467
+#: templates/datasets/dataset_detail.html:477
 msgid "Post Comment"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:476
+#: templates/datasets/dataset_detail.html:486
 msgid "Please"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:476
+#: templates/datasets/dataset_detail.html:486
 msgid "log in"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:476
+#: templates/datasets/dataset_detail.html:486
 msgid "to add a comment."
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:492 templates/home.html:113
+#: templates/datasets/dataset_detail.html:502 templates/home.html:113
 #: templates/home.html:154 templates/home.html:227
 msgid "ago"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:507
+#: templates/datasets/dataset_detail.html:517
 msgid "Are you sure you want to delete this comment?"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:525
+#: templates/datasets/dataset_detail.html:535
 msgid "No comments yet"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:526
+#: templates/datasets/dataset_detail.html:536
 msgid "Be the first to share your thoughts about this dataset!"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:537
+#: templates/datasets/dataset_detail.html:547
 #: templates/datasets/dataset_form.html:297
 msgid "Related Datasets"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:548
-#: templates/datasets/dataset_list.html:175
+#: templates/datasets/dataset_detail.html:558
+#: templates/datasets/dataset_list.html:186
 #: templates/projects/project_detail.html:345
 #: templates/projects/project_list.html:115
 msgid "View"
@@ -1751,35 +1755,35 @@ msgstr ""
 msgid "Featured Datasets"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:110
+#: templates/datasets/dataset_list.html:116
 msgid "View Details"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:125
+#: templates/datasets/dataset_list.html:132
 msgid "All Datasets"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:126
+#: templates/datasets/dataset_list.html:133
 msgid "datasets found"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:160
+#: templates/datasets/dataset_list.html:167
 msgid "No publisher"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:186
+#: templates/datasets/dataset_list.html:198
 msgid "Dataset pagination"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:226
+#: templates/datasets/dataset_list.html:238
 msgid "No datasets found"
 msgstr ""
 
-#: templates/datasets/dataset_list.html:227
+#: templates/datasets/dataset_list.html:239
 msgid "No datasets match your search criteria."
 msgstr ""
 
-#: templates/datasets/dataset_list.html:231 templates/home.html:128
+#: templates/datasets/dataset_list.html:243 templates/home.html:128
 #: templates/projects/project_detail.html:377
 msgid "Add First Dataset"
 msgstr ""

@@ -25,7 +25,7 @@ class DatasetListView(ListView):
         queryset = Dataset.objects.filter(
             status='published',
             access_level__in=['public', 'restricted']
-        ).select_related('owner', 'category').prefetch_related('contributors')
+        ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
         
         # Filter by category
         category = self.request.GET.get('category')
@@ -60,7 +60,7 @@ class DatasetListView(ListView):
             status='published',
             is_featured=True,
             access_level__in=['public', 'restricted']
-        ).select_related('owner', 'category')[:6]
+        ).select_related('owner', 'category').prefetch_related('versions')[:6]
         context['search_query'] = self.request.GET.get('search', '')
         context['selected_category'] = self.request.GET.get('category', '')
         context['selected_tags'] = self.request.GET.get('tags', '')

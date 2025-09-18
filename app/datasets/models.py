@@ -242,6 +242,33 @@ class Dataset(models.Model):
             return user == self.owner or user.is_superuser
         return False
 
+    def get_available_formats(self):
+        """Get list of available data formats from dataset versions"""
+        import os
+        formats = set()
+        
+        for version in self.versions.all():
+            if version.file:
+                # Get file extension
+                _, ext = os.path.splitext(version.file.name)
+                if ext:
+                    # Remove the dot and convert to uppercase
+                    format_name = ext[1:].upper()
+                    formats.add(format_name)
+            elif version.file_url:
+                # For external URLs, try to extract format from URL
+                url_lower = version.file_url.lower()
+                if any(ext in url_lower for ext in ['.csv', '.json', '.xlsx', '.xls', '.txt', '.zip', '.tar.gz', '.gpkg']):
+                    for ext in ['.csv', '.json', '.xlsx', '.xls', '.txt', '.zip', '.tar.gz', '.gpkg']:
+                        if ext in url_lower:
+                            format_name = ext[1:].upper()
+                            if ext == '.tar.gz':
+                                format_name = 'TAR.GZ'
+                            formats.add(format_name)
+                            break
+        
+        return sorted(list(formats))
+
 
 class DatasetVersion(models.Model):
     """Version control for datasets"""

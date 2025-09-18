@@ -250,6 +250,16 @@
                             {{ dataset.get_access_level_display }}
                         </span>
                     </div>
+                    {% if dataset.get_available_formats %}
+                    <div class="mb-3">
+                        <strong>{% trans "Available Formats" %}:</strong>
+                        <div class="mt-1">
+                            {% for format in dataset.get_available_formats %}
+                            <span class="badge bg-info text-dark me-1">{{ format }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                     {% if dataset.projects.exists %}
                     <div class="mb-3">
                         <strong>{% trans "Projects" %}:</strong>
