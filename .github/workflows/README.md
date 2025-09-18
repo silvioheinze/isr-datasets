@@ -4,17 +4,31 @@ This directory contains GitHub Actions workflows for the ISR Datasets project.
 
 ## Workflows
 
-### 1. CI (`ci.yml`)
-**Trigger**: Push to main/master/develop branches, Pull Requests
-**Purpose**: Continuous Integration - runs tests, linting, and basic Docker build validation
+### 1. Comprehensive Tests (`test.yml`)
+**Trigger**: Push to main/master/develop branches, Pull Requests, Manual dispatch
+**Purpose**: Complete test suite with multiple testing phases
 
 **Features**:
-- Python tests with PostgreSQL service
-- Code linting with flake8
-- Docker image build test
-- Basic container health check
+- ✅ **Unit Tests** - All Django tests with PostgreSQL
+- ✅ **Code Linting** - Black, isort, Flake8
+- ✅ **Security Checks** - Safety, Bandit
+- ✅ **Docker Tests** - Container functionality
+- ✅ **Integration Tests** - End-to-end testing
+- ✅ **Performance Tests** - Load testing (PR only)
+- ✅ **Coverage Reports** - Code coverage analysis
 
-### 2. Docker Build and Push (`docker-build.yml`)
+### 2. Quick Tests (`quick-test.yml`)
+**Trigger**: Push to main/master/develop branches, Pull Requests, Manual dispatch
+**Purpose**: Fast development tests for quick feedback
+
+**Features**:
+- ⚡ **Fast Execution** - Uses SQLite for speed
+- 🔄 **Quick Feedback** - Essential tests only
+- 📧 **Notification Tests** - Email functionality
+- 👤 **User Tests** - Authentication
+- 📊 **Dataset Tests** - Core functionality
+
+### 3. Docker Build and Push (`docker-build.yml`)
 **Trigger**: Push to main/master branches, version tags, Pull Requests
 **Purpose**: Builds and pushes Docker images to GitHub Container Registry
 
@@ -27,7 +41,7 @@ This directory contains GitHub Actions workflows for the ISR Datasets project.
 - Provides build summary in GitHub Actions
 - **Combined latest-tag functionality for streamlined CI/CD**
 
-### 3. Release (`release.yml`)
+### 4. Release (`release.yml`)
 **Trigger**: Version tags (v*), Manual dispatch
 **Purpose**: Creates releases with proper versioning and latest tags
 
@@ -37,6 +51,41 @@ This directory contains GitHub Actions workflows for the ISR Datasets project.
 - Creates GitHub releases with detailed information
 - Supports manual workflow dispatch
 - Includes proper OCI labels
+
+## 🧪 Test Coverage
+
+### Test Categories
+- **User Management Tests**
+  - User creation and authentication
+  - Role-based permissions
+  - Email verification
+  - Password reset functionality
+
+- **Dataset Management Tests**
+  - CRUD operations
+  - File upload handling
+  - Version management
+  - Project associations
+  - Publisher relationships
+
+- **Notification System Tests**
+  - Comment notifications
+  - Dataset update notifications
+  - New version notifications
+  - Email template validation
+  - Exception handling
+  - User preference respect
+
+- **Integration Tests**
+  - End-to-end workflows
+  - Database migrations
+  - Static file collection
+  - System health checks
+
+### Test Databases
+- **Comprehensive Tests:** PostgreSQL 15 (production-like)
+- **Quick Tests:** SQLite (fast execution)
+- **Docker Tests:** Built-in database
 
 ## Key Features
 

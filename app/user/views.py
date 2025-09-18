@@ -85,6 +85,13 @@ def SettingsView(request):
                         request.LANGUAGE_CODE = new_language
                     messages.success(request, 'Your language preference has been updated successfully.')
                     return redirect('user-settings')
+            
+            elif 'notifications_submit' in request.POST:
+                settings_form = UserSettingsForm(request.POST, instance=request.user)
+                if settings_form.is_valid():
+                    settings_form.save()
+                    messages.success(request, 'Your notification preferences have been updated successfully.')
+                    return redirect('user-settings')
         
         context = {
             'user': request.user,

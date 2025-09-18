@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 09:38+0200\n"
+"POT-Creation-Date: 2025-09-18 11:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,15 +152,15 @@ msgid "Updated at"
 msgstr ""
 
 #: datasets/models.py:383 templates/datasets/dataset_detail.html:451
-#: templates/documentation.html:323 user/forms.py:89 user/models.py:78
+#: templates/documentation.html:323 user/forms.py:84 user/models.py:78
 msgid "Comments"
 msgstr ""
 
-#: main/settings.py:135 templates/user/settings.html:358 user/models.py:48
+#: main/settings.py:135 templates/user/settings.html:265 user/models.py:48
 msgid "English"
 msgstr ""
 
-#: main/settings.py:136 templates/user/settings.html:368 user/models.py:49
+#: main/settings.py:136 templates/user/settings.html:275 user/models.py:49
 msgid "German"
 msgstr ""
 
@@ -755,7 +755,8 @@ msgstr ""
 #: templates/user/password_reset.html:35
 #: templates/user/password_reset_from_key.html:52
 #: templates/user/settings.html:86 templates/user/settings.html:191
-#: templates/user/signup.html:24 templates/user/user_form.html:39
+#: templates/user/settings.html:329 templates/user/signup.html:24
+#: templates/user/user_form.html:39
 msgid "Please correct the errors below."
 msgstr ""
 
@@ -766,7 +767,7 @@ msgid "Enter your email address"
 msgstr ""
 
 #: templates/account/login.html:52 templates/account/signup.html:51
-#: templates/user/login.html:52 templates/user/settings.html:393
+#: templates/user/login.html:52 templates/user/settings.html:300
 #: templates/user/signup.html:51 templates/user/user_form.html:152
 msgid "Password"
 msgstr ""
@@ -835,7 +836,7 @@ msgstr ""
 #: templates/account/password_change.html:23
 #: templates/account/password_change.html:109
 #: templates/user/password_change.html:4 templates/user/password_change.html:12
-#: templates/user/password_change.html:90 templates/user/settings.html:398
+#: templates/user/password_change.html:90 templates/user/settings.html:305
 msgid "Change Password"
 msgstr ""
 
@@ -1142,7 +1143,7 @@ msgstr ""
 #: templates/datasets/publisher_confirm_delete.html:130
 #: templates/datasets/publisher_confirm_delete.html:137
 #: templates/projects/project_confirm_delete.html:84
-#: templates/user/role_confirm_delete.html:19 templates/user/settings.html:500
+#: templates/user/role_confirm_delete.html:19 templates/user/settings.html:497
 msgid "Warning"
 msgstr ""
 
@@ -1163,7 +1164,8 @@ msgstr[1] ""
 
 #: templates/datasets/category_confirm_delete.html:84
 #: templates/projects/project_confirm_delete.html:97
-#: templates/user/data_export.html:153 templates/user/settings.html:321
+#: templates/user/data_export.html:153 templates/user/settings.html:228
+#: templates/user/settings.html:415
 msgid "Note"
 msgstr ""
 
@@ -2242,7 +2244,7 @@ msgstr ""
 
 #: templates/documentation.html:45 templates/documentation.html:109
 #: templates/documentation.html:316 templates/documentation.html:361
-#: templates/user/settings.html:417 user/forms.py:83 user/models.py:59
+#: user/models.py:59
 msgid "Email Notifications"
 msgstr ""
 
@@ -2370,7 +2372,7 @@ msgid "Control which email notifications you receive"
 msgstr ""
 
 #: templates/documentation.html:110 templates/documentation.html:362
-#: templates/user/settings.html:385
+#: templates/user/settings.html:292
 msgid "Security Settings"
 msgstr ""
 
@@ -2379,7 +2381,7 @@ msgid "Change your password"
 msgstr ""
 
 #: templates/documentation.html:111 templates/documentation.html:363
-#: templates/user/settings.html:447
+#: templates/user/settings.html:444
 msgid "Privacy Settings"
 msgstr ""
 
@@ -2389,7 +2391,7 @@ msgstr ""
 
 #: templates/documentation.html:112 templates/documentation.html:364
 #: templates/user/data_export.html:5 templates/user/data_export.html:16
-#: templates/user/settings.html:471
+#: templates/user/settings.html:468
 msgid "Data Export"
 msgstr ""
 
@@ -2794,7 +2796,7 @@ msgstr ""
 msgid "When someone comments on your datasets"
 msgstr ""
 
-#: templates/documentation.html:324 user/forms.py:85 user/models.py:66
+#: templates/documentation.html:324 user/forms.py:80 user/models.py:66
 msgid "Dataset Updates"
 msgstr ""
 
@@ -2802,7 +2804,7 @@ msgstr ""
 msgid "When datasets you follow are updated"
 msgstr ""
 
-#: templates/documentation.html:325 user/forms.py:87 user/models.py:72
+#: templates/documentation.html:325 user/forms.py:82 user/models.py:72
 msgid "New Versions"
 msgstr ""
 
@@ -3322,7 +3324,7 @@ msgid ""
 "Are you sure you want to delete all your Data? This action cannot be undone."
 msgstr ""
 
-#: templates/user/data_export.html:18 templates/user/settings.html:472
+#: templates/user/data_export.html:18 templates/user/settings.html:469
 msgid "Download a copy of your personal data for GDPR compliance"
 msgstr ""
 
@@ -3821,7 +3823,7 @@ msgstr ""
 msgid "Privacy"
 msgstr ""
 
-#: templates/user/settings.html:61 templates/user/settings.html:494
+#: templates/user/settings.html:61 templates/user/settings.html:491
 msgid "Danger Zone"
 msgstr ""
 
@@ -3851,113 +3853,115 @@ msgstr ""
 msgid "Member Since"
 msgstr ""
 
-#: templates/user/settings.html:249
-msgid "Email Notification Preferences"
-msgstr ""
-
-#: templates/user/settings.html:322
+#: templates/user/settings.html:229
 msgid ""
 "Changing your language preference will update the interface language for "
 "your account. Some changes may require a page refresh to take effect."
 msgstr ""
 
-#: templates/user/settings.html:331
+#: templates/user/settings.html:238
 msgid "Current language"
 msgstr ""
 
-#: templates/user/settings.html:337
+#: templates/user/settings.html:244
 msgid "Save Language Preference"
 msgstr ""
 
-#: templates/user/settings.html:349
+#: templates/user/settings.html:256
 msgid "Supported Languages"
 msgstr ""
 
-#: templates/user/settings.html:360
+#: templates/user/settings.html:267
 msgid "Default language"
 msgstr ""
 
-#: templates/user/settings.html:370
+#: templates/user/settings.html:277
 msgid "Deutsch"
 msgstr ""
 
-#: templates/user/settings.html:395
+#: templates/user/settings.html:302
 msgid ""
 "Update your account password to keep your account secure. Choose a strong "
 "password that you haven't used elsewhere."
 msgstr ""
 
-#: templates/user/settings.html:412
+#: templates/user/settings.html:319
 msgid "Notification Preferences"
 msgstr ""
 
-#: templates/user/settings.html:421
-msgid "Dataset updates and new versions"
+#: templates/user/settings.html:345
+msgid "Email Notification Preferences"
 msgstr ""
 
-#: templates/user/settings.html:427
-msgid "Comments on my datasets"
+#: templates/user/settings.html:416
+msgid ""
+"You can control which types of email notifications you receive. Each setting "
+"can be enabled or disabled independently."
 msgstr ""
 
-#: templates/user/settings.html:435
-msgid "Save Preferences"
+#: templates/user/settings.html:425
+msgid "Manage your email notification preferences"
 msgstr ""
 
-#: templates/user/settings.html:452
+#: templates/user/settings.html:430
+msgid "Save Notification Preferences"
+msgstr ""
+
+#: templates/user/settings.html:449
 msgid "Profile Visibility"
 msgstr ""
 
-#: templates/user/settings.html:456
+#: templates/user/settings.html:453
 msgid "Make my profile public"
 msgstr ""
 
-#: templates/user/settings.html:458
+#: templates/user/settings.html:455
 msgid "Allow other users to see your profile and datasets"
 msgstr ""
 
-#: templates/user/settings.html:463
+#: templates/user/settings.html:460
 msgid "Show email address on profile"
 msgstr ""
 
-#: templates/user/settings.html:475
+#: templates/user/settings.html:472
 msgid "Request Data Export"
 msgstr ""
 
-#: templates/user/settings.html:481
+#: templates/user/settings.html:478
 msgid "Save Privacy Settings"
 msgstr ""
 
-#: templates/user/settings.html:500
+#: templates/user/settings.html:497
 msgid "These actions are irreversible. Please proceed with caution."
 msgstr ""
 
-#: templates/user/settings.html:506 templates/user/settings.html:520
+#: templates/user/settings.html:503 templates/user/settings.html:517
 msgid "Delete Account"
 msgstr ""
 
-#: templates/user/settings.html:508
+#: templates/user/settings.html:505
 msgid ""
 "Permanently delete your account and all associated data. This action cannot "
 "be undone."
 msgstr ""
 
-#: templates/user/settings.html:510
+#: templates/user/settings.html:507
 msgid "What will be deleted"
 msgstr ""
 
-#: templates/user/settings.html:512
+#: templates/user/settings.html:509
 msgid "Your profile and personal information"
 msgstr ""
 
-#: templates/user/settings.html:513
+#: templates/user/settings.html:510
 msgid "All datasets you've uploaded"
 msgstr ""
 
-#: templates/user/settings.html:514
+#: templates/user/settings.html:511
 msgid "Download history and statistics"
 msgstr ""
 
-#: templates/user/settings.html:515
+#: templates/user/settings.html:512
 msgid "Comments and contributions"
 msgstr ""
 
@@ -3985,69 +3989,69 @@ msgstr ""
 msgid "Create User"
 msgstr ""
 
-#: user/forms.py:81
+#: user/forms.py:78
 msgid "Interface Language"
 msgstr ""
 
-#: user/forms.py:82
+#: user/forms.py:79
 msgid "Choose your preferred language for the interface"
 msgstr ""
 
-#: user/forms.py:84 user/forms.py:90 user/models.py:60 user/models.py:79
-msgid "Receive email notifications for comments on your datasets"
-msgstr ""
-
-#: user/forms.py:86 user/models.py:67
+#: user/forms.py:81 user/models.py:67
 msgid "Receive email notifications when datasets you follow are updated"
 msgstr ""
 
-#: user/forms.py:88 user/models.py:73
+#: user/forms.py:83 user/models.py:73
 msgid ""
 "Receive email notifications when new versions of datasets you follow are "
 "published"
 msgstr ""
 
-#: user/forms.py:97
+#: user/forms.py:85 user/models.py:60 user/models.py:79
+msgid "Receive email notifications for comments on your datasets"
+msgstr ""
+
+#: user/forms.py:92
 msgid "JSON"
 msgstr ""
 
-#: user/forms.py:98
+#: user/forms.py:93
 msgid "CSV"
 msgstr ""
 
-#: user/forms.py:99
+#: user/forms.py:94
 msgid "XML"
 msgstr ""
 
-#: user/forms.py:108
+#: user/forms.py:103
 msgid "Export Format"
 msgstr ""
 
-#: user/forms.py:109
+#: user/forms.py:104
 msgid "Choose the format for your data export"
 msgstr ""
 
-#: user/forms.py:118
+#: user/forms.py:113
 msgid "Include Datasets"
 msgstr ""
 
-#: user/forms.py:119
+#: user/forms.py:114
 msgid "Include your datasets in the export"
 msgstr ""
 
-#: user/forms.py:128
+#: user/forms.py:123
 msgid "Include Projects"
 msgstr ""
 
-#: user/forms.py:129
+#: user/forms.py:124
 msgid "Include your projects in the export"
 msgstr ""
 
-#: user/forms.py:138
+#: user/forms.py:133
 msgid "Include Activity Log"
 msgstr ""
 
-#: user/forms.py:139
+#: user/forms.py:134
 msgid "Include your activity and download history"
 msgstr ""
 

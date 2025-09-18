@@ -1,0 +1,83 @@
+name: Quick Tests
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.13'
+
+jobs:
+  quick-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up environment variables
+      run: |
+        echo "DEBUG=True" >> $GITHUB_ENV
+        echo "SECRET_KEY=test-secret-key-for-github-actions" >> $GITHUB_ENV
+        echo "DATABASE_URL=sqlite:///db.sqlite3" >> $GITHUB_ENV
+        echo "EMAIL_BACKEND=django.core.mail.backends.locmem.EmailBackend" >> $GITHUB_ENV
+        echo "DEFAULT_FROM_EMAIL=noreply@test.com" >> $GITHUB_ENV
+        echo "SITE_NAME=Test Site" >> $GITHUB_ENV
+        echo "SITE_URL=http://test.com" >> $GITHUB_ENV
+
+    - name: Run database migrations
+      run: |
+        python manage.py migrate --noinput
+
+    - name: Run Django system checks
+      run: |
+        python manage.py check
+
+    - name: Run notification tests
+      run: |
+        python manage.py test datasets.tests.NotificationEmailTests --verbosity=2
+
+    - name: Run user tests
+      run: |
+        python manage.py test user.tests --verbosity=2
+
+    - name: Run dataset tests
+      run: |
+        python manage.py test datasets.tests --verbosity=2
+
+    - name: Test Summary
+      if: always()
+      run: |
+        echo "## 🚀 Quick Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Tests Executed" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Django system checks" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Database migrations" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Notification email tests" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ User authentication tests" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Dataset model tests" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Performance" >> $GITHUB_STEP_SUMMARY
+        echo "- ⚡ Fast execution with SQLite" >> $GITHUB_STEP_SUMMARY
+        echo "- 🔄 Quick feedback for development" >> $GITHUB_STEP_SUMMARY
