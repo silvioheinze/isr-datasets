@@ -2057,8 +2057,14 @@ msgstr ""
 #: templates/datasets/dataset_version_form.html:270
 msgid ""
 "Maximum file size: 1GB (supported formats: CSV, JSON, Excel, TXT, ZIP, "
-"TAR.GZ, GPKG)"
+"TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal "
+"Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, "
+"SpatiaLite, SQL)"
 msgstr ""
+"Maximale Dateigröße: 1GB (unterstützte Formate: CSV, JSON, Excel, TXT, ZIP, "
+"TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster-Formate, File/Personal "
+"Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Projektdateien, QML, "
+"SpatiaLite, SQL)"
 
 #: templates/datasets/dataset_version_form.html:274
 msgid "The new version will become the current version automatically"
@@ -2658,8 +2664,8 @@ msgid "Upload new data files as versions"
 msgstr ""
 
 #: templates/documentation.html:156
-msgid "Supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG"
-msgstr ""
+msgid "Supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile (.shp, .shx, .dbf, etc.), GeoJSON (.geojson, .json), KML/KMZ (.kml, .kmz), Raster formats (.tif, .jpg, .png, .img), File Geodatabase (.gdb), Personal Geodatabase (.mdb), Esri Layer Files (.lyr, .lyrx), Esri Map Packages (.mpk, .mpkx), QGIS Project Files (.qgs, .qgz), QML (.qml), SpatiaLite (.sqlite), SQL (.sql)"
+msgstr "Unterstützte Formate: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile (.shp, .shx, .dbf, etc.), GeoJSON (.geojson, .json), KML/KMZ (.kml, .kmz), Raster-Formate (.tif, .jpg, .png, .img), File Geodatabase (.gdb), Personal Geodatabase (.mdb), Esri Layer Files (.lyr, .lyrx), Esri Map Packages (.mpk, .mpkx), QGIS Projektdateien (.qgs, .qgz), QML (.qml), SpatiaLite (.sqlite), SQL (.sql)"
 
 #: templates/documentation.html:157 templates/documentation.html:416
 msgid "Maximum file size: 1GB"
@@ -3153,8 +3159,8 @@ msgid "Technical Requirements"
 msgstr ""
 
 #: templates/documentation.html:415
-msgid "Supported file formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG"
-msgstr ""
+msgid "Supported file formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL"
+msgstr "Unterstützte Dateiformate: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster-Formate, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Projektdateien, QML, SpatiaLite, SQL"
 
 #: templates/documentation.html:417
 msgid "Modern web browser with JavaScript enabled"

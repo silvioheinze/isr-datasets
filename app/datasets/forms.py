@@ -229,7 +229,7 @@ class DatasetVersionForm(forms.ModelForm):
             }),
             'file': forms.FileInput(attrs={
                 'class': 'form-control',
-                'accept': '.csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg'
+                'accept': '.csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql'
             }),
             'file_url': forms.URLInput(attrs={
                 'class': 'form-control',
@@ -253,7 +253,7 @@ class DatasetVersionForm(forms.ModelForm):
         # Add help text for fields
         self.fields['version_number'].help_text = 'Use semantic versioning (e.g., 1.0, 1.1, 2.0)'
         self.fields['description'].help_text = 'Optional: Describe what changed in this version'
-        self.fields['file'].help_text = 'Upload the new version file (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG formats supported, max 1GB)'
+        self.fields['file'].help_text = 'Upload the new version file (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL formats supported, max 1GB)'
         self.fields['file_url'].help_text = 'External URL where the file can be accessed'
         self.fields['file_url_description'].help_text = 'Optional: Describe where the file is located'
         self.fields['file_size_text'].help_text = 'Human-readable file size (e.g., "2.5 MB", "1.2 GB")'

@@ -138,7 +138,7 @@
                                 name="{{ form.file.name }}" 
                                 class="form-control {% if form.file.errors %}is-invalid{% endif %}"
                                 id="{{ form.file.id_for_label }}"
-                                accept=".csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg"
+                                accept=".csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql"
                             >
                             {% if form.file.errors %}
                                 <div class="invalid-feedback">
@@ -267,7 +267,7 @@
                         </li>
                         <li class="mb-2">
                             <i class="bi bi-info-circle text-info me-2"></i>
-                            {% trans "Maximum file size: 1GB (supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG)" %}
+                            {% trans "Maximum file size: 1GB (supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL)" %}
                         </li>
                         <li>
                             <i class="bi bi-check-circle text-success me-2"></i>

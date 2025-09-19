@@ -268,12 +268,21 @@ class Dataset(models.Model):
             elif version.file_url:
                 # For external URLs, try to extract format from URL
                 url_lower = version.file_url.lower()
-                if any(ext in url_lower for ext in ['.csv', '.json', '.xlsx', '.xls', '.txt', '.zip', '.tar.gz', '.gpkg']):
-                    for ext in ['.csv', '.json', '.xlsx', '.xls', '.txt', '.zip', '.tar.gz', '.gpkg']:
+                supported_extensions = [
+                    '.csv', '.json', '.xlsx', '.xls', '.txt', '.zip', '.tar.gz', '.gpkg',
+                    '.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.shp.xml', '.cpg',
+                    '.geojson', '.kml', '.kmz', '.tif', '.tiff', '.jpg', '.jpeg', '.png', '.img',
+                    '.gdb', '.mdb', '.lyr', '.lyrx', '.mpk', '.mpkx', '.qgs', '.qgz', '.qml',
+                    '.sqlite', '.sql'
+                ]
+                if any(ext in url_lower for ext in supported_extensions):
+                    for ext in supported_extensions:
                         if ext in url_lower:
                             format_name = ext[1:].upper()
                             if ext == '.tar.gz':
                                 format_name = 'TAR.GZ'
+                            elif ext == '.shp.xml':
+                                format_name = 'SHP.XML'
                             formats.add(format_name)
                             break
         
