@@ -215,6 +215,7 @@
                             {{ user.username }}
                         </a>
                          <ul class="dropdown-menu dropdown-menu-end">
+                             <li><a class="dropdown-item" href="{% url 'user-profile' %}">My Profile</a></li>
                              <li><a class="dropdown-item" href="{% url 'user-settings' %}">Settings</a></li>
                              <li><a class="dropdown-item" href="{% url 'documentation' %}">Documentation</a></li>
                              {% if user.is_superuser %}

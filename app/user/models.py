@@ -22,7 +22,11 @@ class Role(models.Model):
 
     def get_permissions(self):
         """Get list of permissions for this role"""
-        return self.permissions.get('permissions', [])
+        if isinstance(self.permissions, list):
+            return self.permissions
+        elif isinstance(self.permissions, dict):
+            return self.permissions.get('permissions', [])
+        return []
 
     def has_permission(self, permission):
         """Check if role has specific permission"""

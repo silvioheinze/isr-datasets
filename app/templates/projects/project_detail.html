@@ -192,7 +192,9 @@
                         <h6>{% trans "Owner" %}</h6>
                         <div class="d-flex align-items-center">
                             <i class="bi bi-person-circle text-primary me-2"></i>
-                            <span>{{ project.owner.username }}</span>
+                            <a href="{% url 'user-profile-detail' project.owner.id %}" class="text-decoration-none">
+                                {{ project.owner.username }}
+                            </a>
                         </div>
                     </div>
                     
@@ -202,7 +204,9 @@
                             {% for collaborator in project.collaborators.all %}
                                 <div class="list-group-item px-0 py-2 d-flex align-items-center">
                                     <i class="bi bi-person text-secondary me-2"></i>
-                                    <span>{{ collaborator.username }}</span>
+                                    <a href="{% url 'user-profile-detail' collaborator.id %}" class="text-decoration-none">
+                                        {{ collaborator.username }}
+                                    </a>
                                 </div>
                             {% endfor %}
                         </div>
@@ -340,7 +344,9 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-person-circle text-secondary me-1"></i>
-                                                {{ dataset.owner.username }}
+                                                <a href="{% url 'user-profile-detail' dataset.owner.id %}" class="text-decoration-none">
+                                                    {{ dataset.owner.username }}
+                                                </a>
                                             </div>
                                         </td>
                                         <td>

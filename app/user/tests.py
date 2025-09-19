@@ -1626,3 +1626,334 @@ class UserIntegrationTests(TestCase):
         
         # Step 3: Check user was deleted
         self.assertFalse(self.User.objects.filter(pk=user_id).exists())
+
+
+class UserProfileViewTests(TestCase):
+    """Test cases for UserProfileView"""
+    
+    def setUp(self):
+        self.User = get_user_model()
+        
+        # Create test users
+        self.user1 = self.User.objects.create_user(
+            username='user1',
+            email='user1@example.com',
+            password='testpass123',
+            first_name='John',
+            last_name='Doe',
+            is_approved=True
+        )
+        
+        self.user2 = self.User.objects.create_user(
+            username='user2',
+            email='user2@example.com',
+            password='testpass123',
+            first_name='Jane',
+            last_name='Smith',
+            is_approved=True
+        )
+        
+        self.admin = self.User.objects.create_superuser(
+            username='admin',
+            email='admin@example.com',
+            password='adminpass123'
+        )
+        
+        # Create test role
+        self.role, created = Role.objects.get_or_create(
+            name='Test Viewer Role',
+            defaults={
+                'permissions': ['user.view'],
+                'is_active': True
+            }
+        )
+        
+        # Create test projects and datasets
+        self._create_test_data()
+    
+    def _create_test_data(self):
+        """Create test projects and datasets"""
+        from projects.models import Project
+        from datasets.models import Dataset, DatasetCategory, Publisher
+        
+        # Create test category and publisher
+        self.category = DatasetCategory.objects.create(
+            name='Test Category',
+            description='Test category description',
+            color='#007bff',
+            is_active=True
+        )
+        
+        self.publisher = Publisher.objects.create(
+            name='Test Publisher',
+            description='Test publisher description',
+            is_active=True
+        )
+        
+        # Create test project
+        self.project = Project.objects.create(
+            title='Test Project',
+            description='Test project description',
+            owner=self.user1,
+            status='active'
+        )
+        self.project.collaborators.add(self.user2)
+        
+        # Create test datasets
+        self.dataset1 = Dataset.objects.create(
+            title='Test Dataset 1',
+            description='Test dataset 1 description',
+            owner=self.user1,
+            category=self.category,
+            publisher=self.publisher,
+            status='published'
+        )
+        self.dataset1.projects.add(self.project)
+        
+        self.dataset2 = Dataset.objects.create(
+            title='Test Dataset 2',
+            description='Test dataset 2 description',
+            owner=self.user2,
+            category=self.category,
+            status='draft'
+        )
+        self.dataset2.contributors.add(self.user1)
+    
+    def test_user_profile_own_profile_access(self):
+        """Test user can access their own profile"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'John Doe')
+        self.assertContains(response, 'user1@example.com')
+        self.assertContains(response, 'Test Project')
+        self.assertContains(response, 'Test Dataset 1')
+    
+    def test_user_profile_other_user_access_denied(self):
+        """Test user cannot access other user's profile without permission"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user2.pk}))
+        
+        self.assertEqual(response.status_code, 403)
+    
+    def test_user_profile_superuser_access(self):
+        """Test superuser can access any user's profile"""
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user1.pk}))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'John Doe')
+        self.assertContains(response, 'user1@example.com')
+    
+    def test_user_profile_with_permission_access(self):
+        """Test user with user.view permission can access other profiles"""
+        self.user1.role = self.role
+        self.user1.save()
+        
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user2.pk}))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Jane Smith')
+        self.assertContains(response, 'user2@example.com')
+    
+    def test_user_profile_anonymous_access_denied(self):
+        """Test anonymous user cannot access profiles"""
+        response = self.client.get(reverse('user-profile'))
+        self.assertEqual(response.status_code, 302)  # Redirect to login
+    
+    def test_user_profile_context_data(self):
+        """Test profile view context data"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        context = response.context
+        
+        # Check context variables
+        self.assertEqual(context['profile_user'], self.user1)
+        self.assertTrue(context['is_own_profile'])
+        self.assertEqual(context['user_projects'].count(), 1)
+        self.assertEqual(context['user_datasets'].count(), 1)
+        self.assertEqual(context['contributed_datasets'].count(), 1)
+    
+    def test_user_profile_projects_display(self):
+        """Test projects are displayed correctly in profile"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test Project')
+        self.assertContains(response, 'Owner')  # user1 is owner of the project
+        self.assertContains(response, '1 datasets')  # project has 1 dataset
+    
+    def test_user_profile_datasets_display(self):
+        """Test datasets are displayed correctly in profile"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test Dataset 1')
+        self.assertContains(response, 'Owner')  # user1 owns dataset1
+        self.assertContains(response, 'Test Category')
+    
+    def test_user_profile_contributed_datasets_display(self):
+        """Test contributed datasets are displayed correctly"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Contributed Datasets')
+        self.assertContains(response, 'Test Dataset 2')
+        self.assertContains(response, 'Contributor')
+        self.assertContains(response, 'by user2')
+    
+    def test_user_profile_statistics(self):
+        """Test profile statistics are calculated correctly"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check statistics cards
+        self.assertContains(response, '1')  # 1 project
+        self.assertContains(response, '1')  # 1 owned dataset
+        self.assertContains(response, '1')  # 1 contributed dataset
+    
+    def test_user_profile_edit_button_own_profile(self):
+        """Test edit profile button appears for own profile"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Edit Profile')
+        self.assertContains(response, reverse('user-settings'))
+    
+    def test_user_profile_edit_button_other_profile(self):
+        """Test edit profile button does not appear for other profiles"""
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user1.pk}))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Edit Profile')
+    
+    def test_user_profile_create_buttons_own_profile(self):
+        """Test create buttons appear for own profile"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'New Project')
+        self.assertContains(response, 'New Dataset')
+        self.assertContains(response, reverse('projects:project_create'))
+        self.assertContains(response, reverse('datasets:dataset_create'))
+    
+    def test_user_profile_create_buttons_other_profile(self):
+        """Test create buttons do not appear for other profiles"""
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user1.pk}))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'New Project')
+        self.assertNotContains(response, 'New Dataset')
+    
+    def test_user_profile_empty_state(self):
+        """Test profile with no projects or datasets"""
+        # Create user with no projects or datasets
+        empty_user = self.User.objects.create_user(
+            username='emptyuser',
+            email='empty@example.com',
+            password='testpass123',
+            is_approved=True
+        )
+        
+        self.client.login(username='emptyuser', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "You haven't created or joined any projects yet")
+        self.assertContains(response, "You haven't created any datasets yet")
+        self.assertContains(response, 'Create Your First Project')
+        self.assertContains(response, 'Create Your First Dataset')
+    
+    def test_user_profile_nonexistent_user(self):
+        """Test accessing profile of non-existent user"""
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': 99999}))
+        
+        self.assertEqual(response.status_code, 404)
+    
+    def test_user_profile_role_display(self):
+        """Test role is displayed correctly in profile"""
+        self.user1.role = self.role
+        self.user1.save()
+        
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Test Viewer Role')
+        
+        # Test admin profile shows superuser badge
+        self.client.login(username='admin', password='adminpass123')
+        response = self.client.get(reverse('user-profile'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Superuser')
+    
+    def test_user_profile_staff_badge(self):
+        """Test staff badge is displayed correctly"""
+        self.user1.is_staff = True
+        self.user1.save()
+        
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Staff')
+    
+    def test_user_profile_member_since(self):
+        """Test member since date is displayed correctly"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that the date is displayed (format may vary)
+        self.assertContains(response, str(self.user1.date_joined.year))
+    
+    def test_user_profile_url_patterns(self):
+        """Test URL patterns resolve correctly"""
+        # Test own profile URL
+        url = reverse('user-profile')
+        self.assertEqual(url, '/user/profile/')
+        
+        # Test other user profile URL
+        url = reverse('user-profile-detail', kwargs={'user_id': self.user1.pk})
+        self.assertEqual(url, f'/user/profile/{self.user1.pk}/')
+    
+    def test_user_profile_view_class(self):
+        """Test UserProfileView class is used"""
+        from user.views import UserProfileView
+        
+        url = reverse('user-profile')
+        resolver = resolve(url)
+        self.assertEqual(resolver.func.view_class, UserProfileView)
+    
+    def test_user_profile_template_used(self):
+        """Test correct template is used"""
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile'))
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'user/profile.html')
+    
+    def test_user_profile_permission_check_inactive_role(self):
+        """Test permission check with inactive role"""
+        self.role.is_active = False
+        self.role.save()
+        self.user1.role = self.role
+        self.user1.save()
+        
+        self.client.login(username='user1', password='testpass123')
+        response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user2.pk}))
+        
+        self.assertEqual(response.status_code, 403)  # Should be denied with inactive role

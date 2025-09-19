@@ -608,3 +608,55 @@ def user_management_view(request):
         'recent_roles': Role.objects.order_by('-created_at')[:5],
     }
     return render(request, 'user/management.html', context)
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    """Display user profile with projects and datasets"""
+    template_name = 'user/profile.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_id = kwargs.get('user_id')
+        
+        # Get the user to display profile for
+        if user_id:
+            profile_user = get_object_or_404(CustomUser, id=user_id)
+        else:
+            profile_user = self.request.user
+        
+        # Check if current user can view this profile
+        can_view = (
+            self.request.user == profile_user or  # Own profile
+            self.request.user.is_superuser or     # Superuser can view all
+            self.request.user.has_role_permission('user.view')  # Has view permission
+        )
+        
+        if not can_view:
+            raise PermissionDenied("You don't have permission to view this profile.")
+        
+        # Get user's projects
+        from projects.models import Project
+        user_projects = Project.objects.filter(
+            Q(owner=profile_user) | Q(collaborators=profile_user)
+        ).distinct().select_related('owner').prefetch_related('collaborators', 'datasets')
+        
+        # Get user's datasets
+        from datasets.models import Dataset
+        user_datasets = Dataset.objects.filter(owner=profile_user).select_related(
+            'category', 'publisher'
+        ).prefetch_related('projects', 'contributors')
+        
+        # Get contributed datasets
+        contributed_datasets = Dataset.objects.filter(
+            contributors=profile_user
+        ).select_related('owner', 'category', 'publisher').prefetch_related('projects')
+        
+        context.update({
+            'profile_user': profile_user,
+            'user_projects': user_projects,
+            'user_datasets': user_datasets,
+            'contributed_datasets': contributed_datasets,
+            'is_own_profile': self.request.user == profile_user,
+        })
+        
+        return context

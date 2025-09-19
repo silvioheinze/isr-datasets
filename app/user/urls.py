@@ -4,7 +4,7 @@ from user.views import (
     AccountDeleteView, SettingsView, SignupPageView, 
     UsersUpdateView, UsersListView, UserCreateView, RoleListView, RoleCreateView, 
     RoleUpdateView, RoleDeleteView, user_management_view, data_export_view,
-    PendingUsersView, approve_user, reject_user
+    PendingUsersView, approve_user, reject_user, UserProfileView
 )
 
 
@@ -12,6 +12,8 @@ urlpatterns = [
     # User Management
     path('delete/', AccountDeleteView.as_view(), name='user-delete'),
     path('settings/', SettingsView, name='user-settings'),
+    path('profile/', UserProfileView.as_view(), name='user-profile'),
+    path('profile/<int:user_id>/', UserProfileView.as_view(), name='user-profile-detail'),
     path('data-export/', data_export_view, name='data-export'),
     path("signup/", SignupPageView.as_view(), name="user-signup"),
     path('list/', UsersListView.as_view(), name='user-list'),
