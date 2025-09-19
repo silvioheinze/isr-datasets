@@ -151,7 +151,7 @@ class Project(models.Model):
     
     def is_accessible_by(self, user):
         """Check if user can access this project"""
-        if not user.is_authenticated:
+        if not user or not user.is_authenticated:
             return False
         
         # Owner and collaborators always have access
