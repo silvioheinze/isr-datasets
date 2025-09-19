@@ -247,9 +247,9 @@ class Dataset(models.Model):
         if self.access_level == 'public':
             return True
         elif self.access_level == 'restricted':
-            return user.is_authenticated
+            return user and user.is_authenticated
         elif self.access_level == 'private':
-            return user == self.owner or user.is_superuser
+            return user and (user == self.owner or user.is_superuser)
         return False
 
     def get_available_formats(self):
