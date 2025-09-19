@@ -86,6 +86,14 @@ class CustomUser(AbstractUser):
         help_text=_('Whether this user has been approved by an administrator')
     )
     
+    # First login tracking for help section
+    first_login_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('First Login Date'),
+        help_text=_('Date of the user\'s first login')
+    )
+    
     # Add related_name to avoid field clashes
     groups = models.ManyToManyField(
         'auth.Group',

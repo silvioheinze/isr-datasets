@@ -117,6 +117,14 @@ class HomePageView(LoginRequiredMixin, TemplateView):
                 'thirty_days_ago': timezone.now() - timedelta(days=30),
             })
         
+        # Check if help section should be shown (only for 7 days after first login)
+        show_help_section = False
+        if self.request.user.is_authenticated and self.request.user.first_login_date:
+            days_since_first_login = (timezone.now() - self.request.user.first_login_date).days
+            show_help_section = days_since_first_login <= 7
+        
+        context['show_help_section'] = show_help_section
+        
         # Add group membership data for the current user (keeping existing functionality)
         if self.request.user.is_authenticated:
             try:

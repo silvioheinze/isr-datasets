@@ -1,31 +1,54 @@
-from django.utils import translation
-from django.utils.deprecation import MiddlewareMixin
+from django.utils import timezone, translation
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
-class UserLanguageMiddleware(MiddlewareMixin):
+class UserLanguageMiddleware:
     """
-    Middleware to activate user's preferred language if they are authenticated.
-    This should be placed after AuthenticationMiddleware in the middleware stack.
+    Middleware to activate user's preferred language
     """
     
-    def process_request(self, request):
-        if hasattr(request, 'user') and request.user.is_authenticated:
-            # Get user's preferred language
-            user_language = getattr(request.user, 'language', None)
-            
-            if user_language:
-                # Activate the user's preferred language
-                translation.activate(user_language)
-                request.LANGUAGE_CODE = user_language
-            else:
-                # Fall back to default language
-                translation.activate(translation.get_language())
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Process request
+        if request.user.is_authenticated and hasattr(request.user, 'language') and request.user.language:
+            # Activate the user's preferred language
+            translation.activate(request.user.language)
+            request.LANGUAGE_CODE = request.user.language
         else:
-            # For anonymous users, use the default language detection
-            translation.activate(translation.get_language())
-    
-    def process_response(self, request, response):
-        # Ensure the language is properly set in the response
+            # For anonymous users or users without language preference, use current language
+            current_language = translation.get_language()
+            translation.activate(current_language)
+            if request.user.is_authenticated:
+                request.LANGUAGE_CODE = current_language
+
+        response = self.get_response(request)
+        
+        # Process response
         if hasattr(request, 'LANGUAGE_CODE'):
             response['Content-Language'] = request.LANGUAGE_CODE
+        
+        return response
+
+
+class FirstLoginMiddleware:
+    """
+    Middleware to track the user's first login date
+    """
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Process request
+        if (request.user.is_authenticated and 
+            request.user.first_login_date is None and
+            request.path != '/admin/'):  # Don't track admin logins
+            request.user.first_login_date = timezone.now()
+            request.user.save(update_fields=['first_login_date'])
+
+        response = self.get_response(request)
         return response
