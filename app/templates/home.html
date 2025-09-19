@@ -206,7 +206,6 @@
                             <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="list-group-item list-group-item-action">
                                 <div class="d-flex w-100 justify-content-between">
                                     <h6 class="mb-1">{{ dataset.title }}</h6>
-                                    <small class="text-muted">{{ dataset.download_count }} {% trans "downloads" %}</small>
                                 </div>
                                 <p class="mb-1">{{ dataset.description|truncatechars:60 }}</p>
                                 <small class="text-muted">
