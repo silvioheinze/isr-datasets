@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-18 11:37+0200\n"
+"POT-Creation-Date: 2025-09-19 13:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,24 +18,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: datasets/models.py:39 templates/datasets/category_confirm_delete.html:40
+#: datasets/models.py:40 templates/datasets/category_confirm_delete.html:40
 #: templates/datasets/category_list.html:76
 #: templates/datasets/publisher_confirm_delete.html:41
 #: templates/datasets/publisher_list.html:71
 #: templates/user/role_confirm_delete.html:26 templates/user/role_list.html:83
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
-#: datasets/models.py:40
+#: datasets/models.py:41
 msgid "Name of the publisher (e.g., University of Vienna, Research Institute)"
-msgstr ""
+msgstr "Name des Herausgebers (z.B. Universität Wien, Forschungsinstitut)"
 
-#: datasets/models.py:44 projects/models.py:33
+#: datasets/models.py:45 projects/models.py:33
 #: templates/datasets/category_confirm_delete.html:57
 #: templates/datasets/category_form.html:102
 #: templates/datasets/category_list.html:77
 #: templates/datasets/dataset_detail.html:64
-#: templates/datasets/dataset_detail.html:350
+#: templates/datasets/dataset_detail.html:358
 #: templates/datasets/dataset_form.html:88
 #: templates/datasets/publisher_confirm_delete.html:51
 #: templates/projects/project_confirm_delete.html:53
@@ -43,55 +43,57 @@ msgstr ""
 #: templates/user/role_confirm_delete.html:27 templates/user/role_form.html:61
 #: templates/user/role_list.html:84
 msgid "Description"
-msgstr ""
+msgstr "Beschreibung"
 
-#: datasets/models.py:45
+#: datasets/models.py:46
 msgid "Optional description of the publisher"
-msgstr ""
+msgstr "Optionale Beschreibung des Herausgebers"
 
-#: datasets/models.py:49 templates/datasets/publisher_confirm_delete.html:62
+#: datasets/models.py:50 templates/datasets/publisher_confirm_delete.html:62
 #: templates/datasets/publisher_list.html:72
 #: templates/datasets/publisher_list.html:95
 msgid "Website"
-msgstr ""
+msgstr "Website"
 
-#: datasets/models.py:50
+#: datasets/models.py:51
 msgid "Official website of the publisher"
-msgstr ""
+msgstr "Offizielle Website des Herausgebers"
 
-#: datasets/models.py:54 projects/models.py:14
+#: datasets/models.py:55 pages/models.py:42 projects/models.py:14
 #: templates/datasets/category_confirm_delete.html:48
 #: templates/datasets/category_form.html:168
 #: templates/datasets/category_list.html:110
 #: templates/datasets/publisher_confirm_delete.html:79
 #: templates/datasets/publisher_list.html:42
-#: templates/datasets/publisher_list.html:106 templates/user/edit.html:143
-#: templates/user/list.html:87 templates/user/management.html:225
-#: templates/user/role_list.html:54 templates/user/role_list.html:112
+#: templates/datasets/publisher_list.html:106
+#: templates/pages/announcement_form.html:144
+#: templates/pages/announcement_management.html:110 templates/user/list.html:96
+#: templates/user/management.html:225 templates/user/role_list.html:54
+#: templates/user/role_list.html:112
 msgid "Active"
-msgstr ""
+msgstr "Aktiv"
 
-#: datasets/models.py:55
+#: datasets/models.py:56
 msgid "Whether this publisher is active and available for selection"
 msgstr ""
 
-#: datasets/models.py:59 templates/datasets/publisher_confirm_delete.html:85
+#: datasets/models.py:60 templates/datasets/publisher_confirm_delete.html:85
 #: templates/datasets/publisher_list.html:75
 #: templates/datasets/publisher_list.html:113
 msgid "Default"
 msgstr ""
 
-#: datasets/models.py:60
+#: datasets/models.py:61
 msgid "Whether this is the default publisher for new datasets"
 msgstr ""
 
-#: datasets/models.py:66 datasets/models.py:178
-#: templates/datasets/dataset_detail.html:186
+#: datasets/models.py:67 datasets/models.py:188
+#: templates/datasets/dataset_detail.html:188
 #: templates/datasets/dataset_form.html:252
 msgid "Publisher"
 msgstr ""
 
-#: datasets/models.py:67 templates/datasets/publisher_confirm_delete.html:16
+#: datasets/models.py:68 templates/datasets/publisher_confirm_delete.html:16
 #: templates/datasets/publisher_form.html:22
 #: templates/datasets/publisher_list.html:4
 #: templates/datasets/publisher_list.html:15 templates/documentation.html:43
@@ -99,69 +101,227 @@ msgstr ""
 msgid "Publishers"
 msgstr ""
 
-#: datasets/models.py:162 projects/models.py:124
+#: datasets/models.py:118 templates/user/list.html:43
+msgid "ID"
+msgstr ""
+
+#: datasets/models.py:119
+msgid "Unique identifier for the dataset"
+msgstr ""
+
+#: datasets/models.py:172 projects/models.py:124
 #: templates/datasets/assign_to_project.html:29
-#: templates/datasets/dataset_detail.html:265 templates/documentation.html:38
+#: templates/datasets/dataset_detail.html:271 templates/documentation.html:38
 #: templates/documentation.html:195
 #: templates/projects/project_confirm_delete.html:16
 #: templates/projects/project_detail.html:16
 #: templates/projects/project_form.html:18
-#: templates/projects/project_list.html:6
+#: templates/projects/project_list.html:6 templates/user/profile.html:73
+#: templates/user/profile.html:114
 msgid "Projects"
-msgstr ""
+msgstr "Projekte"
 
-#: datasets/models.py:163
+#: datasets/models.py:173
 msgid "The research projects this dataset is associated with"
 msgstr ""
 
-#: datasets/models.py:179
+#: datasets/models.py:189
 msgid "The organization or institution that published this dataset"
 msgstr ""
 
-#: datasets/models.py:354 templates/projects/project_detail.html:285
+#: datasets/models.py:364 templates/projects/project_detail.html:295
 msgid "Dataset"
 msgstr ""
 
-#: datasets/models.py:360
+#: datasets/models.py:370
 msgid "Author"
 msgstr ""
 
-#: datasets/models.py:363 datasets/models.py:382
+#: datasets/models.py:373 datasets/models.py:392
 #: templates/datasets/comment_edit.html:53
 msgid "Comment"
-msgstr ""
+msgstr "Kommentar"
 
-#: datasets/models.py:364
+#: datasets/models.py:374
 msgid "Your comment about this dataset"
 msgstr ""
 
-#: datasets/models.py:368
+#: datasets/models.py:378 templates/user/list.html:48
+#: templates/user/list.html:103 user/forms.py:56 user/models.py:89
 msgid "Approved"
 msgstr ""
 
-#: datasets/models.py:369
+#: datasets/models.py:379
 msgid "Whether this comment is approved and visible to others"
 msgstr ""
 
-#: datasets/models.py:373
+#: datasets/models.py:383
 msgid "Created at"
 msgstr ""
 
-#: datasets/models.py:377
+#: datasets/models.py:387
 msgid "Updated at"
 msgstr ""
 
-#: datasets/models.py:383 templates/datasets/dataset_detail.html:451
-#: templates/documentation.html:323 user/forms.py:84 user/models.py:78
+#: datasets/models.py:393 templates/datasets/dataset_detail.html:459
+#: templates/documentation.html:323 user/forms.py:157 user/forms.py:185
+#: user/models.py:82
 msgid "Comments"
 msgstr ""
 
-#: main/settings.py:135 templates/user/settings.html:265 user/models.py:48
+#: main/settings.py:150 templates/user/settings.html:265 user/models.py:52
 msgid "English"
+msgstr "Englisch"
+
+#: main/settings.py:151 templates/user/settings.html:275 user/models.py:53
+msgid "German"
+msgstr "Deutsch"
+
+#: pages/admin.py:53
+msgid "Content"
 msgstr ""
 
-#: main/settings.py:136 templates/user/settings.html:275 user/models.py:49
-msgid "German"
+#: pages/admin.py:56 projects/forms.py:200 projects/models.py:59
+#: templates/datasets/category_confirm_delete.html:46
+#: templates/datasets/category_list.html:47
+#: templates/datasets/category_list.html:79
+#: templates/datasets/dataset_detail.html:93
+#: templates/datasets/dataset_detail.html:241
+#: templates/datasets/dataset_form.html:170
+#: templates/datasets/publisher_confirm_delete.html:75
+#: templates/datasets/publisher_list.html:39
+#: templates/datasets/publisher_list.html:74
+#: templates/pages/announcement_form.html:239
+#: templates/pages/announcement_management.html:87
+#: templates/projects/project_confirm_delete.html:56
+#: templates/projects/project_detail.html:297
+#: templates/projects/project_form.html:179
+#: templates/projects/project_list.html:45
+#: templates/projects/project_list.html:75 templates/user/list.html:47
+#: templates/user/role_list.html:50 templates/user/role_list.html:86
+msgid "Status"
+msgstr ""
+
+#: pages/admin.py:59 templates/pages/announcement_form.html:234
+msgid "Scheduling"
+msgstr ""
+
+#: pages/admin.py:61
+msgid ""
+"Set when the announcement should be displayed. Leave \"Valid Until\" empty "
+"for no end date."
+msgstr ""
+
+#: pages/admin.py:63
+msgid "Metadata"
+msgstr ""
+
+#: pages/admin.py:80
+msgid "Valid"
+msgstr ""
+
+#: pages/admin.py:85
+msgid "Invalid"
+msgstr ""
+
+#: pages/admin.py:87
+msgid "Currently Valid"
+msgstr ""
+
+#: pages/models.py:15 templates/pages/announcement_form.html:228
+msgid "Low"
+msgstr ""
+
+#: pages/models.py:16 templates/pages/announcement_form.html:229
+msgid "Normal"
+msgstr ""
+
+#: pages/models.py:17 templates/pages/announcement_form.html:230
+msgid "High"
+msgstr ""
+
+#: pages/models.py:18 templates/pages/announcement_form.html:231
+msgid "Urgent"
+msgstr ""
+
+#: pages/models.py:23 templates/datasets/dataset_confirm_delete.html:49
+#: templates/pages/announcement_management.html:85
+#: templates/projects/project_confirm_delete.html:50
+msgid "Title"
+msgstr ""
+
+#: pages/models.py:24
+msgid "Title of the announcement"
+msgstr ""
+
+#: pages/models.py:28
+msgid "Message"
+msgstr ""
+
+#: pages/models.py:29
+msgid "Content of the announcement"
+msgstr ""
+
+#: pages/models.py:36 templates/pages/announcement_management.html:86
+msgid "Priority"
+msgstr ""
+
+#: pages/models.py:37
+msgid "Priority level of the announcement"
+msgstr ""
+
+#: pages/models.py:43
+msgid "Whether this announcement is currently displayed"
+msgstr ""
+
+#: pages/models.py:50 templates/datasets/dataset_detail.html:361
+#: templates/pages/announcement_management.html:88
+msgid "Created By"
+msgstr ""
+
+#: pages/models.py:51
+msgid "Administrator who created this announcement"
+msgstr ""
+
+#: pages/models.py:56 templates/datasets/dataset_detail.html:362
+#: templates/projects/project_confirm_delete.html:77
+msgid "Created At"
+msgstr ""
+
+#: pages/models.py:57
+msgid "When this announcement was created"
+msgstr ""
+
+#: pages/models.py:62
+msgid "Updated At"
+msgstr ""
+
+#: pages/models.py:63
+msgid "When this announcement was last updated"
+msgstr ""
+
+#: pages/models.py:68
+msgid "Valid From"
+msgstr ""
+
+#: pages/models.py:69
+msgid "When this announcement should start being displayed"
+msgstr ""
+
+#: pages/models.py:75 templates/pages/announcement_management.html:90
+msgid "Valid Until"
+msgstr ""
+
+#: pages/models.py:76
+msgid "When this announcement should stop being displayed (optional)"
+msgstr ""
+
+#: pages/models.py:80
+msgid "Announcement"
+msgstr ""
+
+#: pages/models.py:81 templates/home.html:93
+msgid "Announcements"
 msgstr ""
 
 #: projects/admin.py:49 templates/datasets/category_list.html:80
@@ -171,14 +331,14 @@ msgstr ""
 #: templates/datasets/dataset_version_form.html:16
 #: templates/datasets/publisher_confirm_delete.html:109
 #: templates/datasets/publisher_list.html:73 templates/documentation.html:37
-#: templates/documentation.html:131 templates/projects/project_detail.html:221
-#: templates/projects/project_list.html:77
+#: templates/documentation.html:131 templates/projects/project_detail.html:231
+#: templates/projects/project_list.html:77 templates/user/profile.html:182
 msgid "Datasets"
-msgstr ""
+msgstr "Datensätze"
 
 #: projects/admin.py:54 projects/models.py:80
 #: templates/projects/project_confirm_delete.html:71
-#: templates/projects/project_detail.html:194
+#: templates/projects/project_detail.html:202
 #: templates/projects/project_form.html:320
 msgid "Collaborators"
 msgstr ""
@@ -279,39 +439,42 @@ msgstr ""
 msgid "Maximum 15 tags allowed."
 msgstr ""
 
-#: projects/forms.py:129
-msgid "All Statuses"
+#: projects/forms.py:134
+msgid "New Owner"
 msgstr ""
 
 #: projects/forms.py:135
+msgid "Select the user who will become the new owner of this project"
+msgstr ""
+
+#: projects/forms.py:143
+msgid "I confirm that I want to transfer ownership"
+msgstr ""
+
+#: projects/forms.py:144
+msgid ""
+"This action cannot be undone. You will become a collaborator instead of the "
+"owner."
+msgstr ""
+
+#: projects/forms.py:177
+msgid "Please select a new owner for the project."
+msgstr ""
+
+#: projects/forms.py:184
+msgid "All Statuses"
+msgstr ""
+
+#: projects/forms.py:190
 msgid "Search projects..."
 msgstr ""
 
-#: projects/forms.py:137 templates/datasets/category_list.html:41
+#: projects/forms.py:192 templates/datasets/category_list.html:41
 #: templates/datasets/dataset_list.html:45
 #: templates/datasets/dataset_list.html:70
 #: templates/datasets/publisher_list.html:34
 #: templates/projects/project_list.html:39 templates/user/role_list.html:43
 msgid "Search"
-msgstr ""
-
-#: projects/forms.py:145 projects/models.py:59
-#: templates/datasets/category_confirm_delete.html:46
-#: templates/datasets/category_list.html:47
-#: templates/datasets/category_list.html:79
-#: templates/datasets/dataset_detail.html:93
-#: templates/datasets/dataset_detail.html:235
-#: templates/datasets/dataset_form.html:170
-#: templates/datasets/publisher_confirm_delete.html:75
-#: templates/datasets/publisher_list.html:39
-#: templates/datasets/publisher_list.html:74
-#: templates/projects/project_confirm_delete.html:56
-#: templates/projects/project_detail.html:287
-#: templates/projects/project_form.html:179
-#: templates/projects/project_list.html:45
-#: templates/projects/project_list.html:75 templates/user/list.html:39
-#: templates/user/role_list.html:50 templates/user/role_list.html:86
-msgid "Status"
 msgstr ""
 
 #: projects/models.py:13
@@ -356,7 +519,7 @@ msgstr ""
 
 #: projects/models.py:38 templates/datasets/dataset_detail.html:71
 #: templates/datasets/dataset_form.html:102
-#: templates/projects/project_detail.html:63
+#: templates/projects/project_detail.html:69
 #: templates/projects/project_form.html:109
 msgid "Abstract"
 msgstr ""
@@ -365,7 +528,7 @@ msgstr ""
 msgid "Brief summary of the project"
 msgstr ""
 
-#: projects/models.py:46 templates/projects/project_detail.html:80
+#: projects/models.py:46 templates/projects/project_detail.html:86
 #: templates/projects/project_form.html:136
 msgid "Start Date"
 msgstr ""
@@ -374,7 +537,7 @@ msgstr ""
 msgid "Project start date"
 msgstr ""
 
-#: projects/models.py:52 templates/projects/project_detail.html:90
+#: projects/models.py:52 templates/projects/project_detail.html:96
 #: templates/projects/project_form.html:152
 msgid "End Date"
 msgstr ""
@@ -383,7 +546,7 @@ msgstr ""
 msgid "Project end date"
 msgstr ""
 
-#: projects/models.py:65 templates/datasets/dataset_detail.html:245
+#: projects/models.py:65 templates/datasets/dataset_detail.html:251
 #: templates/datasets/dataset_form.html:181
 #: templates/projects/project_confirm_delete.html:62
 #: templates/projects/project_form.html:195
@@ -400,7 +563,7 @@ msgstr ""
 
 #: projects/models.py:88 templates/datasets/dataset_detail.html:123
 #: templates/datasets/dataset_form.html:143
-#: templates/projects/project_detail.html:124
+#: templates/projects/project_detail.html:130
 #: templates/projects/project_form.html:222
 msgid "Keywords"
 msgstr ""
@@ -412,17 +575,17 @@ msgstr ""
 #: projects/models.py:94 templates/datasets/dataset_detail.html:115
 #: templates/datasets/dataset_form.html:128
 #: templates/datasets/dataset_list.html:61
-#: templates/projects/project_detail.html:135
+#: templates/projects/project_detail.html:141
 #: templates/projects/project_form.html:238
 msgid "Tags"
 msgstr ""
 
-#: projects/models.py:101 templates/projects/project_detail.html:147
+#: projects/models.py:101 templates/projects/project_detail.html:153
 #: templates/projects/project_form.html:265
 msgid "Project URL"
 msgstr ""
 
-#: projects/models.py:107 templates/projects/project_detail.html:157
+#: projects/models.py:107 templates/projects/project_detail.html:163
 #: templates/projects/project_form.html:284
 msgid "Funding Source"
 msgstr ""
@@ -431,7 +594,7 @@ msgstr ""
 msgid "Organization or agency funding this project"
 msgstr ""
 
-#: projects/models.py:113 templates/projects/project_detail.html:164
+#: projects/models.py:113 templates/projects/project_detail.html:170
 #: templates/projects/project_form.html:300
 msgid "Grant Number"
 msgstr ""
@@ -465,14 +628,18 @@ msgstr ""
 #: templates/datasets/publisher_form.html:6
 #: templates/datasets/publisher_form.html:8
 #: templates/datasets/publisher_list.html:4 templates/home.html:4
+#: templates/pages/announcement_confirm_delete.html:4
+#: templates/pages/announcement_form.html:6
+#: templates/pages/announcement_form.html:8
+#: templates/pages/announcement_management.html:4
 #: templates/projects/project_confirm_delete.html:4
 #: templates/projects/project_detail.html:6
 #: templates/projects/project_form.html:5
 #: templates/projects/project_list.html:6 templates/user/data_export.html:5
 #: templates/user/edit.html:5 templates/user/login.html:4
 #: templates/user/management.html:6 templates/user/password_change.html:4
-#: templates/user/role_list.html:6 templates/user/settings.html:6
-#: templates/user/user_form.html:5
+#: templates/user/profile.html:4 templates/user/role_list.html:6
+#: templates/user/settings.html:6 templates/user/user_form.html:5
 msgid "ISR Datasets"
 msgstr ""
 
@@ -523,6 +690,7 @@ msgid "Remove"
 msgstr ""
 
 #: templates/account/email.html:47
+#: templates/pages/announcement_confirm_delete.html:42
 msgid "Warning:"
 msgstr ""
 
@@ -538,13 +706,13 @@ msgstr ""
 
 #: templates/account/email.html:54 templates/account/login.html:32
 #: templates/account/password_reset.html:42 templates/account/signup.html:31
-#: templates/user/edit.html:87 templates/user/login.html:32
+#: templates/user/edit.html:115 templates/user/login.html:32
 #: templates/user/password_reset.html:42 templates/user/signup.html:31
 #: templates/user/user_form.html:108
 msgid "Email Address"
 msgstr ""
 
-#: templates/account/email.html:55 templates/user/edit.html:95
+#: templates/account/email.html:55 templates/user/edit.html:123
 #: templates/user/user_form.html:115
 msgid "Enter email address"
 msgstr ""
@@ -749,10 +917,11 @@ msgstr ""
 #: templates/datasets/dataset_form.html:57
 #: templates/datasets/dataset_version_form.html:41
 #: templates/datasets/publisher_form.html:60
-#: templates/projects/project_form.html:48 templates/user/data_export.html:52
-#: templates/user/edit.html:39 templates/user/login.html:25
-#: templates/user/logout.html:36 templates/user/password_change.html:23
-#: templates/user/password_reset.html:35
+#: templates/projects/project_form.html:48
+#: templates/projects/project_transfer_ownership.html:61
+#: templates/user/data_export.html:52 templates/user/edit.html:39
+#: templates/user/login.html:25 templates/user/logout.html:36
+#: templates/user/password_change.html:23 templates/user/password_reset.html:35
 #: templates/user/password_reset_from_key.html:52
 #: templates/user/settings.html:86 templates/user/settings.html:191
 #: templates/user/settings.html:329 templates/user/signup.html:24
@@ -822,14 +991,18 @@ msgstr ""
 #: templates/datasets/dataset_form.html:316
 #: templates/datasets/dataset_version_form.html:231
 #: templates/datasets/publisher_confirm_delete.html:146
+#: templates/pages/announcement_confirm_delete.html:120
+#: templates/pages/announcement_form.html:199
 #: templates/projects/project_confirm_delete.html:107
 #: templates/projects/project_form.html:346
+#: templates/projects/project_transfer_ownership.html:161
+#: templates/user/approve_user_confirm.html:77
 #: templates/user/confirm_delete.html:13
-#: templates/user/data_confirm_delete.html:13 templates/user/edit.html:167
-#: templates/user/logout.html:47 templates/user/role_confirm_delete.html:53
-#: templates/user/role_form.html:123
+#: templates/user/data_confirm_delete.html:13 templates/user/edit.html:249
+#: templates/user/logout.html:47 templates/user/reject_user_confirm.html:77
+#: templates/user/role_confirm_delete.html:53 templates/user/role_form.html:123
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: templates/account/password_change.html:4
 #: templates/account/password_change.html:18
@@ -845,7 +1018,7 @@ msgstr ""
 #: templates/documentation.html:353 templates/user/settings.html:6
 #: templates/user/settings.html:36
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: templates/account/password_change.html:25
 msgid "Update your password to keep your account secure"
@@ -1101,12 +1274,13 @@ msgstr ""
 #: templates/datasets/category_confirm_delete.html:18
 #: templates/datasets/category_list.html:126
 #: templates/datasets/dataset_confirm_delete.html:21
-#: templates/datasets/dataset_detail.html:518
+#: templates/datasets/dataset_detail.html:526
 #: templates/datasets/publisher_confirm_delete.html:18
 #: templates/datasets/publisher_list.html:128
+#: templates/pages/announcement_management.html:145
 #: templates/projects/project_list.html:124 templates/user/role_list.html:126
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: templates/datasets/category_confirm_delete.html:25
 msgid "Are you sure you want to delete this category?"
@@ -1120,7 +1294,9 @@ msgstr ""
 #: templates/datasets/category_list.html:112
 #: templates/datasets/publisher_confirm_delete.html:81
 #: templates/datasets/publisher_list.html:43
-#: templates/datasets/publisher_list.html:108 templates/user/list.html:89
+#: templates/datasets/publisher_list.html:108
+#: templates/pages/announcement_management.html:117
+#: templates/pages/announcement_management.html:120 templates/user/list.html:98
 #: templates/user/management.html:225 templates/user/role_list.html:55
 #: templates/user/role_list.html:114
 msgid "Inactive"
@@ -1129,11 +1305,12 @@ msgstr ""
 #: templates/datasets/category_confirm_delete.html:64
 #: templates/datasets/category_list.html:81
 #: templates/datasets/dataset_confirm_delete.html:50
-#: templates/datasets/dataset_detail.html:225
+#: templates/datasets/dataset_detail.html:231
 #: templates/datasets/publisher_confirm_delete.html:92
 #: templates/datasets/publisher_list.html:76
-#: templates/projects/project_detail.html:242
-#: templates/projects/project_detail.html:291
+#: templates/pages/announcement_management.html:89
+#: templates/projects/project_detail.html:252
+#: templates/projects/project_detail.html:301
 #: templates/user/role_confirm_delete.html:29 templates/user/role_list.html:87
 msgid "Created"
 msgstr ""
@@ -1143,6 +1320,7 @@ msgstr ""
 #: templates/datasets/publisher_confirm_delete.html:130
 #: templates/datasets/publisher_confirm_delete.html:137
 #: templates/projects/project_confirm_delete.html:84
+#: templates/user/reject_user_confirm.html:20
 #: templates/user/role_confirm_delete.html:19 templates/user/settings.html:497
 msgid "Warning"
 msgstr ""
@@ -1210,19 +1388,20 @@ msgstr ""
 #: templates/datasets/category_form.html:26
 #: templates/datasets/category_list.html:123
 #: templates/datasets/dataset_detail.html:38
-#: templates/datasets/dataset_detail.html:513
+#: templates/datasets/dataset_detail.html:521
 #: templates/datasets/publisher_form.html:26
 #: templates/datasets/publisher_list.html:124
-#: templates/projects/project_detail.html:349
-#: templates/projects/project_list.html:119 templates/user/list.html:96
-#: templates/user/list.html:97 templates/user/role_list.html:122
+#: templates/pages/announcement_management.html:140
+#: templates/projects/project_detail.html:361
+#: templates/projects/project_list.html:119 templates/user/list.html:115
+#: templates/user/list.html:116 templates/user/role_list.html:122
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: templates/datasets/category_form.html:28
 #: templates/datasets/publisher_form.html:28
 msgid "Add"
-msgstr ""
+msgstr "Hinzufügen"
 
 #: templates/datasets/category_form.html:43
 msgid "Update the category information below."
@@ -1282,7 +1461,7 @@ msgid "Only active categories will be available for dataset selection"
 msgstr ""
 
 #: templates/datasets/category_list.html:15 templates/documentation.html:285
-#: templates/home.html:179
+#: templates/home.html:237
 msgid "Dataset Categories"
 msgstr ""
 
@@ -1302,16 +1481,17 @@ msgid "Filter"
 msgstr ""
 
 #: templates/datasets/category_list.html:82
-#: templates/datasets/dataset_detail.html:355
+#: templates/datasets/dataset_detail.html:363
 #: templates/datasets/publisher_list.html:77
-#: templates/projects/project_detail.html:292
-#: templates/projects/project_list.html:78 templates/user/list.html:43
-#: templates/user/role_list.html:88
+#: templates/pages/announcement_management.html:91
+#: templates/projects/project_detail.html:302
+#: templates/projects/project_list.html:78 templates/user/list.html:52
+#: templates/user/pending_users.html:40 templates/user/role_list.html:88
 msgid "Actions"
 msgstr ""
 
 #: templates/datasets/category_list.html:99
-#: templates/datasets/dataset_detail.html:371 templates/user/role_list.html:104
+#: templates/datasets/dataset_detail.html:379 templates/user/role_list.html:104
 msgid "No description"
 msgstr ""
 
@@ -1322,42 +1502,54 @@ msgstr ""
 #: templates/datasets/category_list.html:148
 #: templates/datasets/dataset_list.html:203
 #: templates/datasets/publisher_list.html:148
-#: templates/projects/project_list.html:147 templates/user/role_list.html:154
+#: templates/pages/announcement_management.html:162
+#: templates/projects/project_list.html:147
+#: templates/user/pending_users.html:102 templates/user/role_list.html:154
 msgid "First"
 msgstr ""
 
 #: templates/datasets/category_list.html:153
 #: templates/datasets/dataset_list.html:208
 #: templates/datasets/publisher_list.html:153
-#: templates/projects/project_list.html:152 templates/user/role_list.html:159
+#: templates/pages/announcement_management.html:165
+#: templates/projects/project_list.html:152
+#: templates/user/pending_users.html:105 templates/user/role_list.html:159
 msgid "Previous"
 msgstr ""
 
 #: templates/datasets/category_list.html:160
 #: templates/datasets/dataset_list.html:215
 #: templates/datasets/publisher_list.html:160
-#: templates/projects/project_list.html:159 templates/user/role_list.html:166
+#: templates/pages/announcement_management.html:171
+#: templates/projects/project_list.html:159
+#: templates/user/pending_users.html:111 templates/user/role_list.html:166
 msgid "Page"
 msgstr ""
 
 #: templates/datasets/category_list.html:160
 #: templates/datasets/dataset_list.html:215
 #: templates/datasets/publisher_list.html:160
-#: templates/projects/project_list.html:159 templates/user/role_list.html:166
+#: templates/pages/announcement_management.html:171
+#: templates/projects/project_list.html:159
+#: templates/user/pending_users.html:111 templates/user/role_list.html:166
 msgid "of"
 msgstr ""
 
 #: templates/datasets/category_list.html:167
 #: templates/datasets/dataset_list.html:222
 #: templates/datasets/publisher_list.html:167
-#: templates/projects/project_list.html:166 templates/user/role_list.html:173
+#: templates/pages/announcement_management.html:177
+#: templates/projects/project_list.html:166
+#: templates/user/pending_users.html:117 templates/user/role_list.html:173
 msgid "Next"
 msgstr ""
 
 #: templates/datasets/category_list.html:172
 #: templates/datasets/dataset_list.html:227
 #: templates/datasets/publisher_list.html:172
-#: templates/projects/project_list.html:171 templates/user/role_list.html:178
+#: templates/pages/announcement_management.html:180
+#: templates/projects/project_list.html:171
+#: templates/user/pending_users.html:120 templates/user/role_list.html:178
 msgid "Last"
 msgstr ""
 
@@ -1412,6 +1604,7 @@ msgid "Are you sure you want to delete this dataset?"
 msgstr ""
 
 #: templates/datasets/dataset_confirm_delete.html:37
+#: templates/pages/announcement_confirm_delete.html:36
 #: templates/projects/project_confirm_delete.html:37
 msgid "Confirm Deletion"
 msgstr ""
@@ -1423,26 +1616,21 @@ msgid ""
 msgstr ""
 
 #: templates/datasets/dataset_confirm_delete.html:47
-#: templates/datasets/dataset_detail.html:216
+#: templates/datasets/dataset_detail.html:218
 msgid "Dataset Information"
-msgstr ""
-
-#: templates/datasets/dataset_confirm_delete.html:49
-#: templates/projects/project_confirm_delete.html:50
-msgid "Title"
 msgstr ""
 
 #: templates/datasets/dataset_confirm_delete.html:51
 #: templates/datasets/dataset_detail.html:88
-#: templates/datasets/dataset_detail.html:314
-#: templates/projects/project_detail.html:289
+#: templates/datasets/dataset_detail.html:322
+#: templates/projects/project_detail.html:299
 msgid "Downloads"
 msgstr ""
 
 #: templates/datasets/dataset_confirm_delete.html:52
 #: templates/datasets/dataset_detail.html:89
-#: templates/datasets/dataset_detail.html:319
-#: templates/projects/project_detail.html:288
+#: templates/datasets/dataset_detail.html:327
+#: templates/projects/project_detail.html:298
 msgid "Versions"
 msgstr ""
 
@@ -1476,178 +1664,172 @@ msgid "Attribution & License"
 msgstr ""
 
 #: templates/datasets/dataset_detail.html:143
-#: templates/datasets/dataset_detail.html:287
+#: templates/datasets/dataset_detail.html:293
 #: templates/datasets/dataset_form.html:282
 msgid "Contributors"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:157
+#: templates/datasets/dataset_detail.html:159
 #: templates/datasets/dataset_form.html:207
 msgid "License"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:164
+#: templates/datasets/dataset_detail.html:166
 #: templates/datasets/dataset_form.html:222
 msgid "Citation"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:173
+#: templates/datasets/dataset_detail.html:175
 #: templates/datasets/dataset_form.html:237
 msgid "DOI"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:193
+#: templates/datasets/dataset_detail.html:195
 #: templates/datasets/dataset_form.html:267
 msgid "URI Reference"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:197
+#: templates/datasets/dataset_detail.html:199
 msgid "View Reference"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:221
+#: templates/datasets/dataset_detail.html:223
 #: templates/projects/project_confirm_delete.html:68
-#: templates/projects/project_detail.html:186
-#: templates/projects/project_detail.html:290
+#: templates/projects/project_detail.html:192
+#: templates/projects/project_detail.html:300 templates/user/profile.html:137
+#: templates/user/profile.html:204
 msgid "Owner"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:230 templates/home.html:117
+#: templates/datasets/dataset_detail.html:236 templates/home.html:176
 msgid "Published"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:255
+#: templates/datasets/dataset_detail.html:261
 msgid "Available Formats"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:306
+#: templates/datasets/dataset_detail.html:314
 msgid "Statistics"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:333 templates/documentation.html:152
+#: templates/datasets/dataset_detail.html:341 templates/documentation.html:152
 msgid "Dataset Versions"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:338
+#: templates/datasets/dataset_detail.html:346
 #: templates/datasets/dataset_version_form.html:4
 #: templates/datasets/dataset_version_form.html:21
 #: templates/datasets/dataset_version_form.html:26
 msgid "Add New Version"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:349
+#: templates/datasets/dataset_detail.html:357
 msgid "Version"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:351
+#: templates/datasets/dataset_detail.html:359
 #: templates/datasets/dataset_version_form.html:206
 msgid "File Size"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:352
+#: templates/datasets/dataset_detail.html:360
 msgid "File Source"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:353
-msgid "Created By"
-msgstr ""
-
-#: templates/datasets/dataset_detail.html:354
-#: templates/projects/project_confirm_delete.html:77
-msgid "Created At"
-msgstr ""
-
-#: templates/datasets/dataset_detail.html:364
+#: templates/datasets/dataset_detail.html:372
 msgid "Latest"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:381
+#: templates/datasets/dataset_detail.html:389
 msgid "Uploaded"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:387
+#: templates/datasets/dataset_detail.html:395
 msgid "External"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:413
+#: templates/datasets/dataset_detail.html:421
 msgid "Download this version"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:420
+#: templates/datasets/dataset_detail.html:428
 msgid "Open external URL"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:424
+#: templates/datasets/dataset_detail.html:432
 msgid "No file"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:438
+#: templates/datasets/dataset_detail.html:446
 msgid "No versions yet"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:439
+#: templates/datasets/dataset_detail.html:447
 msgid "This dataset doesn't have any versions yet."
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:461
+#: templates/datasets/dataset_detail.html:469
 msgid "Add a Comment"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:477
+#: templates/datasets/dataset_detail.html:485
 msgid "Post Comment"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:486
+#: templates/datasets/dataset_detail.html:494
 msgid "Please"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:486
+#: templates/datasets/dataset_detail.html:494
 msgid "log in"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:486
+#: templates/datasets/dataset_detail.html:494
 msgid "to add a comment."
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:502 templates/home.html:113
-#: templates/home.html:154 templates/home.html:227
+#: templates/datasets/dataset_detail.html:510 templates/home.html:172
+#: templates/home.html:212 templates/home.html:285
+#: templates/user/profile.html:141 templates/user/profile.html:208
+#: templates/user/profile.html:272
 msgid "ago"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:517
+#: templates/datasets/dataset_detail.html:525
 msgid "Are you sure you want to delete this comment?"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:535
+#: templates/datasets/dataset_detail.html:543
 msgid "No comments yet"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:536
+#: templates/datasets/dataset_detail.html:544
 msgid "Be the first to share your thoughts about this dataset!"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:547
+#: templates/datasets/dataset_detail.html:555
 #: templates/datasets/dataset_form.html:297
 msgid "Related Datasets"
 msgstr ""
 
-#: templates/datasets/dataset_detail.html:558
+#: templates/datasets/dataset_detail.html:566
 #: templates/datasets/dataset_list.html:186
-#: templates/projects/project_detail.html:345
+#: templates/projects/project_detail.html:357
 #: templates/projects/project_list.html:115
 msgid "View"
-msgstr ""
+msgstr "Anzeigen"
 
 #: templates/datasets/dataset_form.html:6
 #: templates/datasets/dataset_form.html:24
 msgid "Edit Dataset"
-msgstr ""
+msgstr "Datensatz bearbeiten"
 
 #: templates/datasets/dataset_form.html:8
 #: templates/datasets/dataset_form.html:27
 #: templates/datasets/dataset_form.html:324
 #: templates/datasets/dataset_list.html:20
-#: templates/projects/project_detail.html:274
+#: templates/projects/project_detail.html:284
 msgid "Add Dataset"
 msgstr ""
 
@@ -1675,7 +1857,7 @@ msgstr ""
 
 #: templates/datasets/dataset_form.html:117
 #: templates/datasets/dataset_list.html:50
-#: templates/projects/project_detail.html:286
+#: templates/projects/project_detail.html:296
 msgid "Category"
 msgstr ""
 
@@ -1785,8 +1967,8 @@ msgstr ""
 msgid "No datasets match your search criteria."
 msgstr ""
 
-#: templates/datasets/dataset_list.html:243 templates/home.html:128
-#: templates/projects/project_detail.html:377
+#: templates/datasets/dataset_list.html:243 templates/home.html:187
+#: templates/projects/project_detail.html:389
 msgid "Add First Dataset"
 msgstr ""
 
@@ -2244,7 +2426,7 @@ msgstr ""
 
 #: templates/documentation.html:45 templates/documentation.html:109
 #: templates/documentation.html:316 templates/documentation.html:361
-#: user/models.py:59
+#: user/models.py:63
 msgid "Email Notifications"
 msgstr ""
 
@@ -2284,7 +2466,7 @@ msgstr ""
 
 #: templates/documentation.html:74 templates/home.html:4
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: templates/documentation.html:75
 msgid "The dashboard provides an overview of:"
@@ -2796,7 +2978,8 @@ msgstr ""
 msgid "When someone comments on your datasets"
 msgstr ""
 
-#: templates/documentation.html:324 user/forms.py:80 user/models.py:66
+#: templates/documentation.html:324 user/forms.py:153 user/forms.py:181
+#: user/models.py:70
 msgid "Dataset Updates"
 msgstr ""
 
@@ -2804,7 +2987,8 @@ msgstr ""
 msgid "When datasets you follow are updated"
 msgstr ""
 
-#: templates/documentation.html:325 user/forms.py:82 user/models.py:72
+#: templates/documentation.html:325 user/forms.py:155 user/forms.py:183
+#: user/models.py:76
 msgid "New Versions"
 msgstr ""
 
@@ -2990,88 +3174,331 @@ msgid ""
 "datasets"
 msgstr ""
 
-#: templates/home.html:31
-msgid "Need help getting started?"
-msgstr ""
-
-#: templates/home.html:32
-msgid "Check out our comprehensive documentation for guides and tutorials."
-msgstr ""
-
-#: templates/home.html:36
-msgid "View Documentation"
-msgstr ""
-
-#: templates/home.html:51
+#: templates/home.html:30
 msgid "Published Datasets"
 msgstr ""
 
-#: templates/home.html:60
+#: templates/home.html:39
 msgid "Data Volume"
 msgstr ""
 
-#: templates/home.html:69 templates/user/management.html:56
+#: templates/home.html:48 templates/user/management.html:56
 msgid "Active Users"
 msgstr ""
 
-#: templates/home.html:78
+#: templates/home.html:57
 msgid "Active Projects"
 msgstr ""
 
-#: templates/home.html:92
+#: templates/home.html:72
+msgid "Need help getting started?"
+msgstr ""
+
+#: templates/home.html:73
+msgid "Check out our comprehensive documentation for guides and tutorials."
+msgstr ""
+
+#: templates/home.html:77
+msgid "View Documentation"
+msgstr ""
+
+#: templates/home.html:98
+msgid "Manage Announcements"
+msgstr ""
+
+#: templates/home.html:120
+msgid "URGENT"
+msgstr ""
+
+#: templates/home.html:122
+msgid "HIGH"
+msgstr ""
+
+#: templates/home.html:128
+msgid "Posted by"
+msgstr ""
+
+#: templates/home.html:133 templates/pages/announcement_confirm_delete.html:78
+msgid "Valid until"
+msgstr ""
+
+#: templates/home.html:151
 msgid "Recent Activity"
 msgstr ""
 
-#: templates/home.html:104
+#: templates/home.html:163
 msgid "New version added"
 msgstr ""
 
-#: templates/home.html:106
+#: templates/home.html:165
 msgid "Version updated"
 msgstr ""
 
-#: templates/home.html:117
+#: templates/home.html:176
 msgid "Draft"
 msgstr ""
 
-#: templates/home.html:125
+#: templates/home.html:184
 msgid "No recent activity found"
 msgstr ""
 
-#: templates/home.html:140
+#: templates/home.html:199
 msgid "Popular Datasets"
 msgstr ""
 
-#: templates/home.html:150
-msgid "downloads"
-msgstr ""
-
-#: templates/home.html:154
+#: templates/home.html:212 templates/user/profile.html:268
 msgid "by"
 msgstr ""
 
-#: templates/home.html:162
+#: templates/home.html:220
 msgid "No datasets available yet"
 msgstr ""
 
-#: templates/home.html:190
+#: templates/home.html:248 templates/user/profile.html:141
 msgid "datasets"
 msgstr ""
 
-#: templates/home.html:198
+#: templates/home.html:256
 msgid "View All Categories"
 msgstr ""
 
-#: templates/home.html:212
+#: templates/home.html:270
 msgid "Your Datasets"
 msgstr ""
 
-#: templates/home.html:227
+#: templates/home.html:285 templates/user/profile.html:208
+#: templates/user/profile.html:272
 msgid "versions"
 msgstr ""
 
-#: templates/home.html:235
+#: templates/home.html:293
 msgid "Add New Dataset"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:4
+#: templates/pages/announcement_confirm_delete.html:15
+#: templates/pages/announcement_confirm_delete.html:124
+msgid "Delete Announcement"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:18
+msgid "Confirm deletion of this announcement"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:23
+#: templates/pages/announcement_form.html:38 templates/user/role_list.html:28
+msgid "Back to Management"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:43
+msgid ""
+"This action cannot be undone. The announcement will be permanently deleted."
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:48
+#: templates/pages/announcement_form.html:52
+msgid "Announcement Details"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:73
+msgid "Created by"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:89
+msgid "Current Status"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:93
+msgid "Active:"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:95
+#: templates/pages/announcement_confirm_delete.html:105
+msgid "Yes"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:97
+#: templates/pages/announcement_confirm_delete.html:107
+msgid "No"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:103
+msgid "Currently Displayed:"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:138
+msgid "Important Information"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:142
+msgid "What happens when you delete?"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:144
+msgid "Announcement is permanently removed"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:145
+msgid "No longer visible to users"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:146
+msgid "Cannot be recovered"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:149
+msgid "Alternative Actions"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:151
+msgid "Instead of deleting, you can:"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:154
+msgid "Deactivate the announcement"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:155
+msgid "Set an expiration date"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:156
+msgid "Edit the content"
+msgstr ""
+
+#: templates/pages/announcement_confirm_delete.html:162
+msgid "Edit Instead"
+msgstr ""
+
+#: templates/pages/announcement_form.html:6
+#: templates/pages/announcement_form.html:22
+msgid "Edit Announcement"
+msgstr ""
+
+#: templates/pages/announcement_form.html:8
+#: templates/pages/announcement_form.html:25
+#: templates/pages/announcement_form.html:207
+#: templates/pages/announcement_management.html:23
+#: templates/pages/announcement_management.html:193
+msgid "Create Announcement"
+msgstr ""
+
+#: templates/pages/announcement_form.html:30
+msgid "Update announcement details and settings"
+msgstr ""
+
+#: templates/pages/announcement_form.html:32
+msgid "Create a new announcement for users"
+msgstr ""
+
+#: templates/pages/announcement_form.html:54
+msgid "New Announcement"
+msgstr ""
+
+#: templates/pages/announcement_form.html:73
+msgid "Enter announcement title"
+msgstr ""
+
+#: templates/pages/announcement_form.html:95
+msgid "Enter announcement message"
+msgstr ""
+
+#: templates/pages/announcement_form.html:204
+msgid "Update Announcement"
+msgstr ""
+
+#: templates/pages/announcement_form.html:222
+msgid "Help & Tips"
+msgstr ""
+
+#: templates/pages/announcement_form.html:226
+msgid "Priority Levels"
+msgstr ""
+
+#: templates/pages/announcement_form.html:228
+msgid "General information"
+msgstr ""
+
+#: templates/pages/announcement_form.html:229
+msgid "Standard announcements"
+msgstr ""
+
+#: templates/pages/announcement_form.html:230
+msgid "Important updates"
+msgstr ""
+
+#: templates/pages/announcement_form.html:231
+msgid "Critical information"
+msgstr ""
+
+#: templates/pages/announcement_form.html:236
+msgid ""
+"Set 'Valid From' to schedule future announcements. Leave 'Valid Until' empty "
+"for permanent announcements."
+msgstr ""
+
+#: templates/pages/announcement_form.html:241
+msgid ""
+"Only active announcements are displayed to users. Use this to temporarily "
+"hide announcements without deleting them."
+msgstr ""
+
+#: templates/pages/announcement_management.html:4
+#: templates/pages/announcement_management.html:15
+msgid "Announcement Management"
+msgstr ""
+
+#: templates/pages/announcement_management.html:18
+msgid "Manage system announcements and messages for users"
+msgstr ""
+
+#: templates/pages/announcement_management.html:36
+msgid "Total Announcements"
+msgstr ""
+
+#: templates/pages/announcement_management.html:45
+msgid "Active Announcements"
+msgstr ""
+
+#: templates/pages/announcement_management.html:54
+msgid "Scheduled Announcements"
+msgstr ""
+
+#: templates/pages/announcement_management.html:63
+msgid "Expired Announcements"
+msgstr ""
+
+#: templates/pages/announcement_management.html:76
+msgid "All Announcements"
+msgstr ""
+
+#: templates/pages/announcement_management.html:113
+msgid "Scheduled"
+msgstr ""
+
+#: templates/pages/announcement_management.html:115
+msgid "Expired"
+msgstr ""
+
+#: templates/pages/announcement_management.html:133
+msgid "No expiration"
+msgstr ""
+
+#: templates/pages/announcement_management.html:158
+msgid "Announcement pagination"
+msgstr ""
+
+#: templates/pages/announcement_management.html:189
+msgid "No announcements found"
+msgstr ""
+
+#: templates/pages/announcement_management.html:190
+msgid "Create your first announcement to get started."
+msgstr ""
+
+#: templates/pages/announcement_management.html:207
+#: templates/user/settings.html:24
+msgid "Back to Dashboard"
 msgstr ""
 
 #: templates/projects/project_confirm_delete.html:4
@@ -3134,72 +3561,77 @@ msgstr[1] ""
 msgid "Edit Project"
 msgstr ""
 
-#: templates/projects/project_detail.html:56
+#: templates/projects/project_detail.html:46
+#: templates/projects/project_transfer_ownership.html:165
+msgid "Transfer Ownership"
+msgstr ""
+
+#: templates/projects/project_detail.html:62
 msgid "Project Description"
 msgstr ""
 
-#: templates/projects/project_detail.html:74
-#: templates/projects/project_detail.html:236
+#: templates/projects/project_detail.html:80
+#: templates/projects/project_detail.html:246
 #: templates/projects/project_form.html:129
 msgid "Project Timeline"
 msgstr ""
 
-#: templates/projects/project_detail.html:85
-#: templates/projects/project_detail.html:95
+#: templates/projects/project_detail.html:91
+#: templates/projects/project_detail.html:101
 msgid "Not specified"
 msgstr ""
 
-#: templates/projects/project_detail.html:104
-#: templates/projects/project_detail.html:251
+#: templates/projects/project_detail.html:110
+#: templates/projects/project_detail.html:261
 msgid "Duration"
 msgstr ""
 
-#: templates/projects/project_detail.html:105
-#: templates/projects/project_detail.html:252
+#: templates/projects/project_detail.html:111
+#: templates/projects/project_detail.html:262
 msgid "days"
 msgstr ""
 
-#: templates/projects/project_detail.html:118
+#: templates/projects/project_detail.html:124
 msgid "Project Information"
 msgstr ""
 
-#: templates/projects/project_detail.html:181
+#: templates/projects/project_detail.html:187
 msgid "Project Team"
 msgstr ""
 
-#: templates/projects/project_detail.html:204
+#: templates/projects/project_detail.html:214
 msgid "No collaborators assigned"
 msgstr ""
 
-#: templates/projects/project_detail.html:214
+#: templates/projects/project_detail.html:224
 msgid "Project Statistics"
 msgstr ""
 
-#: templates/projects/project_detail.html:225
+#: templates/projects/project_detail.html:235
 msgid "Team Members"
 msgstr ""
 
-#: templates/projects/project_detail.html:246
+#: templates/projects/project_detail.html:256
 msgid "Last Updated"
 msgstr ""
 
-#: templates/projects/project_detail.html:269
+#: templates/projects/project_detail.html:279
 msgid "Project Datasets"
 msgstr ""
 
-#: templates/projects/project_detail.html:320
+#: templates/projects/project_detail.html:330
 msgid "No category"
 msgstr ""
 
-#: templates/projects/project_detail.html:354
+#: templates/projects/project_detail.html:366
 msgid "Download"
 msgstr ""
 
-#: templates/projects/project_detail.html:371
+#: templates/projects/project_detail.html:383
 msgid "No Datasets Found"
 msgstr ""
 
-#: templates/projects/project_detail.html:373
+#: templates/projects/project_detail.html:385
 msgid "This project doesn't have any associated datasets yet."
 msgstr ""
 
@@ -3233,7 +3665,7 @@ msgstr ""
 msgid "Project Collaborators"
 msgstr ""
 
-#: templates/projects/project_form.html:350 templates/user/edit.html:171
+#: templates/projects/project_form.html:350 templates/user/edit.html:253
 #: templates/user/settings.html:166
 msgid "Save Changes"
 msgstr ""
@@ -3298,6 +3730,188 @@ msgstr ""
 
 #: templates/projects/project_list.html:197
 msgid "Create First Project"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:4
+#: templates/projects/project_transfer_ownership.html:19
+msgid "Transfer Project Ownership"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:14
+msgid "Back to Project"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:21
+msgid "Transfer ownership of"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:32
+msgid "Important Notice"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:34
+msgid ""
+"Transferring project ownership is a permanent action that cannot be undone. "
+"After the transfer:"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:37
+msgid "The new owner will have full control over the project"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:38
+msgid "You will become a collaborator instead of the owner"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:39
+msgid ""
+"You will no longer be able to delete the project or transfer ownership again"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:40
+msgid "All project settings and permissions will be managed by the new owner"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:51
+msgid "Select New Owner"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:75
+msgid "Current Owner"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:111
+msgid "Current Collaborators"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:130
+msgid ""
+"Current collaborators are shown at the top of the new owner selection list."
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:177
+msgid "What happens after transfer?"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:183
+msgid "New Owner Can:"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:185
+msgid "Edit project details"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:186
+msgid "Manage collaborators"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:187
+msgid "Delete the project"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:188
+msgid "Transfer ownership again"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:192
+msgid "You Become:"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:194
+msgid "A project collaborator"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:195
+msgid "Able to edit project details"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:196
+msgid "Unable to delete the project"
+msgstr ""
+
+#: templates/projects/project_transfer_ownership.html:197
+msgid "Unable to transfer ownership"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:4
+#: templates/user/approve_user_confirm.html:14
+#: templates/user/approve_user_confirm.html:81
+#: templates/user/pending_users.html:73
+msgid "Approve User"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:20
+msgid ""
+"Are you sure you want to approve this user? Once approved, they will have "
+"full access to the system."
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:25
+#: templates/user/reject_user_confirm.html:25
+msgid "User Details"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:28 templates/user/edit.html:53
+#: templates/user/list.html:44 templates/user/pending_users.html:35
+#: templates/user/reject_user_confirm.html:28 templates/user/settings.html:102
+#: templates/user/user_form.html:87
+msgid "Username"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:32 templates/user/list.html:45
+#: templates/user/pending_users.html:36
+#: templates/user/reject_user_confirm.html:32 templates/user/settings.html:106
+msgid "Email"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:36
+#: templates/user/pending_users.html:37
+#: templates/user/reject_user_confirm.html:36
+msgid "Full Name"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:41
+#: templates/user/pending_users.html:54
+#: templates/user/reject_user_confirm.html:41
+msgid "Not provided"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:46 templates/user/edit.html:137
+#: templates/user/list.html:46 templates/user/pending_users.html:38
+#: templates/user/reject_user_confirm.html:46 templates/user/settings.html:156
+#: templates/user/user_form.html:129
+msgid "Role"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:51 templates/user/edit.html:144
+#: templates/user/reject_user_confirm.html:51
+msgid "No role assigned"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:56
+#: templates/user/pending_users.html:39
+#: templates/user/reject_user_confirm.html:56
+msgid "Date Joined"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:62
+msgid "What happens when approved?"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:64
+msgid "User can log in and access the system"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:65
+msgid "User can create and manage datasets"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:66
+msgid "User can participate in projects"
+msgstr ""
+
+#: templates/user/approve_user_confirm.html:67
+msgid "User can comment on datasets"
 msgstr ""
 
 #: templates/user/confirm_delete.html:5 templates/user/confirm_delete.html:8
@@ -3406,7 +4020,7 @@ msgid "Contact Support"
 msgstr ""
 
 #: templates/user/edit.html:5 templates/user/edit.html:19
-#: templates/user/edit.html:24
+#: templates/user/edit.html:24 templates/user/pending_users.html:83
 msgid "Edit User"
 msgstr ""
 
@@ -3414,35 +4028,26 @@ msgstr ""
 msgid "Update user information and settings"
 msgstr ""
 
-#: templates/user/edit.html:47 templates/user/user_form.html:47
-#: user/forms.py:51
+#: templates/user/edit.html:61 templates/user/user_form.html:94
+msgid "Enter username"
+msgstr ""
+
+#: templates/user/edit.html:75 templates/user/user_form.html:47
+#: user/forms.py:124
 msgid "First Name"
 msgstr ""
 
-#: templates/user/edit.html:55 templates/user/user_form.html:54
+#: templates/user/edit.html:83 templates/user/user_form.html:54
 msgid "Enter first name"
 msgstr ""
 
-#: templates/user/edit.html:66 templates/user/user_form.html:66
-#: user/forms.py:52
+#: templates/user/edit.html:94 templates/user/user_form.html:66
+#: user/forms.py:125
 msgid "Last Name"
 msgstr ""
 
-#: templates/user/edit.html:74 templates/user/user_form.html:73
+#: templates/user/edit.html:102 templates/user/user_form.html:73
 msgid "Enter last name"
-msgstr ""
-
-#: templates/user/edit.html:109 templates/user/list.html:38
-#: templates/user/settings.html:156 templates/user/user_form.html:129
-msgid "Role"
-msgstr ""
-
-#: templates/user/edit.html:116
-msgid "No role assigned"
-msgstr ""
-
-#: templates/user/edit.html:158 templates/user/list.html:40
-msgid "Staff"
 msgstr ""
 
 #: templates/user/email/email_confirmation_message.txt:5
@@ -3466,51 +4071,59 @@ msgstr ""
 #: templates/user/list.html:6 templates/user/list.html:17
 #: templates/user/role_list.html:85 templates/user/user_form.html:17
 msgid "Users"
-msgstr ""
+msgstr "Benutzer"
 
-#: templates/user/list.html:20 templates/user/user_form.html:5
+#: templates/user/list.html:22
+msgid "Pending Users"
+msgstr "Ausstehende Benutzer"
+
+#: templates/user/list.html:27 templates/user/user_form.html:5
 #: templates/user/user_form.html:19 templates/user/user_form.html:24
 msgid "Add User"
-msgstr ""
+msgstr "Benutzer hinzufügen"
 
-#: templates/user/list.html:35
-msgid "ID"
-msgstr ""
+#: templates/user/list.html:49 templates/user/profile.html:46 user/forms.py:44
+msgid "Staff"
+msgstr "Mitarbeiter"
 
-#: templates/user/list.html:36 templates/user/settings.html:102
-#: templates/user/user_form.html:87
-msgid "Username"
-msgstr ""
-
-#: templates/user/list.html:37 templates/user/settings.html:106
-msgid "Email"
-msgstr ""
-
-#: templates/user/list.html:41
+#: templates/user/list.html:50 templates/user/profile.html:40 user/forms.py:50
 msgid "Superuser"
-msgstr ""
+msgstr "Superuser"
 
-#: templates/user/list.html:42
+#: templates/user/list.html:51
 msgid "Date joined"
-msgstr ""
+msgstr "Beitrittsdatum"
 
-#: templates/user/list.html:61
+#: templates/user/list.html:70
 msgid "Group Admin"
 msgstr ""
 
-#: templates/user/list.html:65
+#: templates/user/list.html:74
 msgid "Leader"
 msgstr ""
 
-#: templates/user/list.html:69
+#: templates/user/list.html:78
 msgid "Deputy Leader"
 msgstr ""
 
-#: templates/user/list.html:73
+#: templates/user/list.html:82
 msgid "Board Member"
 msgstr ""
 
-#: templates/user/list.html:106
+#: templates/user/list.html:105
+msgid "Pending"
+msgstr ""
+
+#: templates/user/list.html:112
+msgid "View Profile"
+msgstr ""
+
+#: templates/user/list.html:113 templates/user/profile.html:4
+#: templates/user/settings.html:41
+msgid "Profile"
+msgstr ""
+
+#: templates/user/list.html:125
 msgid "No users found."
 msgstr ""
 
@@ -3638,6 +4251,137 @@ msgid ""
 "operations."
 msgstr ""
 
+#: templates/user/pending_users.html:4 templates/user/pending_users.html:13
+msgid "Pending User Approvals"
+msgstr ""
+
+#: templates/user/pending_users.html:17 templates/user/pending_users.html:134
+msgid "Back to User List"
+msgstr ""
+
+#: templates/user/pending_users.html:26
+msgid "Users Awaiting Approval"
+msgstr ""
+
+#: templates/user/pending_users.html:61
+msgid "No role"
+msgstr ""
+
+#: templates/user/pending_users.html:78
+#: templates/user/reject_user_confirm.html:4
+#: templates/user/reject_user_confirm.html:14
+msgid "Reject User"
+msgstr ""
+
+#: templates/user/pending_users.html:98
+msgid "Pending users pagination"
+msgstr ""
+
+#: templates/user/pending_users.html:130
+msgid "No Pending Approvals"
+msgstr ""
+
+#: templates/user/pending_users.html:131
+msgid "All users have been approved. Great job!"
+msgstr ""
+
+#: templates/user/profile.html:4
+msgid "My Profile"
+msgstr "Mein Profil"
+
+#: templates/user/profile.html:56
+msgid "Edit Profile"
+msgstr "Profil bearbeiten"
+
+#: templates/user/profile.html:82
+msgid "Owned Datasets"
+msgstr "Eigene Datensätze"
+
+#: templates/user/profile.html:91 templates/user/profile.html:252
+msgid "Contributed Datasets"
+msgstr "Beigetragene Datensätze"
+
+#: templates/user/profile.html:100 templates/user/settings.html:160
+msgid "Member Since"
+msgstr "Mitglied seit"
+
+#: templates/user/profile.html:119
+msgid "New Project"
+msgstr "Neues Projekt"
+
+#: templates/user/profile.html:139
+msgid "Collaborator"
+msgstr ""
+
+#: templates/user/profile.html:150
+msgid "View All Projects"
+msgstr ""
+
+#: templates/user/profile.html:159
+msgid "You haven't created or joined any projects yet."
+msgstr ""
+
+#: templates/user/profile.html:161
+msgid "This user hasn't created or joined any projects yet."
+msgstr ""
+
+#: templates/user/profile.html:167
+msgid "Create Your First Project"
+msgstr ""
+
+#: templates/user/profile.html:187
+msgid "New Dataset"
+msgstr "Neuer Datensatz"
+
+#: templates/user/profile.html:217
+msgid "View All Datasets"
+msgstr ""
+
+#: templates/user/profile.html:226
+msgid "You haven't created any datasets yet."
+msgstr ""
+
+#: templates/user/profile.html:228
+msgid "This user hasn't created any datasets yet."
+msgstr ""
+
+#: templates/user/profile.html:234
+msgid "Create Your First Dataset"
+msgstr ""
+
+#: templates/user/profile.html:267
+msgid "Contributor"
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:20
+msgid ""
+"This action will permanently delete the user's account and cannot be undone."
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:62
+msgid "What happens when rejected?"
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:64
+msgid "User account will be permanently deleted"
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:65
+msgid "User will not be able to log in"
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:66
+msgid "All user data will be removed"
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:67
+msgid "This action cannot be undone"
+msgstr ""
+
+#: templates/user/reject_user_confirm.html:81
+msgid "Reject and Delete User"
+msgstr ""
+
 #: templates/user/role_confirm_delete.html:5
 #: templates/user/role_confirm_delete.html:14
 #: templates/user/role_confirm_delete.html:56
@@ -3762,10 +4506,6 @@ msgstr ""
 msgid "Add Role"
 msgstr ""
 
-#: templates/user/role_list.html:28
-msgid "Back to Management"
-msgstr ""
-
 #: templates/user/role_list.html:46
 msgid "Search by name or description"
 msgstr ""
@@ -3799,15 +4539,7 @@ msgstr ""
 msgid "Manage your account preferences and security settings"
 msgstr ""
 
-#: templates/user/settings.html:24
-msgid "Back to Dashboard"
-msgstr ""
-
-#: templates/user/settings.html:41
-msgid "Profile"
-msgstr ""
-
-#: templates/user/settings.html:45 user/models.py:52
+#: templates/user/settings.html:45 user/models.py:56
 msgid "Language"
 msgstr ""
 
@@ -3847,10 +4579,6 @@ msgstr ""
 
 #: templates/user/settings.html:125
 msgid "Your email address is verified."
-msgstr ""
-
-#: templates/user/settings.html:160
-msgid "Member Since"
 msgstr ""
 
 #: templates/user/settings.html:229
@@ -3969,92 +4697,146 @@ msgstr ""
 msgid "Create a new user account"
 msgstr ""
 
-#: templates/user/user_form.html:94
-msgid "Enter username"
-msgstr ""
-
 #: templates/user/user_form.html:159
 msgid "Enter password"
-msgstr ""
+msgstr "Passwort eingeben"
 
 #: templates/user/user_form.html:179
 msgid "Confirm password"
-msgstr ""
+msgstr "Passwort bestätigen"
 
 #: templates/user/user_form.html:193
 msgid "Back to Users"
-msgstr ""
+msgstr "Zurück zu Benutzern"
 
 #: templates/user/user_form.html:197
 msgid "Create User"
-msgstr ""
+msgstr "Benutzer erstellen"
 
-#: user/forms.py:78
+#: user/forms.py:45
+msgid "Designates whether the user can log into the admin site."
+msgstr "Bestimmt, ob der Benutzer sich in die Admin-Seite einloggen kann."
+
+#: user/forms.py:51
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Bestimmt, dass dieser Benutzer alle Berechtigungen hat, ohne sie explizit "
+"zuzuweisen."
+
+#: user/forms.py:57 user/models.py:90
+msgid "Whether this user has been approved by an administrator"
+msgstr "Ob dieser Benutzer von einem Administrator genehmigt wurde"
+
+#: user/forms.py:81
+msgid "A user with this username already exists."
+msgstr "Ein Benutzer mit diesem Benutzernamen existiert bereits."
+
+#: user/forms.py:90
+msgid "A user with this email address already exists."
+msgstr "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits."
+
+#: user/forms.py:102
+msgid "Superusers must also be staff members. This has been automatically set."
+msgstr "Superuser müssen auch Mitarbeiter sein. Dies wurde automatisch gesetzt."
+
+#: user/forms.py:151
 msgid "Interface Language"
-msgstr ""
+msgstr "Oberflächensprache"
 
-#: user/forms.py:79
+#: user/forms.py:152
 msgid "Choose your preferred language for the interface"
-msgstr ""
+msgstr "Wählen Sie Ihre bevorzugte Sprache für die Oberfläche"
 
-#: user/forms.py:81 user/models.py:67
+#: user/forms.py:154 user/forms.py:182 user/models.py:71
 msgid "Receive email notifications when datasets you follow are updated"
-msgstr ""
+msgstr "E-Mail-Benachrichtigungen erhalten, wenn Datensätze, denen Sie folgen, aktualisiert werden"
 
-#: user/forms.py:83 user/models.py:73
+#: user/forms.py:156 user/forms.py:184 user/models.py:77
 msgid ""
 "Receive email notifications when new versions of datasets you follow are "
 "published"
 msgstr ""
+"E-Mail-Benachrichtigungen erhalten, wenn neue Versionen von Datensätzen, "
+"denen Sie folgen, veröffentlicht werden"
 
-#: user/forms.py:85 user/models.py:60 user/models.py:79
+#: user/forms.py:158 user/forms.py:186 user/models.py:64 user/models.py:83
 msgid "Receive email notifications for comments on your datasets"
-msgstr ""
+msgstr "E-Mail-Benachrichtigungen für Kommentare zu Ihren Datensätzen erhalten"
 
-#: user/forms.py:92
+#: user/forms.py:193
 msgid "JSON"
-msgstr ""
+msgstr "JSON"
 
-#: user/forms.py:93
+#: user/forms.py:194
 msgid "CSV"
-msgstr ""
+msgstr "CSV"
 
-#: user/forms.py:94
+#: user/forms.py:195
 msgid "XML"
-msgstr ""
+msgstr "XML"
 
-#: user/forms.py:103
+#: user/forms.py:204
 msgid "Export Format"
-msgstr ""
+msgstr "Exportformat"
 
-#: user/forms.py:104
+#: user/forms.py:205
 msgid "Choose the format for your data export"
-msgstr ""
+msgstr "Wählen Sie das Format für Ihren Datenexport"
 
-#: user/forms.py:113
+#: user/forms.py:214
 msgid "Include Datasets"
-msgstr ""
+msgstr "Datensätze einschließen"
 
-#: user/forms.py:114
+#: user/forms.py:215
 msgid "Include your datasets in the export"
-msgstr ""
+msgstr "Ihre Datensätze in den Export einschließen"
 
-#: user/forms.py:123
+#: user/forms.py:224
 msgid "Include Projects"
-msgstr ""
+msgstr "Projekte einschließen"
 
-#: user/forms.py:124
+#: user/forms.py:225
 msgid "Include your projects in the export"
-msgstr ""
+msgstr "Ihre Projekte in den Export einschließen"
 
-#: user/forms.py:133
+#: user/forms.py:234
 msgid "Include Activity Log"
-msgstr ""
+msgstr "Aktivitätsprotokoll einschließen"
 
-#: user/forms.py:134
+#: user/forms.py:235
 msgid "Include your activity and download history"
-msgstr ""
+msgstr "Ihre Aktivität und Download-Historie einschließen"
 
-#: user/models.py:53
+#: user/models.py:57
 msgid "Preferred language for the interface"
-msgstr ""
+msgstr "Bevorzugte Sprache für die Oberfläche"
+
+#: user/models.py:97
+msgid "First Login Date"
+msgstr "Erstes Anmeldedatum"
+
+#: user/models.py:98
+msgid "Date of the user's first login"
+msgstr "Datum der ersten Anmeldung des Benutzers"
+
+#: user/views.py:355
+msgid "Only superusers can modify staff privileges."
+msgstr "Nur Superuser können Mitarbeiterberechtigungen ändern."
+
+#: user/views.py:356
+msgid "Only superusers can modify superuser privileges."
+msgstr "Nur Superuser können Superuser-Berechtigungen ändern."
+
+#: user/views.py:362
+msgid "Only superusers can assign superuser privileges."
+msgstr "Nur Superuser können Superuser-Berechtigungen zuweisen."
+
+#: user/views.py:367
+msgid "Only superusers can assign staff privileges."
+msgstr "Nur Superuser können Mitarbeiterberechtigungen zuweisen."
+
+#: user/views.py:374
+msgid "You cannot remove your own superuser privileges."
+msgstr "Sie können Ihre eigenen Superuser-Berechtigungen nicht entfernen."
