@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -112,6 +113,11 @@ else:
             'PORT': os.environ.get('POSTGRES_PORT', '5432'),
         }
     }
+
+# Test database configuration
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    # Use a separate test database to avoid conflicts
+    DATABASES['default']['NAME'] = f"test_{DATABASES['default']['NAME']}"
 
 
 # Password validation
