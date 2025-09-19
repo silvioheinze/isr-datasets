@@ -1,0 +1,170 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete Announcement" %} - {% trans "ISR Datasets" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-trash me-2 text-danger"></i>
+                        {% trans "Delete Announcement" %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% trans "Confirm deletion of this announcement" %}
+                    </p>
+                </div>
+                <a href="{% url 'announcement-management' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    {% trans "Back to Management" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Section -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        {% trans "Confirm Deletion" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>{% trans "Warning:" %}</strong>
+                        {% trans "This action cannot be undone. The announcement will be permanently deleted." %}
+                    </div>
+
+                    <!-- Announcement Details -->
+                    <div class="mb-4">
+                        <h6>{% trans "Announcement Details" %}</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start">
+                                    <div class="flex-shrink-0 me-3">
+                                        {% if object.priority == 'urgent' %}
+                                            <i class="bi bi-exclamation-triangle-fill fs-4 text-danger"></i>
+                                        {% elif object.priority == 'high' %}
+                                            <i class="bi bi-exclamation-circle-fill fs-4 text-warning"></i>
+                                        {% elif object.priority == 'normal' %}
+                                            <i class="bi bi-info-circle-fill fs-4 text-primary"></i>
+                                        {% else %}
+                                            <i class="bi bi-info-circle fs-4 text-info"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title">
+                                            {{ object.title }}
+                                            <span class="badge bg-{{ object.get_priority_class }} ms-2">
+                                                {{ object.get_priority_display }}
+                                            </span>
+                                        </h5>
+                                        <p class="card-text">{{ object.message|linebreaks }}</p>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-person me-1"></i>
+                                            {% trans "Created by" %} {{ object.created_by.get_full_name|default:object.created_by.username }}
+                                            <i class="bi bi-calendar me-1 ms-2"></i>
+                                            {{ object.created_at|date:"M d, Y H:i" }}
+                                            {% if object.valid_until %}
+                                                <i class="bi bi-clock me-1 ms-2"></i>
+                                                {% trans "Valid until" %} {{ object.valid_until|date:"M d, Y H:i" }}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Information -->
+                    <div class="mb-4">
+                        <h6>{% trans "Current Status" %}</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">{% trans "Active:" %}</span>
+                                    {% if object.is_active %}
+                                        <span class="badge bg-success">{% trans "Yes" %}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{% trans "No" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <span class="me-2">{% trans "Currently Displayed:" %}</span>
+                                    {% if object.is_displayed %}
+                                        <span class="badge bg-success">{% trans "Yes" %}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{% trans "No" %}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'announcement-management' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>
+                                {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash me-2"></i>
+                                {% trans "Delete Announcement" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% trans "Important Information" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>{% trans "What happens when you delete?" %}</h6>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-check text-danger me-2"></i>{% trans "Announcement is permanently removed" %}</li>
+                        <li><i class="bi bi-check text-danger me-2"></i>{% trans "No longer visible to users" %}</li>
+                        <li><i class="bi bi-check text-danger me-2"></i>{% trans "Cannot be recovered" %}</li>
+                    </ul>
+
+                    <h6 class="mt-3">{% trans "Alternative Actions" %}</h6>
+                    <p class="small text-muted">
+                        {% trans "Instead of deleting, you can:" %}
+                    </p>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-toggle-off text-warning me-2"></i>{% trans "Deactivate the announcement" %}</li>
+                        <li><i class="bi bi-calendar-x text-warning me-2"></i>{% trans "Set an expiration date" %}</li>
+                        <li><i class="bi bi-pencil text-info me-2"></i>{% trans "Edit the content" %}</li>
+                    </ul>
+
+                    <div class="mt-3">
+                        <a href="{% url 'announcement-edit' object.pk %}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-pencil me-1"></i>
+                            {% trans "Edit Instead" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

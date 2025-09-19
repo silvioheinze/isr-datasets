@@ -1,0 +1,248 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% if object %}
+        {% trans "Edit Announcement" %} - {% trans "ISR Datasets" %}
+    {% else %}
+        {% trans "Create Announcement" %} - {% trans "ISR Datasets" %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">
+                        {% if object %}
+                            <i class="bi bi-pencil-square me-2"></i>
+                            {% trans "Edit Announcement" %}
+                        {% else %}
+                            <i class="bi bi-plus-circle me-2"></i>
+                            {% trans "Create Announcement" %}
+                        {% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if object %}
+                            {% trans "Update announcement details and settings" %}
+                        {% else %}
+                            {% trans "Create a new announcement for users" %}
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{% url 'announcement-management' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    {% trans "Back to Management" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-form me-2"></i>
+                        {% if object %}
+                            {% trans "Announcement Details" %}
+                        {% else %}
+                            {% trans "New Announcement" %}
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Title Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                <i class="bi bi-type me-1"></i>
+                                {{ form.title.label }}
+                            </label>
+                            <input type="text" 
+                                   class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                                   id="{{ form.title.id_for_label }}" 
+                                   name="{{ form.title.name }}" 
+                                   value="{{ form.title.value|default:'' }}"
+                                   placeholder="{% trans 'Enter announcement title' %}"
+                                   maxlength="200">
+                            {% if form.title.help_text %}
+                                <div class="form-text">{{ form.title.help_text }}</div>
+                            {% endif %}
+                            {% if form.title.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.title.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Message Field -->
+                        <div class="mb-3">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">
+                                <i class="bi bi-chat-text me-1"></i>
+                                {{ form.message.label }}
+                            </label>
+                            <textarea class="form-control {% if form.message.errors %}is-invalid{% endif %}" 
+                                      id="{{ form.message.id_for_label }}" 
+                                      name="{{ form.message.name }}" 
+                                      rows="6"
+                                      placeholder="{% trans 'Enter announcement message' %}">{{ form.message.value|default:'' }}</textarea>
+                            {% if form.message.help_text %}
+                                <div class="form-text">{{ form.message.help_text }}</div>
+                            {% endif %}
+                            {% if form.message.errors %}
+                                <div class="invalid-feedback">
+                                    {{ form.message.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Priority and Status Row -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                    <i class="bi bi-flag me-1"></i>
+                                    {{ form.priority.label }}
+                                </label>
+                                <select class="form-select {% if form.priority.errors %}is-invalid{% endif %}" 
+                                        id="{{ form.priority.id_for_label }}" 
+                                        name="{{ form.priority.name }}">
+                                    {% for value, label in form.priority.field.choices %}
+                                        <option value="{{ value }}" 
+                                                {% if form.priority.value == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.priority.help_text %}
+                                    <div class="form-text">{{ form.priority.help_text }}</div>
+                                {% endif %}
+                                {% if form.priority.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.priority.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="bi bi-toggle-on me-1"></i>
+                                    {{ form.is_active.label }}
+                                </label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="{{ form.is_active.id_for_label }}" 
+                                           name="{{ form.is_active.name }}"
+                                           {% if form.is_active.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                        {% trans "Active" %}
+                                    </label>
+                                </div>
+                                {% if form.is_active.help_text %}
+                                    <div class="form-text">{{ form.is_active.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Date Fields Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.valid_from.id_for_label }}" class="form-label">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    {{ form.valid_from.label }}
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control {% if form.valid_from.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.valid_from.id_for_label }}" 
+                                       name="{{ form.valid_from.name }}" 
+                                       value="{{ form.valid_from.value|date:'Y-m-d\TH:i'|default:'' }}">
+                                {% if form.valid_from.help_text %}
+                                    <div class="form-text">{{ form.valid_from.help_text }}</div>
+                                {% endif %}
+                                {% if form.valid_from.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.valid_from.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.valid_until.id_for_label }}" class="form-label">
+                                    <i class="bi bi-calendar-x me-1"></i>
+                                    {{ form.valid_until.label }}
+                                </label>
+                                <input type="datetime-local" 
+                                       class="form-control {% if form.valid_until.errors %}is-invalid{% endif %}" 
+                                       id="{{ form.valid_until.id_for_label }}" 
+                                       name="{{ form.valid_until.name }}" 
+                                       value="{{ form.valid_until.value|date:'Y-m-d\TH:i'|default:'' }}">
+                                {% if form.valid_until.help_text %}
+                                    <div class="form-text">{{ form.valid_until.help_text }}</div>
+                                {% endif %}
+                                {% if form.valid_until.errors %}
+                                    <div class="invalid-feedback">
+                                        {{ form.valid_until.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'announcement-management' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>
+                                {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                {% if object %}
+                                    <i class="bi bi-check-circle me-2"></i>
+                                    {% trans "Update Announcement" %}
+                                {% else %}
+                                    <i class="bi bi-plus-circle me-2"></i>
+                                    {% trans "Create Announcement" %}
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help Section -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% trans "Help & Tips" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>{% trans "Priority Levels" %}</h6>
+                    <ul class="list-unstyled">
+                        <li><span class="badge bg-info me-2">{% trans "Low" %}</span>{% trans "General information" %}</li>
+                        <li><span class="badge bg-primary me-2">{% trans "Normal" %}</span>{% trans "Standard announcements" %}</li>
+                        <li><span class="badge bg-warning me-2">{% trans "High" %}</span>{% trans "Important updates" %}</li>
+                        <li><span class="badge bg-danger me-2">{% trans "Urgent" %}</span>{% trans "Critical information" %}</li>
+                    </ul>
+
+                    <h6 class="mt-3">{% trans "Scheduling" %}</h6>
+                    <p class="small text-muted">
+                        {% trans "Set 'Valid From' to schedule future announcements. Leave 'Valid Until' empty for permanent announcements." %}
+                    </p>
+
+                    <h6 class="mt-3">{% trans "Status" %}</h6>
+                    <p class="small text-muted">
+                        {% trans "Only active announcements are displayed to users. Use this to temporarily hide announcements without deleting them." %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

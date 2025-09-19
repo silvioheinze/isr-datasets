@@ -3,8 +3,10 @@ import requests
 import json
 from datetime import datetime, timedelta
 
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib import messages
+from django.urls import reverse_lazy
 from django.conf import settings
 from django.db.models import Count, Sum, Q
 from django.utils import timezone
@@ -125,6 +127,21 @@ class HomePageView(LoginRequiredMixin, TemplateView):
         
         context['show_help_section'] = show_help_section
         
+        # Get active announcements
+        try:
+            from .models import Announcement
+            active_announcements = Announcement.objects.filter(
+                is_active=True
+            ).filter(
+                Q(valid_until__isnull=True) | Q(valid_until__gt=timezone.now())
+            ).filter(
+                valid_from__lte=timezone.now()
+            ).select_related('created_by').order_by('-priority', '-created_at')
+            
+            context['active_announcements'] = active_announcements
+        except ImportError:
+            context['active_announcements'] = []
+        
         # Add group membership data for the current user (keeping existing functionality)
         if self.request.user.is_authenticated:
             try:
@@ -172,3 +189,135 @@ class HomePageView(LoginRequiredMixin, TemplateView):
 class DocumentationView(TemplateView):
     """Documentation page view"""
     template_name = "documentation.html"
+
+
+class AnnouncementManagementView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """
+    View for managing announcements - only accessible by administrators
+    """
+    template_name = 'pages/announcement_management.html'
+    context_object_name = 'announcements'
+    paginate_by = 20
+    
+    def test_func(self):
+        """Only superusers and users with admin role permission can access"""
+        return (
+            self.request.user.is_superuser or
+            self.request.user.has_role_permission('admin')
+        )
+    
+    def get_queryset(self):
+        """Get all announcements ordered by priority and creation date"""
+        from .models import Announcement
+        return Announcement.objects.select_related('created_by').order_by('-priority', '-created_at')
+    
+    @property
+    def model(self):
+        """Get the Announcement model"""
+        from .models import Announcement
+        return Announcement
+    
+    def get_context_data(self, **kwargs):
+        """Add additional context data"""
+        # Set up view attributes for proper context generation
+        if not hasattr(self, 'kwargs'):
+            self.kwargs = {}
+        if not hasattr(self, 'object_list'):
+            self.object_list = self.get_queryset()
+        
+        context = super().get_context_data(**kwargs)
+        
+        # Add statistics
+        from .models import Announcement
+        context['total_announcements'] = Announcement.objects.count()
+        context['active_announcements'] = Announcement.objects.filter(is_active=True).count()
+        context['expired_announcements'] = Announcement.objects.filter(
+            valid_until__lt=timezone.now()
+        ).count()
+        context['future_announcements'] = Announcement.objects.filter(
+            valid_from__gt=timezone.now()
+        ).count()
+        
+        return context
+
+
+class AnnouncementCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """
+    View for creating new announcements
+    """
+    model = None  # Will be set in __init__
+    template_name = 'pages/announcement_form.html'
+    fields = ['title', 'message', 'priority', 'is_active', 'valid_from', 'valid_until']
+    success_url = reverse_lazy('announcement-management')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .models import Announcement
+        self.model = Announcement
+    
+    def test_func(self):
+        """Only superusers and users with admin role permission can access"""
+        return (
+            self.request.user.is_superuser or
+            self.request.user.has_role_permission('admin')
+        )
+    
+    def form_valid(self, form):
+        """Set the created_by field to current user"""
+        form.instance.created_by = self.request.user
+        messages.success(self.request, f'Announcement "{form.instance.title}" has been created successfully.')
+        return super().form_valid(form)
+
+
+class AnnouncementUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    View for updating existing announcements
+    """
+    model = None  # Will be set in __init__
+    template_name = 'pages/announcement_form.html'
+    fields = ['title', 'message', 'priority', 'is_active', 'valid_from', 'valid_until']
+    success_url = reverse_lazy('announcement-management')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .models import Announcement
+        self.model = Announcement
+    
+    def test_func(self):
+        """Only superusers and users with admin role permission can access"""
+        return (
+            self.request.user.is_superuser or
+            self.request.user.has_role_permission('admin')
+        )
+    
+    def form_valid(self, form):
+        """Show success message"""
+        messages.success(self.request, f'Announcement "{form.instance.title}" has been updated successfully.')
+        return super().form_valid(form)
+
+
+class AnnouncementDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    View for deleting announcements
+    """
+    model = None  # Will be set in __init__
+    template_name = 'pages/announcement_confirm_delete.html'
+    success_url = reverse_lazy('announcement-management')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from .models import Announcement
+        self.model = Announcement
+    
+    def test_func(self):
+        """Only superusers and users with admin role permission can access"""
+        return (
+            self.request.user.is_superuser or
+            self.request.user.has_role_permission('admin')
+        )
+    
+    def delete(self, request, *args, **kwargs):
+        """Show success message"""
+        announcement = self.get_object()
+        messages.success(request, f'Announcement "{announcement.title}" has been deleted successfully.')
+        return super().delete(request, *args, **kwargs)

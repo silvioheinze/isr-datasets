@@ -1,0 +1,212 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Announcement Management" %} - {% trans "ISR Datasets" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-1">
+                        <i class="bi bi-megaphone me-2"></i>
+                        {% trans "Announcement Management" %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% trans "Manage system announcements and messages for users" %}
+                    </p>
+                </div>
+                <a href="{% url 'announcement-create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    {% trans "Create Announcement" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-collection fs-1 mb-3 text-primary"></i>
+                    <h3 class="card-title">{{ total_announcements|default:0 }}</h3>
+                    <p class="card-text">{% trans "Total Announcements" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle fs-1 mb-3 text-success"></i>
+                    <h3 class="card-title">{{ active_announcements|default:0 }}</h3>
+                    <p class="card-text">{% trans "Active Announcements" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock fs-1 mb-3 text-warning"></i>
+                    <h3 class="card-title">{{ future_announcements|default:0 }}</h3>
+                    <p class="card-text">{% trans "Scheduled Announcements" %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-x-circle fs-1 mb-3 text-danger"></i>
+                    <h3 class="card-title">{{ expired_announcements|default:0 }}</h3>
+                    <p class="card-text">{% trans "Expired Announcements" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcements List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        {% trans "All Announcements" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if announcements %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans "Title" %}</th>
+                                        <th>{% trans "Priority" %}</th>
+                                        <th>{% trans "Status" %}</th>
+                                        <th>{% trans "Created By" %}</th>
+                                        <th>{% trans "Created" %}</th>
+                                        <th>{% trans "Valid Until" %}</th>
+                                        <th>{% trans "Actions" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for announcement in announcements %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ announcement.title }}</strong>
+                                            {% if announcement.message|length > 50 %}
+                                                <br><small class="text-muted">{{ announcement.message|truncatechars:50 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{{ announcement.get_priority_class }}">
+                                                {{ announcement.get_priority_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if announcement.is_displayed %}
+                                                <span class="badge bg-success">{% trans "Active" %}</span>
+                                            {% elif announcement.is_active %}
+                                                {% if announcement.valid_from > now %}
+                                                    <span class="badge bg-info">{% trans "Scheduled" %}</span>
+                                                {% elif announcement.valid_until < now %}
+                                                    <span class="badge bg-secondary">{% trans "Expired" %}</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">{% trans "Inactive" %}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">{% trans "Inactive" %}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
+                                        </td>
+                                        <td>
+                                            <small>{{ announcement.created_at|date:"M d, Y" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if announcement.valid_until %}
+                                                <small>{{ announcement.valid_until|date:"M d, Y" }}</small>
+                                            {% else %}
+                                                <small class="text-muted">{% trans "No expiration" %}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'announcement-edit' announcement.pk %}" 
+                                                   class="btn btn-outline-primary" 
+                                                   title="{% trans 'Edit' %}">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'announcement-delete' announcement.pk %}" 
+                                                   class="btn btn-outline-danger" 
+                                                   title="{% trans 'Delete' %}">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        {% if is_paginated %}
+                        <nav aria-label="{% trans 'Announcement pagination' %}">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">{% trans "First" %}</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">{% trans "Previous" %}</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">{% trans "Next" %}</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{% trans "Last" %}</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="bi bi-megaphone fs-1 text-muted mb-3"></i>
+                            <h5 class="text-muted">{% trans "No announcements found" %}</h5>
+                            <p class="text-muted">{% trans "Create your first announcement to get started." %}</p>
+                            <a href="{% url 'announcement-create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Create Announcement" %}
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                {% trans "Back to Dashboard" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

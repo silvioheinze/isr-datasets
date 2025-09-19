@@ -83,6 +83,64 @@
     </div>
     {% endif %}
 
+    <!-- Announcements Section -->
+    {% if active_announcements %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">
+                    <i class="bi bi-megaphone me-2"></i>
+                    {% trans "Announcements" %}
+                </h4>
+                {% if user.is_superuser or user.has_role_permission|default:False %}
+                <a href="{% url 'announcement-management' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-gear me-1"></i>
+                    {% trans "Manage Announcements" %}
+                </a>
+                {% endif %}
+            </div>
+            {% for announcement in active_announcements %}
+            <div class="alert alert-{{ announcement.get_priority_class }} border-0 shadow-sm mb-3">
+                <div class="d-flex align-items-start">
+                    <div class="flex-shrink-0 me-3">
+                        {% if announcement.priority == 'urgent' %}
+                            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                        {% elif announcement.priority == 'high' %}
+                            <i class="bi bi-exclamation-circle-fill fs-4"></i>
+                        {% elif announcement.priority == 'normal' %}
+                            <i class="bi bi-info-circle-fill fs-4"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle fs-4"></i>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h5 class="alert-heading mb-2">
+                            {{ announcement.title }}
+                            {% if announcement.priority == 'urgent' %}
+                                <span class="badge bg-danger ms-2">{% trans "URGENT" %}</span>
+                            {% elif announcement.priority == 'high' %}
+                                <span class="badge bg-warning ms-2">{% trans "HIGH" %}</span>
+                            {% endif %}
+                        </h5>
+                        <p class="mb-2">{{ announcement.message|linebreaks }}</p>
+                        <small class="text-muted">
+                            <i class="bi bi-person me-1"></i>
+                            {% trans "Posted by" %} {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
+                            <i class="bi bi-calendar me-1 ms-2"></i>
+                            {{ announcement.created_at|date:"M d, Y" }}
+                            {% if announcement.valid_until %}
+                                <i class="bi bi-clock me-1 ms-2"></i>
+                                {% trans "Valid until" %} {{ announcement.valid_until|date:"M d, Y" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Recent Activity & Popular Datasets -->
     <div class="row">
         <div class="col-md-8">
