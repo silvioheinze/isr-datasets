@@ -17,6 +17,19 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         model = CustomUser
         fields = ('username', 'email', 'first_name', 'last_name', 'role')
+    
+    def __init__(self, *args, **kwargs):
+        self.created_by_admin = kwargs.pop('created_by_admin', False)
+        super().__init__(*args, **kwargs)
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # If created by an admin, auto-approve the user
+        if self.created_by_admin:
+            user.is_approved = True
+        if commit:
+            user.save()
+        return user
 
 
 class CustomUserEditForm(UserChangeForm):
@@ -37,10 +50,16 @@ class CustomUserEditForm(UserChangeForm):
         label=_('Superuser'),
         help_text=_('Designates that this user has all permissions without explicitly assigning them.')
     )
+    
+    is_approved = forms.BooleanField(
+        required=False,
+        label=_('Approved'),
+        help_text=_('Whether this user has been approved by an administrator')
+    )
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff', 'is_superuser')
+        fields = ('username', 'email', 'first_name', 'last_name', 'role', 'is_staff', 'is_superuser', 'is_approved')
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

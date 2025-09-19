@@ -213,6 +213,36 @@
                             </div>
                         </div>
 
+                        <!-- User Approval Status -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input 
+                                        type="checkbox" 
+                                        name="{{ form.is_approved.name }}" 
+                                        class="form-check-input" 
+                                        id="{{ form.is_approved.id_for_label }}"
+                                        {% if form.is_approved.value %}checked{% endif %}
+                                    >
+                                    <label class="form-check-label" for="{{ form.is_approved.id_for_label }}">
+                                        <i class="bi bi-person-check me-1"></i>
+                                        {{ form.is_approved.label }}
+                                    </label>
+                                    {% if form.is_approved.help_text %}
+                                        <div class="form-text">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            {{ form.is_approved.help_text }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if form.is_approved.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.is_approved.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="{% url 'user-management' %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>

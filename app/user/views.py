@@ -49,8 +49,31 @@ class SignupPageView(CreateView):
     success_url = reverse_lazy("home")
     template_name = "user/signup.html"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Check if the current user is an admin (superuser or has admin role)
+        kwargs['created_by_admin'] = (
+            self.request.user.is_authenticated and 
+            (self.request.user.is_superuser or self.request.user.has_role_permission('admin'))
+        )
+        return kwargs
+
     def form_valid(self, form):
-        user = form.instance
+        user = form.save()
+        
+        # If user was created by admin, show success message
+        if form.created_by_admin:
+            messages.success(
+                self.request, 
+                f'User {user.username} has been created and approved successfully.'
+            )
+        else:
+            # If user was created by regular signup, show pending approval message
+            messages.info(
+                self.request, 
+                f'Your account has been created successfully. Please wait for administrator approval before you can access all features.'
+            )
+        
         return super().form_valid(form)
 
 
@@ -410,13 +433,77 @@ class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         # Allow access only if user is superuser
         return self.request.user.is_superuser
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        # Since this is an admin view, mark as created by admin
+        kwargs['created_by_admin'] = True
+        return kwargs
+
     def form_valid(self, form):
-        messages.success(self.request, 'User created successfully.')
+        user = form.save()
+        messages.success(
+            self.request, 
+            f'User {user.username} has been created and approved successfully.'
+        )
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.error(self.request, 'Please correct the errors below.')
         return super().form_invalid(form)
+
+
+class PendingUsersView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """View for administrators to see and approve pending users"""
+    model = get_user_model()
+    template_name = 'user/pending_users.html'
+    context_object_name = 'pending_users'
+    paginate_by = 20
+
+    def test_func(self):
+        # Allow access only if user is superuser or has admin role
+        return (
+            self.request.user.is_superuser or 
+            self.request.user.has_role_permission('admin')
+        )
+
+    def get_queryset(self):
+        return CustomUser.objects.filter(is_approved=False).order_by('date_joined')
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser or u.has_role_permission('admin'))
+def approve_user(request, user_id):
+    """Approve a pending user"""
+    user = get_object_or_404(CustomUser, id=user_id, is_approved=False)
+    
+    if request.method == 'POST':
+        user.is_approved = True
+        user.save()
+        messages.success(
+            request, 
+            f'User {user.username} has been approved successfully.'
+        )
+        return redirect('pending-users')
+    
+    return render(request, 'user/approve_user_confirm.html', {'user': user})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser or u.has_role_permission('admin'))
+def reject_user(request, user_id):
+    """Reject a pending user (delete their account)"""
+    user = get_object_or_404(CustomUser, id=user_id, is_approved=False)
+    
+    if request.method == 'POST':
+        username = user.username
+        user.delete()
+        messages.success(
+            request, 
+            f'User {username} has been rejected and their account has been deleted.'
+        )
+        return redirect('pending-users')
+    
+    return render(request, 'user/reject_user_confirm.html', {'user': user})
 
 
 # Role Management Views

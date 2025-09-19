@@ -79,6 +79,13 @@ class CustomUser(AbstractUser):
         help_text=_('Receive email notifications for comments on your datasets')
     )
     
+    # User approval system
+    is_approved = models.BooleanField(
+        default=False,
+        verbose_name=_('Approved'),
+        help_text=_('Whether this user has been approved by an administrator')
+    )
+    
     # Add related_name to avoid field clashes
     groups = models.ManyToManyField(
         'auth.Group',
