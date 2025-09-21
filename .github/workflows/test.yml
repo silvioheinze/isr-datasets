@@ -74,6 +74,11 @@ jobs:
         echo "DEBUG=True" >> $GITHUB_ENV
         echo "DJANGO_SECRET_KEY=test-secret-key-for-github-actions" >> $GITHUB_ENV
         echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+        echo "POSTGRES_USER=${{ env.POSTGRES_USER }}" >> $GITHUB_ENV
+        echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
+        echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+        echo "POSTGRES_HOST=localhost" >> $GITHUB_ENV
+        echo "POSTGRES_PORT=5432" >> $GITHUB_ENV
         echo "EMAIL_BACKEND=django.core.mail.backends.locmem.EmailBackend" >> $GITHUB_ENV
         echo "DEFAULT_FROM_EMAIL=noreply@test.com" >> $GITHUB_ENV
         echo "SITE_NAME=Test Site" >> $GITHUB_ENV
@@ -87,6 +92,12 @@ jobs:
           echo "Waiting for PostgreSQL..."
           sleep 2
         done
+        echo "PostgreSQL is ready!"
+
+    - name: Verify database connection
+      run: |
+        echo "Testing database connection with user: ${{ env.POSTGRES_USER }}"
+        psql -h localhost -p 5432 -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "SELECT version();" || echo "Database connection failed"
 
     - name: Create test database
       run: |
@@ -95,6 +106,8 @@ jobs:
     - name: Run database migrations
       run: |
         cd app
+        echo "Database configuration:"
+        python manage.py shell -c "from django.conf import settings; print('Database:', settings.DATABASES['default'])"
         python manage.py migrate --noinput
 
     - name: Collect static files
@@ -289,6 +302,11 @@ jobs:
         echo "DEBUG=True" >> $GITHUB_ENV
         echo "DJANGO_SECRET_KEY=test-secret-key-for-github-actions" >> $GITHUB_ENV
         echo "DATABASE_URL=postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+        echo "POSTGRES_USER=${{ env.POSTGRES_USER }}" >> $GITHUB_ENV
+        echo "POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
+        echo "POSTGRES_DB=${{ env.POSTGRES_DB }}" >> $GITHUB_ENV
+        echo "POSTGRES_HOST=localhost" >> $GITHUB_ENV
+        echo "POSTGRES_PORT=5432" >> $GITHUB_ENV
         echo "EMAIL_BACKEND=django.core.mail.backends.locmem.EmailBackend" >> $GITHUB_ENV
         echo "GDAL_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgdal.so" >> $GITHUB_ENV
         echo "GEOS_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/libgeos_c.so" >> $GITHUB_ENV
