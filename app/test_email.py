@@ -7,6 +7,7 @@ Run this to test if email settings are working correctly
 import os
 import sys
 import django
+import logging
 from django.conf import settings
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
@@ -14,6 +15,10 @@ from django.template.loader import render_to_string
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
 django.setup()
+
+# Setup logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('email')
 
 def test_email_configuration():
     """Test the email configuration"""
@@ -40,9 +45,11 @@ def test_email_configuration():
     
     try:
         print("📧 Sending test email...")
+        logger.info(f"Test email sending to {test_recipient}")
         
         # Send a simple test email
-        send_mail(
+        logger.info(f"Sending test email from {settings.DEFAULT_FROM_EMAIL} to {test_recipient}")
+        result = send_mail(
             subject='ISR Datasets - Email Configuration Test',
             message='This is a test email to verify that email configuration is working correctly.',
             from_email=settings.DEFAULT_FROM_EMAIL,
@@ -50,16 +57,19 @@ def test_email_configuration():
             fail_silently=False,
         )
         
+        logger.info(f"Test email sent successfully, result: {result}")
         print("✅ Test email sent successfully!")
         print(f"📬 Check {test_recipient} for the test email")
         
     except Exception as e:
+        logger.error(f"Failed to send test email: {str(e)}")
         print(f"❌ Failed to send test email: {e}")
         print("\n🔍 Troubleshooting tips:")
         print("1. Check EMAIL_HOST_USER and EMAIL_HOST_PASSWORD")
         print("2. For Gmail, use an App Password instead of your regular password")
         print("3. Ensure 2-factor authentication is enabled for Gmail")
         print("4. Check if your email provider requires specific settings")
+        print("5. Check the email logs in logs/email.log for detailed error information")
 
 def test_password_reset_email():
     """Test password reset email template"""

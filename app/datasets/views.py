@@ -480,16 +480,26 @@ def delete_comment(request, comment_id):
 
 def send_comment_notification_email(comment):
     """Send email notification to dataset owner about new comment"""
+    import logging
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
     from django.conf import settings
     
+    logger = logging.getLogger('datasets.email')
+    
     dataset = comment.dataset
     owner = dataset.owner
     
+    logger.info(f"Comment notification email requested for dataset '{dataset.title}' (ID: {dataset.id})")
+    logger.info(f"Dataset owner: {owner.username} ({owner.email})")
+    logger.info(f"Comment author: {comment.author.username}")
+    
     # Check if owner wants to receive comment notifications
     if not owner.notify_comments:
+        logger.info(f"Comment notifications disabled for user {owner.username}, skipping email")
         return
+    
+    logger.info(f"Comment notifications enabled for user {owner.username}, proceeding with email")
     
     # Prepare email context
     context = {
@@ -506,8 +516,14 @@ def send_comment_notification_email(comment):
     html_message = render_to_string('datasets/email/comment_notification.html', context)
     plain_message = render_to_string('datasets/email/comment_notification.txt', context)
     
+    logger.info(f"Email templates rendered successfully")
+    logger.info(f"Subject: {subject}")
+    logger.info(f"Plain message length: {len(plain_message)} chars")
+    logger.info(f"HTML message length: {len(html_message)} chars")
+    
     try:
-        send_mail(
+        logger.info(f"Attempting to send comment notification email to {owner.email}")
+        result = send_mail(
             subject=subject,
             message=plain_message,
             html_message=html_message,
@@ -515,17 +531,26 @@ def send_comment_notification_email(comment):
             recipient_list=[owner.email],
             fail_silently=False,
         )
+        logger.info(f"Comment notification email sent successfully to {owner.email}")
+        return result
     except Exception as e:
-        # Log the error but don't break the comment creation
-        print(f"Failed to send comment notification email: {e}")
+        logger.error(f"Failed to send comment notification email to {owner.email}: {str(e)}")
+        logger.error(f"Email backend: {settings.EMAIL_BACKEND}")
+        logger.error(f"SMTP settings: host={getattr(settings, 'EMAIL_HOST', 'N/A')}, port={getattr(settings, 'EMAIL_PORT', 'N/A')}")
+        raise
 
 
 def send_dataset_update_notification_email(dataset):
     """Send email notification to users following this dataset about updates"""
+    import logging
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
     from django.conf import settings
     from user.models import CustomUser
+    
+    logger = logging.getLogger('datasets.email')
+    
+    logger.info(f"Dataset update notification email requested for dataset '{dataset.title}' (ID: {dataset.id})")
     
     # Get users who want to receive dataset update notifications
     # For now, we'll notify all users who have this preference enabled
@@ -535,7 +560,10 @@ def send_dataset_update_notification_email(dataset):
         is_active=True
     ).exclude(email='')
     
+    logger.info(f"Found {users_to_notify.count()} users with dataset update notifications enabled")
+    
     if not users_to_notify.exists():
+        logger.info("No users to notify for dataset updates, skipping email")
         return
     
     # Prepare email context
@@ -550,11 +578,20 @@ def send_dataset_update_notification_email(dataset):
     html_message = render_to_string('datasets/email/dataset_update_notification.html', context)
     plain_message = render_to_string('datasets/email/dataset_update_notification.txt', context)
     
+    logger.info(f"Email templates rendered successfully")
+    logger.info(f"Subject: {subject}")
+    logger.info(f"Plain message length: {len(plain_message)} chars")
+    logger.info(f"HTML message length: {len(html_message)} chars")
+    
     # Send emails to all users
+    success_count = 0
+    failure_count = 0
+    
     for user in users_to_notify:
         try:
+            logger.info(f"Attempting to send dataset update notification email to {user.email}")
             context['user'] = user
-            send_mail(
+            result = send_mail(
                 subject=subject,
                 message=plain_message,
                 html_message=html_message,
@@ -562,16 +599,27 @@ def send_dataset_update_notification_email(dataset):
                 recipient_list=[user.email],
                 fail_silently=False,
             )
+            logger.info(f"Dataset update notification email sent successfully to {user.email}")
+            success_count += 1
         except Exception as e:
-            print(f"Failed to send dataset update notification email to {user.email}: {e}")
+            logger.error(f"Failed to send dataset update notification email to {user.email}: {str(e)}")
+            failure_count += 1
+    
+    logger.info(f"Dataset update notification email summary: {success_count} sent, {failure_count} failed")
 
 
 def send_new_version_notification_email(dataset, version):
     """Send email notification to users following this dataset about new versions"""
+    import logging
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
     from django.conf import settings
     from user.models import CustomUser
+    
+    logger = logging.getLogger('datasets.email')
+    
+    logger.info(f"New version notification email requested for dataset '{dataset.title}' (ID: {dataset.id})")
+    logger.info(f"Version: {version.version_number}")
     
     # Get users who want to receive new version notifications
     users_to_notify = CustomUser.objects.filter(
@@ -579,7 +627,10 @@ def send_new_version_notification_email(dataset, version):
         is_active=True
     ).exclude(email='')
     
+    logger.info(f"Found {users_to_notify.count()} users with new version notifications enabled")
+    
     if not users_to_notify.exists():
+        logger.info("No users to notify for new versions, skipping email")
         return
     
     # Prepare email context
@@ -595,11 +646,20 @@ def send_new_version_notification_email(dataset, version):
     html_message = render_to_string('datasets/email/new_version_notification.html', context)
     plain_message = render_to_string('datasets/email/new_version_notification.txt', context)
     
+    logger.info(f"Email templates rendered successfully")
+    logger.info(f"Subject: {subject}")
+    logger.info(f"Plain message length: {len(plain_message)} chars")
+    logger.info(f"HTML message length: {len(html_message)} chars")
+    
     # Send emails to all users
+    success_count = 0
+    failure_count = 0
+    
     for user in users_to_notify:
         try:
+            logger.info(f"Attempting to send new version notification email to {user.email}")
             context['user'] = user
-            send_mail(
+            result = send_mail(
                 subject=subject,
                 message=plain_message,
                 html_message=html_message,
@@ -607,8 +667,13 @@ def send_new_version_notification_email(dataset, version):
                 recipient_list=[user.email],
                 fail_silently=False,
             )
+            logger.info(f"New version notification email sent successfully to {user.email}")
+            success_count += 1
         except Exception as e:
-            print(f"Failed to send new version notification email to {user.email}: {e}")
+            logger.error(f"Failed to send new version notification email to {user.email}: {str(e)}")
+            failure_count += 1
+    
+    logger.info(f"New version notification email summary: {success_count} sent, {failure_count} failed")
 
 
 # Publisher Views

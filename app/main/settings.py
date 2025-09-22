@@ -207,11 +207,11 @@ ACCOUNT_RATE_LIMITS = {
 
 # Email settings (for allauth and password reset)
 if DEBUG:
-    # Development: Print emails to console
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    # Development: Print emails to console with logging
+    EMAIL_BACKEND = 'main.email_backend.LoggingConsoleEmailBackend'
 else:
-    # Production: Use SMTP
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    # Production: Use SMTP with logging
+    EMAIL_BACKEND = 'main.email_backend.LoggingSMTPEmailBackend'
 
 # SMTP Configuration
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
@@ -253,3 +253,61 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 API_URL = ''
+
+# Logging configuration
+import os
+
+# Ensure logs directory exists
+LOGS_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOGS_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'django.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'email_file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(LOGS_DIR, 'email.log'),
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'email': {
+            'handlers': ['email_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'datasets.email': {
+            'handlers': ['email_file', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

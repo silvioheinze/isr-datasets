@@ -175,6 +175,167 @@ Access pgAdmin at http://localhost:8080:
 - **Email**: admin@example.com
 - **Password**: admin
 
+## 📧 Email Configuration & Testing
+
+The application includes comprehensive email functionality with debugging and testing capabilities.
+
+### Email Features
+
+- **Password Reset**: Custom branded HTML emails
+- **Email Confirmation**: User account verification emails
+- **Dataset Notifications**: Email alerts for dataset updates, new versions, and comments
+- **Multilingual Support**: German and English email templates
+- **Comprehensive Logging**: Detailed email operation logging
+
+### Email Backend Configuration
+
+The application automatically configures email backends based on environment:
+
+- **Development**: Console backend (emails printed to console)
+- **Production**: SMTP backend (real email sending)
+
+### Testing Email Configuration
+
+#### 1. Run Email Test Script
+
+```bash
+# Test email configuration
+docker compose exec app python test_email.py
+```
+
+This script will:
+- Display current email settings
+- Test email sending functionality
+- Verify SMTP configuration
+- Provide troubleshooting guidance
+
+#### 2. Test Email Notifications
+
+```bash
+# Test comment notification emails
+docker compose exec app python manage.py shell -c "
+from datasets.models import Dataset, Comment
+from user.models import CustomUser
+from datasets.views import send_comment_notification_email
+
+# Create a test comment to trigger email notification
+dataset = Dataset.objects.first()
+user = CustomUser.objects.first()
+if dataset and user:
+    comment = Comment.objects.create(
+        dataset=dataset,
+        author=user,
+        content='Test comment for email notification'
+    )
+    send_comment_notification_email(comment)
+    comment.delete()
+    print('Email notification test completed')
+"
+```
+
+#### 3. Check Email Logs
+
+```bash
+# View email operation logs
+docker compose exec app cat logs/email.log
+
+# Monitor email logs in real-time
+docker compose exec app tail -f logs/email.log
+```
+
+### Email Logging Features
+
+The application provides comprehensive email logging:
+
+- **Email Backend Logging**: Tracks all email sending operations
+- **Notification Function Logging**: Detailed logging for dataset notifications
+- **Template Rendering**: Logs email template rendering success/failure
+- **User Preferences**: Tracks notification preferences
+- **Success/Failure Tracking**: Monitors email delivery success rates
+
+#### Log File Locations
+
+- **`logs/email.log`**: Dedicated email operation logging
+- **`logs/django.log`**: General application logging
+
+#### Example Log Output
+
+```
+INFO Comment notification email requested for dataset 'Test Dataset' (ID: 123)
+INFO Dataset owner: user@example.com
+INFO Comment notifications enabled for user, proceeding with email
+INFO Email templates rendered successfully
+INFO Subject: New comment on your dataset: Test Dataset
+INFO Plain message length: 624 chars
+INFO HTML message length: 4688 chars
+INFO Attempting to send comment notification email to user@example.com
+INFO Comment notification email sent successfully to user@example.com
+```
+
+### Production Email Setup
+
+For production deployment, configure these environment variables:
+
+```bash
+# SMTP Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_USE_SSL=False
+EMAIL_HOST_USER=your_email@gmail.com
+EMAIL_HOST_PASSWORD=your_app_password
+DEFAULT_FROM_EMAIL=noreply@isrdatasets.dataplexity.eu
+SERVER_EMAIL=noreply@isrdatasets.dataplexity.eu
+```
+
+#### Gmail Setup (Recommended)
+
+1. **Enable 2-Factor Authentication** on your Google account
+2. **Create App Password**:
+   - Go to [Google Account Security](https://myaccount.google.com/security)
+   - Navigate to "App passwords"
+   - Generate password for "ISR Datasets"
+   - Use the 16-character password as `EMAIL_HOST_PASSWORD`
+
+### Troubleshooting Email Issues
+
+#### Common Issues
+
+1. **Authentication Failed**
+   - Use App Password, not regular password
+   - Check `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`
+
+2. **Connection Refused**
+   - Verify `EMAIL_HOST` and `EMAIL_PORT`
+   - Check firewall settings
+
+3. **Emails Not Received**
+   - Check spam folder
+   - Verify email address
+   - Check email provider settings
+
+#### Debug Commands
+
+```bash
+# Check email settings
+docker compose exec app python manage.py shell -c "
+from django.conf import settings
+print('EMAIL_BACKEND:', settings.EMAIL_BACKEND)
+print('EMAIL_HOST:', settings.EMAIL_HOST)
+print('EMAIL_PORT:', settings.EMAIL_PORT)
+print('EMAIL_USE_TLS:', settings.EMAIL_USE_TLS)
+"
+
+# Test SMTP connection
+docker compose exec app python manage.py shell -c "
+from django.core.mail import get_connection
+conn = get_connection()
+conn.open()
+print('SMTP connection successful')
+conn.close()
+"
+```
+
 ## 🎨 Customization
 
 ### Branding
