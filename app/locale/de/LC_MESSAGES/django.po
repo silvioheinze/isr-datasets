@@ -4871,3 +4871,13 @@ msgstr "Fehler"
 #: templates/account/verification_sent.html:123
 msgid "An error occurred while sending the email. Please try again."
 msgstr "Beim Senden der E-Mail ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+
+#: templates/account/email_verification_sent.html:27
+#: templates/account/verification_sent.html:27
+msgid "Didn't receive the email?"
+msgstr "E-Mail nicht erhalten?"
+
+#: templates/account/email_verification_sent.html:28
+#: templates/account/verification_sent.html:28
+msgid "Please check your spam folder and click 'Send Again' if needed."
+msgstr "Bitte überprüfen Sie Ihren Spam-Ordner und klicken Sie bei Bedarf auf 'Erneut senden'."

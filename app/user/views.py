@@ -668,17 +668,30 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
 
 @require_POST
 def resend_email_verification(request):
-    """Resend email verification for the current user"""
-    if not request.user.is_authenticated:
-        return JsonResponse({'success': False, 'message': 'User not authenticated'}, status=401)
-    
+    """Resend email verification for the current user or session user"""
     try:
         from allauth.account.models import EmailAddress
         
+        # Try to get user from session if not authenticated
+        user = None
+        if request.user.is_authenticated:
+            user = request.user
+        else:
+            # Check if there's a user in the session (for unverified users)
+            user_id = request.session.get('_auth_user_id')
+            if user_id:
+                try:
+                    user = CustomUser.objects.get(id=user_id)
+                except CustomUser.DoesNotExist:
+                    pass
+        
+        if not user:
+            return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
+        
         # Get the user's primary email address
         email_address = EmailAddress.objects.get(
-            user=request.user, 
-            email=request.user.email
+            user=user, 
+            email=user.email
         )
         
         # Check if email is already verified
@@ -690,6 +703,11 @@ def resend_email_verification(request):
         
         # Send email confirmation
         email_address.send_confirmation(request)
+        
+        # Log the email sending for debugging
+        import logging
+        logger = logging.getLogger('email')
+        logger.info(f"Email verification resent for user {user.username} ({user.email})")
         
         return JsonResponse({
             'success': True, 

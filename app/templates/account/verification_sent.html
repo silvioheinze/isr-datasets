@@ -22,6 +22,11 @@
                     <p class="mb-4">
                         {% trans "We have sent an e-mail to you for verification. Please follow the link provided to finalize the signup process. Please contact us if you do not receive it within a few minutes." %}
                     </p>
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>{% trans "Didn't receive the email?" %}</strong><br>
+                        {% trans "Please check your spam folder and click 'Send Again' if needed." %}
+                    </div>
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-outline-primary" id="resend-verification-btn">
                             <i class="bi bi-arrow-clockwise me-2"></i>
