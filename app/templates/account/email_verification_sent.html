@@ -27,10 +27,23 @@
                         <strong>{% trans "Didn't receive the email?" %}</strong><br>
                         {% trans "Please check your spam folder and click 'Send Again' if needed." %}
                     </div>
+                    
+                    <!-- Fallback email input (hidden by default) -->
+                    <div id="email-input-section" class="mb-3" style="display: none;">
+                        <label for="resend-email-input" class="form-label">{% trans "Email Address" %}</label>
+                        <input type="email" class="form-control" id="resend-email-input" 
+                               placeholder="{% trans 'Enter your email address' %}">
+                        <div class="form-text">{% trans "If the automatic resend doesn't work, enter your email address here." %}</div>
+                    </div>
+                    
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-outline-primary" id="resend-verification-btn">
                             <i class="bi bi-arrow-clockwise me-2"></i>
                             {% trans "Send Again" %}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="show-email-input-btn">
+                            <i class="bi bi-envelope me-2"></i>
+                            {% trans "Enter Email Manually" %}
                         </button>
                         <a href="{% url 'home' %}" class="btn btn-primary">
                             <i class="bi bi-house me-2"></i>
@@ -46,9 +59,30 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const resendBtn = document.getElementById('resend-verification-btn');
+    const showEmailBtn = document.getElementById('show-email-input-btn');
+    const emailInputSection = document.getElementById('email-input-section');
+    const emailInput = document.getElementById('resend-email-input');
     const originalText = resendBtn.innerHTML;
     
+    // Show email input when button is clicked
+    showEmailBtn.addEventListener('click', function() {
+        emailInputSection.style.display = 'block';
+        showEmailBtn.style.display = 'none';
+        emailInput.focus();
+    });
+    
     resendBtn.addEventListener('click', function() {
+        // Get email from input if available, otherwise from template
+        const email = emailInput.value.trim() || '{{ user.email|default:"" }}';
+        
+        if (!email) {
+            // Show email input if no email available
+            emailInputSection.style.display = 'block';
+            showEmailBtn.style.display = 'none';
+            emailInput.focus();
+            return;
+        }
+        
         // Disable button and show loading state
         resendBtn.disabled = true;
         resendBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>{% trans "Sending..." %}';
@@ -61,7 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
                               document.querySelector('meta[name=csrf-token]')?.getAttribute('content') || '',
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({})
+            body: JSON.stringify({
+                email: email
+            })
         })
         .then(response => response.json())
         .then(data => {
@@ -104,6 +140,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 resendBtn.parentNode.appendChild(alertDiv);
                 
+                // If it's a user not found error, show email input
+                if (data.message.includes('User not found') || data.message.includes('not found')) {
+                    emailInputSection.style.display = 'block';
+                    showEmailBtn.style.display = 'none';
+                    emailInput.focus();
+                }
+                
                 // Re-enable button after 3 seconds
                 setTimeout(() => {
                     resendBtn.disabled = false;
@@ -129,6 +172,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
             resendBtn.parentNode.appendChild(alertDiv);
+            
+            // Show email input for manual entry
+            emailInputSection.style.display = 'block';
+            showEmailBtn.style.display = 'none';
+            emailInput.focus();
             
             // Re-enable button after 3 seconds
             setTimeout(() => {

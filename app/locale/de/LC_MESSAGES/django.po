@@ -4881,3 +4881,23 @@ msgstr "E-Mail nicht erhalten?"
 #: templates/account/verification_sent.html:28
 msgid "Please check your spam folder and click 'Send Again' if needed."
 msgstr "Bitte überprüfen Sie Ihren Spam-Ordner und klicken Sie bei Bedarf auf 'Erneut senden'."
+
+#: templates/account/email_verification_sent.html:33
+#: templates/account/verification_sent.html:33
+msgid "Email Address"
+msgstr "E-Mail-Adresse"
+
+#: templates/account/email_verification_sent.html:35
+#: templates/account/verification_sent.html:35
+msgid "Enter your email address"
+msgstr "Geben Sie Ihre E-Mail-Adresse ein"
+
+#: templates/account/email_verification_sent.html:36
+#: templates/account/verification_sent.html:36
+msgid "If the automatic resend doesn't work, enter your email address here."
+msgstr "Wenn das automatische erneute Senden nicht funktioniert, geben Sie hier Ihre E-Mail-Adresse ein."
+
+#: templates/account/email_verification_sent.html:45
+#: templates/account/verification_sent.html:45
+msgid "Enter Email Manually"
+msgstr "E-Mail manuell eingeben"

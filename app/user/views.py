@@ -672,12 +672,15 @@ def resend_email_verification(request):
     try:
         from allauth.account.models import EmailAddress
         
-        # Try to get user from session if not authenticated
+        # Try to get user from different sources
         user = None
+        
+        # Method 1: Check if user is authenticated
         if request.user.is_authenticated:
             user = request.user
-        else:
-            # Check if there's a user in the session (for unverified users)
+        
+        # Method 2: Check session for user ID
+        if not user:
             user_id = request.session.get('_auth_user_id')
             if user_id:
                 try:
@@ -685,8 +688,53 @@ def resend_email_verification(request):
                 except CustomUser.DoesNotExist:
                     pass
         
+        # Method 3: Check for email in session (allauth sometimes stores this)
         if not user:
-            return JsonResponse({'success': False, 'message': 'User not found'}, status=404)
+            email = request.session.get('account_verified_email')
+            if email:
+                try:
+                    email_address = EmailAddress.objects.get(email=email, verified=False)
+                    user = email_address.user
+                except EmailAddress.DoesNotExist:
+                    pass
+        
+        # Method 4: Check for temporary user in session
+        if not user:
+            temp_user_id = request.session.get('temp_user_id')
+            if temp_user_id:
+                try:
+                    user = CustomUser.objects.get(id=temp_user_id)
+                except CustomUser.DoesNotExist:
+                    pass
+        
+        # Method 5: Try to get from request JSON data if available
+        if not user:
+            try:
+                import json
+                data = json.loads(request.body)
+                email = data.get('email')
+                if email:
+                    try:
+                        email_address = EmailAddress.objects.get(email=email, verified=False)
+                        user = email_address.user
+                    except EmailAddress.DoesNotExist:
+                        pass
+            except (json.JSONDecodeError, AttributeError):
+                pass
+        
+        if not user:
+            # Log session data for debugging
+            import logging
+            logger = logging.getLogger('email')
+            logger.error(f"Could not find user for resend verification. Session keys: {list(request.session.keys())}")
+            logger.error(f"Session data: {dict(request.session)}")
+            logger.error(f"User authenticated: {request.user.is_authenticated}")
+            logger.error(f"User: {request.user}")
+            
+            return JsonResponse({
+                'success': False, 
+                'message': 'User not found. Please try logging in again.'
+            }, status=404)
         
         # Get the user's primary email address
         email_address = EmailAddress.objects.get(
@@ -720,6 +768,12 @@ def resend_email_verification(request):
             'message': 'Email address not found'
         }, status=404)
     except Exception as e:
+        # Log the full error for debugging
+        import logging
+        logger = logging.getLogger('email')
+        logger.error(f"Error in resend_email_verification: {str(e)}")
+        logger.error(f"Exception type: {type(e)}")
+        
         return JsonResponse({
             'success': False, 
             'message': f'Error sending email: {str(e)}'
