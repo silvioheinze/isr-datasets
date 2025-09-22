@@ -12,6 +12,10 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserNotificationForm, UserProfileForm, DataExportForm
 from .models import Role
@@ -660,3 +664,45 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         })
         
         return context
+
+
+@require_POST
+def resend_email_verification(request):
+    """Resend email verification for the current user"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'User not authenticated'}, status=401)
+    
+    try:
+        from allauth.account.models import EmailAddress
+        
+        # Get the user's primary email address
+        email_address = EmailAddress.objects.get(
+            user=request.user, 
+            email=request.user.email
+        )
+        
+        # Check if email is already verified
+        if email_address.verified:
+            return JsonResponse({
+                'success': False, 
+                'message': 'Email is already verified'
+            }, status=400)
+        
+        # Send email confirmation
+        email_address.send_confirmation(request)
+        
+        return JsonResponse({
+            'success': True, 
+            'message': 'Verification email sent successfully'
+        })
+        
+    except EmailAddress.DoesNotExist:
+        return JsonResponse({
+            'success': False, 
+            'message': 'Email address not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'message': f'Error sending email: {str(e)}'
+        }, status=500)

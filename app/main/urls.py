@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +27,7 @@ urlpatterns = [
     path('user/', include('user.urls')),
     path('datasets/', include('datasets.urls')),
     path('projects/', include('projects.urls')),
+    path('logs/', views.LogView.as_view(), name='logs'),
 ]
 
 # Serve static and media files during development

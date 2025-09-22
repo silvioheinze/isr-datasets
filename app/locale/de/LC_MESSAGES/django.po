@@ -4846,3 +4846,28 @@ msgstr "Nur Superuser können Mitarbeiterberechtigungen zuweisen."
 #: user/views.py:374
 msgid "You cannot remove your own superuser privileges."
 msgstr "Sie können Ihre eigenen Superuser-Berechtigungen nicht entfernen."
+
+#: templates/account/email_verification_sent.html:28
+#: templates/account/verification_sent.html:28
+msgid "Send Again"
+msgstr "Erneut senden"
+
+#: templates/account/email_verification_sent.html:49
+#: templates/account/verification_sent.html:49
+msgid "Sending..."
+msgstr "Wird gesendet..."
+
+#: templates/account/email_verification_sent.html:65
+#: templates/account/verification_sent.html:65
+msgid "Sent!"
+msgstr "Gesendet!"
+
+#: templates/account/email_verification_sent.html:88
+#: templates/account/verification_sent.html:88
+msgid "Error"
+msgstr "Fehler"
+
+#: templates/account/email_verification_sent.html:123
+#: templates/account/verification_sent.html:123
+msgid "An error occurred while sending the email. Please try again."
+msgstr "Beim Senden der E-Mail ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."

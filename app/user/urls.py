@@ -4,7 +4,7 @@ from user.views import (
     AccountDeleteView, SettingsView, SignupPageView, 
     UsersUpdateView, UsersListView, UserCreateView, RoleListView, RoleCreateView, 
     RoleUpdateView, RoleDeleteView, user_management_view, data_export_view,
-    PendingUsersView, approve_user, reject_user, UserProfileView
+    PendingUsersView, approve_user, reject_user, UserProfileView, resend_email_verification
 )
 
 
@@ -33,6 +33,9 @@ urlpatterns = [
     
     # User Management Dashboard
     path('management/', user_management_view, name='user-management'),
+    
+    # Email Verification
+    path('resend-verification/', resend_email_verification, name='resend-email-verification'),
     
     # Allauth URLs
     path("", include("allauth.account.urls")),
