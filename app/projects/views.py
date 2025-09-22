@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -13,6 +13,35 @@ from .models import Project
 from .forms import ProjectForm, ProjectFilterForm, ProjectTransferOwnershipForm
 
 User = get_user_model()
+
+
+class EditorOrAdministratorMixin(UserPassesTestMixin):
+    """Mixin to restrict access to users with Editor or Administrator role"""
+    
+    def test_func(self):
+        """Check if user has Editor or Administrator role"""
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
+        
+        # Superusers are always allowed
+        if user.is_superuser:
+            return True
+        
+        # Check if user has Editor or Administrator role
+        if user.role and user.role.is_active:
+            if user.role.name in ['Editor', 'Administrator']:
+                return True
+        
+        return False
+    
+    def handle_no_permission(self):
+        """Handle access denied - redirect with error message"""
+        messages.error(
+            self.request, 
+            'Access denied. Only Editors and Administrators can create projects.'
+        )
+        return redirect('projects:project_list')
 
 
 class ProjectListView(LoginRequiredMixin, ListView):
@@ -96,7 +125,7 @@ class ProjectDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ProjectCreateView(LoginRequiredMixin, CreateView):
+class ProjectCreateView(LoginRequiredMixin, EditorOrAdministratorMixin, CreateView):
     """Create a new project"""
     model = Project
     form_class = ProjectForm

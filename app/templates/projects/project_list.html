@@ -19,10 +19,12 @@
                     <p class="text-muted">{% trans "Manage and explore research projects and their associated datasets" %}</p>
                 </div>
                 <div>
-                    <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>
-                        {% trans "Add Project" %}
-                    </a>
+                    {% if user.is_superuser or user.role.name == 'Editor' or user.role.name == 'Administrator' %}
+                        <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            {% trans "Add Project" %}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -192,10 +194,12 @@
                         {% endif %}
                     </p>
                     {% if not search_query and not selected_status %}
-                        <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            {% trans "Create First Project" %}
-                        </a>
+                        {% if user.is_superuser or user.role.name == 'Editor' or user.role.name == 'Administrator' %}
+                            <a href="{% url 'projects:project_create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Create First Project" %}
+                            </a>
+                        {% endif %}
                     {% else %}
                         <a href="{% url 'projects:project_list' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-2"></i>
