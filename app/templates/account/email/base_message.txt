@@ -1,7 +1,4 @@
 {% load i18n %}
 {% block content %}{% endblock %}
 
-{% trans "Thanks for using our site!" %}
-{% blocktrans %}The {{ site_name }} team{% endblocktrans %}
-
 {% trans "This is an automated message, please do not reply to this email." %}

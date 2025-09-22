@@ -14,6 +14,34 @@ from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, C
 from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm
 
 
+class AdministratorOnlyMixin(UserPassesTestMixin):
+    """Mixin to restrict access to users with Administrator role only"""
+    
+    def test_func(self):
+        """Check if user has Administrator role"""
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
+        
+        # Superusers are always allowed
+        if user.is_superuser:
+            return True
+        
+        # Check if user has Administrator role
+        if user.role and user.role.name == 'Administrator' and user.role.is_active:
+            return True
+        
+        return False
+    
+    def handle_no_permission(self):
+        """Handle access denied - redirect with error message"""
+        messages.error(
+            self.request, 
+            'Access denied. Only Administrators can manage dataset categories.'
+        )
+        return redirect('datasets:category_list')
+
+
 class DatasetListView(LoginRequiredMixin, ListView):
     """List all datasets (requires authentication)"""
     model = Dataset
@@ -369,8 +397,8 @@ class DatasetCategoryListView(LoginRequiredMixin, ListView):
         return context
 
 
-class DatasetCategoryCreateView(LoginRequiredMixin, CreateView):
-    """Create a new dataset category"""
+class DatasetCategoryCreateView(LoginRequiredMixin, AdministratorOnlyMixin, CreateView):
+    """Create a new dataset category (Administrators only)"""
     model = DatasetCategory
     form_class = DatasetCategoryForm
     template_name = 'datasets/category_form.html'
@@ -383,8 +411,8 @@ class DatasetCategoryCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class DatasetCategoryUpdateView(LoginRequiredMixin, UpdateView):
-    """Update an existing dataset category"""
+class DatasetCategoryUpdateView(LoginRequiredMixin, AdministratorOnlyMixin, UpdateView):
+    """Update an existing dataset category (Administrators only)"""
     model = DatasetCategory
     form_class = DatasetCategoryForm
     template_name = 'datasets/category_form.html'
@@ -397,8 +425,8 @@ class DatasetCategoryUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class DatasetCategoryDeleteView(LoginRequiredMixin, DeleteView):
-    """Delete a dataset category"""
+class DatasetCategoryDeleteView(LoginRequiredMixin, AdministratorOnlyMixin, DeleteView):
+    """Delete a dataset category (Administrators only)"""
     model = DatasetCategory
     template_name = 'datasets/category_confirm_delete.html'
     success_url = reverse_lazy('datasets:category_list')

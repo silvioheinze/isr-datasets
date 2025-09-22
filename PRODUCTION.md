@@ -65,13 +65,6 @@ DJANGO_SECRET_KEY=your_secret_key_here
 DJANGO_SETTINGS_MODULE=main.settings
 DEBUG=False
 
-# Optional: Custom image registry
-IMAGE_REGISTRY=ghcr.io
-IMAGE_NAMESPACE=silvioheinze
-IMAGE_NAME=isr-datasets
-IMAGE_TAG=latest
-```
-
 ### Generating a Secret Key
 
 ```bash
@@ -128,18 +121,6 @@ docker compose -f docker compose.prod.local.yml --env-file .env.prod up -d --bui
 The deploy script automatically detects if registry images are available and chooses the appropriate method.
 
 ## 🌐 Network Configuration
-
-### Required Networks
-
-The application requires two networks:
-
-1. **internal**: Internal communication between services
-2. **proxy**: External network for Traefik (must be created manually)
-
-```bash
-# Create proxy network
-docker network create proxy
-```
 
 ### Traefik Configuration
 
@@ -450,15 +431,7 @@ DEFAULT_FROM_EMAIL=noreply@isrdatasets.dataplexity.eu
 SERVER_EMAIL=noreply@isrdatasets.dataplexity.eu
 ```
 
-#### 2. Gmail App Password Setup
-
-1. Go to [Google Account Security](https://myaccount.google.com/security)
-2. Enable 2-Step Verification
-3. Go to [App Passwords](https://myaccount.google.com/apppasswords)
-4. Create app password for "ISR Datasets"
-5. Use the 16-character password as `EMAIL_HOST_PASSWORD`
-
-#### 3. Deploy and Test
+#### 2. Deploy and Test
 
 ```bash
 # Deploy with new email settings
