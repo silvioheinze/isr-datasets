@@ -239,13 +239,11 @@
                 <i class="bi bi-database display-1 text-muted"></i>
                 <h4 class="mt-3">{% trans "No datasets found" %}</h4>
                 <p class="text-muted">{% trans "No datasets match your search criteria." %}</p>
-                {% if user.is_authenticated %}
-                    {% if user.is_superuser or user.role.name == 'Editor' or user.role.name == 'Administrator' %}
-                    <a href="{% url 'datasets:dataset_create' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>
-                        {% trans "Add First Dataset" %}
-                    </a>
-                    {% endif %}
+                {% if user.is_authenticated and user.is_superuser or user.role.name == 'Editor' or user.role.name == 'Administrator' %}
+                <a href="{% url 'datasets:dataset_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    {% trans "Add First Dataset" %}
+                </a>
                 {% endif %}
             </div>
             {% endif %}

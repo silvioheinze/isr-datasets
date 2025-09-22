@@ -21,10 +21,12 @@
                         <i class="bi bi-arrow-left me-2"></i>
                         {% trans "Back to Datasets" %}
                     </a>
-                    <a href="{% url 'datasets:category_create' %}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle me-2"></i>
-                        {% trans "Add Category" %}
-                    </a>
+                    {% if user.is_superuser or user.role.name == 'Administrator' %}
+                        <a href="{% url 'datasets:category_create' %}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle me-2"></i>
+                            {% trans "Add Category" %}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -119,14 +121,18 @@
                                             <small class="text-muted">{{ category.created_at|date:"M d, Y" }}</small>
                                         </td>
                                         <td>
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <a href="{% url 'datasets:category_edit' category.pk %}" class="btn btn-outline-primary" title="{% trans 'Edit' %}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <a href="{% url 'datasets:category_delete' category.pk %}" class="btn btn-outline-danger" title="{% trans 'Delete' %}">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            </div>
+                                            {% if user.is_superuser or user.role.name == 'Administrator' %}
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <a href="{% url 'datasets:category_edit' category.pk %}" class="btn btn-outline-primary" title="{% trans 'Edit' %}">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </a>
+                                                    <a href="{% url 'datasets:category_delete' category.pk %}" class="btn btn-outline-danger" title="{% trans 'Delete' %}">
+                                                        <i class="bi bi-trash"></i>
+                                                    </a>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">{% trans "View only" %}</span>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -194,10 +200,12 @@
                         {% endif %}
                     </p>
                     {% if not search_query and not selected_status %}
-                        <a href="{% url 'datasets:category_create' %}" class="btn btn-primary">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            {% trans "Create First Category" %}
-                        </a>
+                        {% if user.is_superuser or user.role.name == 'Administrator' %}
+                            <a href="{% url 'datasets:category_create' %}" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Create First Category" %}
+                            </a>
+                        {% endif %}
                     {% else %}
                         <a href="{% url 'datasets:category_list' %}" class="btn btn-outline-secondary">
                             <i class="bi bi-arrow-left me-2"></i>

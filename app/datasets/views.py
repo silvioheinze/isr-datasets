@@ -42,6 +42,35 @@ class AdministratorOnlyMixin(UserPassesTestMixin):
         return redirect('datasets:category_list')
 
 
+class EditorOrAdministratorMixin(UserPassesTestMixin):
+    """Mixin to restrict access to users with Editor or Administrator role"""
+    
+    def test_func(self):
+        """Check if user has Editor or Administrator role"""
+        user = self.request.user
+        if not user.is_authenticated:
+            return False
+        
+        # Superusers are always allowed
+        if user.is_superuser:
+            return True
+        
+        # Check if user has Editor or Administrator role
+        if user.role and user.role.is_active:
+            if user.role.name in ['Editor', 'Administrator']:
+                return True
+        
+        return False
+    
+    def handle_no_permission(self):
+        """Handle access denied - redirect with error message"""
+        messages.error(
+            self.request, 
+            'Access denied. Only Editors and Administrators can create datasets.'
+        )
+        return redirect('datasets:dataset_list')
+
+
 class DatasetListView(LoginRequiredMixin, ListView):
     """List all datasets (requires authentication)"""
     model = Dataset
@@ -178,8 +207,8 @@ class DatasetDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class DatasetCreateView(LoginRequiredMixin, CreateView):
-    """Create a new dataset"""
+class DatasetCreateView(LoginRequiredMixin, EditorOrAdministratorMixin, CreateView):
+    """Create a new dataset (Editors and Administrators only)"""
     model = Dataset
     form_class = DatasetForm
     template_name = 'datasets/dataset_form.html'
