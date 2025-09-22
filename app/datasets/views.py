@@ -14,33 +14,23 @@ from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, C
 from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm
 
 
-class DatasetListView(ListView):
-    """List all published datasets"""
+class DatasetListView(LoginRequiredMixin, ListView):
+    """List all datasets (requires authentication)"""
     model = Dataset
     template_name = 'datasets/dataset_list.html'
     context_object_name = 'datasets'
     paginate_by = 12
 
     def get_queryset(self):
-        # Superusers can see all datasets
-        if self.request.user and self.request.user.is_authenticated and self.request.user.is_superuser:
+        # All authenticated users can see all published datasets
+        # Superusers can see all datasets including drafts
+        if self.request.user.is_superuser:
             queryset = Dataset.objects.all().select_related('owner', 'category').prefetch_related('contributors', 'versions')
         else:
-            # Base queryset for published datasets with public/restricted access
+            # Regular authenticated users can see all published datasets
             queryset = Dataset.objects.filter(
-                status='published',
-                access_level__in=['public', 'restricted']
+                status='published'
             ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
-            
-            # Add private datasets that belong to the current user
-            if self.request.user and self.request.user.is_authenticated:
-                user_private_datasets = Dataset.objects.filter(
-                    owner=self.request.user,
-                    access_level='private'
-                ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
-                
-                # Combine the querysets
-                queryset = queryset.union(user_private_datasets)
         
         # Filter by category
         category = self.request.GET.get('category')
@@ -102,28 +92,32 @@ class DatasetListView(ListView):
         return context
 
 
-class DatasetDetailView(DetailView):
-    """View individual dataset details"""
+class DatasetDetailView(LoginRequiredMixin, DetailView):
+    """View individual dataset details (requires authentication)"""
     model = Dataset
     template_name = 'datasets/dataset_detail.html'
     context_object_name = 'dataset'
 
     def get_queryset(self):
-        return Dataset.objects.select_related('owner', 'category', 'publisher').prefetch_related(
-            'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
-        )
+        # All authenticated users can see all published datasets
+        # Superusers can see all datasets including drafts
+        if self.request.user.is_superuser:
+            return Dataset.objects.select_related('owner', 'category', 'publisher').prefetch_related(
+                'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
+            )
+        else:
+            return Dataset.objects.filter(
+                status='published'
+            ).select_related('owner', 'category', 'publisher').prefetch_related(
+                'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
+            )
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
         
-        # Check access permissions
-        if not obj.is_accessible_by(self.request.user):
-            raise Http404("Dataset not found or access denied")
-        
-        # Increment view count
-        if self.request.user.is_authenticated:
-            obj.view_count += 1
-            obj.save(update_fields=['view_count'])
+        # Increment view count for authenticated users
+        obj.view_count += 1
+        obj.save(update_fields=['view_count'])
         
         return obj
 
@@ -132,15 +126,18 @@ class DatasetDetailView(DetailView):
         dataset = self.get_object()
         
         # Add related datasets to context (from model relationship)
-        context['related_datasets'] = dataset.related_datasets.filter(
-            status='published',
-            access_level__in=['public', 'restricted']
-        ).select_related('owner', 'category')[:8]
+        if self.request.user.is_superuser:
+            context['related_datasets'] = dataset.related_datasets.all().select_related('owner', 'category')[:8]
+        else:
+            context['related_datasets'] = dataset.related_datasets.filter(
+                status='published'
+            ).select_related('owner', 'category')[:8]
+        
         context['can_edit'] = (
             self.request.user == dataset.owner or 
             self.request.user.is_superuser
         )
-        context['can_download'] = dataset.is_accessible_by(self.request.user)
+        context['can_download'] = True  # All authenticated users can download
         context['can_assign_project'] = (
             self.request.user == dataset.owner or 
             self.request.user.is_superuser
@@ -215,14 +212,23 @@ class DatasetDeleteView(LoginRequiredMixin, DeleteView):
 
 @login_required
 def dataset_download(request, pk):
-    """Handle dataset downloads"""
+    """Handle dataset downloads (requires authentication)"""
     dataset = get_object_or_404(Dataset, pk=pk)
     
-    # Check access permissions
-    if not dataset.is_accessible_by(request.user):
+    # All authenticated users can download published datasets
+    # Superusers can download all datasets including drafts
+    if not request.user.is_superuser and dataset.status != 'published':
         raise Http404("Dataset not found or access denied")
     
-    if not dataset.file:
+    # Get the current version of the dataset
+    current_version = dataset.versions.filter(is_current=True).first()
+    
+    if not current_version:
+        messages.error(request, 'No version available for download.')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    # Check if there's a file to download
+    if not current_version.file and not current_version.file_url:
         messages.error(request, 'No file available for download.')
         return redirect('datasets:dataset_detail', pk=pk)
     
@@ -238,27 +244,34 @@ def dataset_download(request, pk):
     dataset.download_count += 1
     dataset.save(update_fields=['download_count'])
     
-    # Serve file
-    response = HttpResponse(dataset.file.read(), content_type='application/octet-stream')
-    response['Content-Disposition'] = f'attachment; filename="{dataset.file.name}"'
-    return response
+    # Serve file or redirect to URL
+    if current_version.file:
+        # Serve uploaded file
+        response = HttpResponse(current_version.file.read(), content_type='application/octet-stream')
+        response['Content-Disposition'] = f'attachment; filename="{current_version.file.name}"'
+        return response
+    else:
+        # Redirect to external URL
+        return redirect(current_version.file_url)
 
 
+@login_required
 def dataset_statistics(request):
-    """Display dataset statistics"""
+    """Display dataset statistics (requires authentication)"""
+    # All authenticated users can see statistics for all published datasets
+    # Superusers can see statistics for all datasets including drafts
+    if request.user.is_superuser:
+        dataset_filter = Q()
+    else:
+        dataset_filter = Q(status='published')
+    
     stats = {
-        'total_datasets': Dataset.objects.filter(status='published').count(),
+        'total_datasets': Dataset.objects.filter(dataset_filter).count(),
         'total_categories': DatasetCategory.objects.filter(is_active=True).count(),
         'total_downloads': DatasetDownload.objects.count(),
-        'total_contributors': Dataset.objects.filter(status='published').values('owner').distinct().count(),
-        'recent_datasets': Dataset.objects.filter(
-            status='published',
-            access_level__in=['public', 'restricted']
-        ).order_by('-created_at')[:5],
-        'most_downloaded': Dataset.objects.filter(
-            status='published',
-            access_level__in=['public', 'restricted']
-        ).order_by('-download_count')[:5],
+        'total_contributors': Dataset.objects.filter(dataset_filter).values('owner').distinct().count(),
+        'recent_datasets': Dataset.objects.filter(dataset_filter).order_by('-created_at')[:5],
+        'most_downloaded': Dataset.objects.filter(dataset_filter).order_by('-download_count')[:5],
         'categories_with_counts': DatasetCategory.objects.filter(
             is_active=True
         ).annotate(
@@ -791,8 +804,9 @@ class PublisherDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+@login_required
 def assign_dataset_to_project(request, pk):
-    """Assign a dataset to projects"""
+    """Assign a dataset to projects (requires authentication)"""
     dataset = get_object_or_404(Dataset, pk=pk)
     
     # Check permissions - user must be dataset owner or superuser

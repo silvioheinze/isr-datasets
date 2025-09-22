@@ -14,8 +14,8 @@ urlpatterns = [
     path('<uuid:pk>/assign-project/', views.assign_dataset_to_project, name='assign_to_project'),
     path('<uuid:dataset_pk>/version/create/', views.DatasetVersionCreateView.as_view(), name='dataset_version_create'),
     
-    # Statistics
-    path('statistics/', views.dataset_statistics, name='dataset_statistics'),
+    # Statistics (removed - template was deleted)
+    # path('statistics/', views.dataset_statistics, name='dataset_statistics'),
     
     # Category views
     path('categories/', views.DatasetCategoryListView.as_view(), name='category_list'),
