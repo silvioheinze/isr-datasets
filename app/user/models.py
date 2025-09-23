@@ -59,26 +59,26 @@ class CustomUser(AbstractUser):
     
     # Notification preferences
     email_notifications = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name=_('Email Notifications'),
         help_text=_('Receive email notifications for comments on your datasets')
     )
     
     # Dataset notification preferences
     notify_dataset_updates = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name=_('Dataset Updates'),
         help_text=_('Receive email notifications when datasets you follow are updated')
     )
     
     notify_new_versions = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name=_('New Versions'),
         help_text=_('Receive email notifications when new versions of datasets you follow are published')
     )
     
     notify_comments = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name=_('Comments'),
         help_text=_('Receive email notifications for comments on your datasets')
     )
