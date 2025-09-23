@@ -100,30 +100,19 @@
                 </div>
             </div>
 
-            <!-- Tags and Keywords -->
-            {% if dataset.get_tags_list or dataset.keywords %}
+            <!-- Tags -->
+            {% if dataset.get_tags_list %}
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-tags me-2"></i>
-                        {% trans "Tags & Keywords" %}
+                        {% trans "Tags" %}
                     </h5>
                 </div>
                 <div class="card-body">
-                    {% if dataset.get_tags_list %}
-                    <div class="mb-3">
-                        <strong>{% trans "Tags" %}:</strong>
-                        {% for tag in dataset.get_tags_list %}
-                        <span class="badge bg-secondary me-1">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    {% if dataset.keywords %}
-                    <div>
-                        <strong>{% trans "Keywords" %}:</strong>
-                        <p class="text-muted mb-0">{{ dataset.keywords|linebreaks }}</p>
-                    </div>
-                    {% endif %}
+                    {% for tag in dataset.get_tags_list %}
+                    <span class="badge bg-secondary me-1">{{ tag }}</span>
+                    {% endfor %}
                 </div>
             </div>
             {% endif %}

@@ -13,7 +13,7 @@ class DatasetForm(forms.ModelForm):
     class Meta:
         model = Dataset
         fields = [
-            'title', 'description', 'abstract', 'category', 'tags', 'keywords',
+            'title', 'description', 'abstract', 'category', 'tags',
             'status', 'access_level', 'license',
             'citation', 'doi', 'publisher', 'uri_ref', 'contributors', 'related_datasets', 'projects'
         ]
@@ -36,11 +36,6 @@ class DatasetForm(forms.ModelForm):
             'tags': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Enter tags separated by commas'
-            }),
-            'keywords': forms.Textarea(attrs={
-                'class': 'form-control',
-                'rows': 2,
-                'placeholder': 'Keywords for search (one per line)'
             }),
             'status': forms.Select(attrs={'class': 'form-select'}),
             'access_level': forms.Select(attrs={'class': 'form-select'}),
