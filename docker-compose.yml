@@ -9,6 +9,8 @@ services:
       - .env
     depends_on:
       db:
+        condition: service_healthy
+      import_db:
         condition: service_healthy  
   db:
     image: postgis/postgis:15-3.3
@@ -20,6 +22,22 @@ services:
       - .env
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U isruser -d isrdatasets"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  import_db:
+    image: postgis/postgis:15-3.3
+    platform: linux/amd64
+    volumes:
+      - import_postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=isrdatasets_import
+      - POSTGRES_USER=isruser
+      - POSTGRES_PASSWORD=isrpass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U isruser -d isrdatasets_import"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -48,4 +66,5 @@ services:
       - "8080:80"
 volumes:
   postgres_data:
+  import_postgres_data:
   pgadmin-data:

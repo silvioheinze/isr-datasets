@@ -413,6 +413,249 @@ class Comment(models.Model):
         return user == self.author or user.is_staff or user.is_superuser
 
 
+class DatasetImport(models.Model):
+    """Model to track dataset imports to the import database"""
+    
+    STATUS_CHOICES = [
+        ('pending', _('Pending')),
+        ('importing', _('Importing')),
+        ('completed', _('Completed')),
+        ('failed', _('Failed')),
+        ('cancelled', _('Cancelled')),
+    ]
+    
+    dataset = models.ForeignKey(
+        Dataset,
+        on_delete=models.CASCADE,
+        related_name='imports',
+        verbose_name=_('Dataset'),
+        help_text=_('The dataset being imported')
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name=_('Status'),
+        help_text=_('Current status of the import')
+    )
+    imported_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='dataset_imports',
+        verbose_name=_('Imported By'),
+        help_text=_('User who initiated the import')
+    )
+    import_started_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Import Started'),
+        help_text=_('When the import was initiated')
+    )
+    import_completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Import Completed'),
+        help_text=_('When the import was completed')
+    )
+    import_notes = models.TextField(
+        blank=True,
+        verbose_name=_('Import Notes'),
+        help_text=_('Additional notes about the import process')
+    )
+    error_message = models.TextField(
+        blank=True,
+        verbose_name=_('Error Message'),
+        help_text=_('Error message if import failed')
+    )
+    import_database_table = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_('Import Database Table'),
+        help_text=_('Name of the table created in the import database')
+    )
+    records_imported = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=_('Records Imported'),
+        help_text=_('Number of records successfully imported')
+    )
+    
+    class Meta:
+        ordering = ['-import_started_at']
+        verbose_name = _('Dataset Import')
+        verbose_name_plural = _('Dataset Imports')
+        unique_together = ['dataset', 'imported_by']
+    
+    def __str__(self):
+        return f"Import of {self.dataset.title} by {self.imported_by.username}"
+    
+    @property
+    def is_completed(self):
+        """Check if import is completed"""
+        return self.status == 'completed'
+    
+    @property
+    def is_failed(self):
+        """Check if import failed"""
+        return self.status == 'failed'
+    
+    @property
+    def is_in_progress(self):
+        """Check if import is in progress"""
+        return self.status in ['pending', 'importing']
+    
+    def can_import(self, user):
+        """Check if user can import this dataset"""
+        return user.is_authenticated and (user.is_superuser or user.role.name in ['Editor', 'Administrator'])
+
+
+class ImportQueue(models.Model):
+    """Model to manage import queue and ensure only one import runs at a time"""
+    
+    STATUS_CHOICES = [
+        ('pending', _('Pending')),
+        ('processing', _('Processing')),
+        ('completed', _('Completed')),
+        ('failed', _('Failed')),
+        ('cancelled', _('Cancelled')),
+    ]
+    
+    PRIORITY_CHOICES = [
+        ('low', _('Low')),
+        ('normal', _('Normal')),
+        ('high', _('High')),
+        ('urgent', _('Urgent')),
+    ]
+    
+    dataset = models.ForeignKey(
+        Dataset,
+        on_delete=models.CASCADE,
+        related_name='import_queue_entries',
+        verbose_name=_('Dataset'),
+        help_text=_('The dataset to be imported')
+    )
+    requested_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='import_queue_requests',
+        verbose_name=_('Requested By'),
+        help_text=_('User who requested the import')
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='pending',
+        verbose_name=_('Status'),
+        help_text=_('Current status of the import in the queue')
+    )
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default='normal',
+        verbose_name=_('Priority'),
+        help_text=_('Priority level for processing')
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name=_('Created At'),
+        help_text=_('When the import was queued')
+    )
+    started_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Started At'),
+        help_text=_('When the import processing started')
+    )
+    completed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_('Completed At'),
+        help_text=_('When the import was completed')
+    )
+    error_message = models.TextField(
+        blank=True,
+        verbose_name=_('Error Message'),
+        help_text=_('Error message if import failed')
+    )
+    import_notes = models.TextField(
+        blank=True,
+        verbose_name=_('Import Notes'),
+        help_text=_('Additional notes about the import')
+    )
+    dataset_import = models.OneToOneField(
+        DatasetImport,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='queue_entry',
+        verbose_name=_('Dataset Import'),
+        help_text=_('The associated DatasetImport record')
+    )
+    
+    class Meta:
+        ordering = ['created_at']  # Default ordering by creation time
+        verbose_name = _('Import Queue Entry')
+        verbose_name_plural = _('Import Queue Entries')
+        unique_together = ['dataset', 'requested_by', 'status']
+    
+    def __str__(self):
+        return f"Import Queue: {self.dataset.title} by {self.requested_by.username} ({self.status})"
+    
+    @property
+    def is_pending(self):
+        """Check if import is pending"""
+        return self.status == 'pending'
+    
+    @property
+    def is_processing(self):
+        """Check if import is currently processing"""
+        return self.status == 'processing'
+    
+    @property
+    def is_completed(self):
+        """Check if import is completed"""
+        return self.status == 'completed'
+    
+    @property
+    def is_failed(self):
+        """Check if import failed"""
+        return self.status == 'failed'
+    
+    @property
+    def processing_time(self):
+        """Calculate processing time"""
+        if self.started_at and self.completed_at:
+            return self.completed_at - self.started_at
+        elif self.started_at:
+            from django.utils import timezone
+            return timezone.now() - self.started_at
+        return None
+    
+    @classmethod
+    def get_next_import(cls):
+        """Get the next import to process (highest priority, oldest first)"""
+        # Define priority order (higher number = higher priority)
+        priority_order = {
+            'urgent': 4,
+            'high': 3,
+            'normal': 2,
+            'low': 1
+        }
+        
+        # Get all pending imports and sort by priority (descending) then by creation time (ascending)
+        pending_imports = cls.objects.filter(status='pending').all()
+        sorted_imports = sorted(
+            pending_imports,
+            key=lambda x: (-priority_order.get(x.priority, 0), x.created_at)
+        )
+        
+        return sorted_imports[0] if sorted_imports else None
+    
+    @classmethod
+    def is_processing_import(cls):
+        """Check if any import is currently being processed"""
+        return cls.objects.filter(status='processing').exists()
+
+
 # Register models for audit logging
 auditlog.register(Publisher)
 auditlog.register(Dataset)
@@ -420,3 +663,5 @@ auditlog.register(DatasetCategory)
 auditlog.register(DatasetVersion)
 auditlog.register(Comment)
 auditlog.register(DatasetDownload)
+auditlog.register(DatasetImport)
+auditlog.register(ImportQueue)

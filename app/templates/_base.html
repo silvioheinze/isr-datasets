@@ -219,9 +219,12 @@
                              <li><a class="dropdown-item" href="{% url 'user-profile' %}">My Profile</a></li>
                              <li><a class="dropdown-item" href="{% url 'user-settings' %}">Settings</a></li>
                              <li><a class="dropdown-item" href="{% url 'documentation' %}">Documentation</a></li>
+                             <li><hr class="dropdown-divider"></li>
                              {% if user.is_superuser %}
+                             <li><a class="dropdown-item disabled" href="">Admin</a></li>
                              <li><a class="dropdown-item" href="{% url 'user-management' %}">Users</a></li>
                              <li><a class="dropdown-item" href="{% url 'logs' %}">Logs</a></li>
+                             <li><a class="dropdown-item" href="{% url 'datasets:import_management' %}">Database</a></li>
                              {% endif %}
                              <li><hr class="dropdown-divider"></li>
                              <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>

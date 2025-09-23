@@ -2,15 +2,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db import transaction
+import os
 
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher, DatasetImport, ImportQueue
 from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm
 
 
@@ -199,6 +200,50 @@ class DatasetDetailView(LoginRequiredMixin, DetailView):
             self.request.user == dataset.owner or 
             self.request.user.is_superuser
         )
+        
+        # Add import information
+        context['can_import'] = (
+            self.request.user.is_authenticated and 
+            (self.request.user.is_superuser or 
+             (self.request.user.role and self.request.user.role.name in ['Editor', 'Administrator']))
+        )
+        
+        # Check if dataset has importable versions
+        importable_formats = ['.csv', '.json', '.geojson', '.xlsx', '.xls', '.gdb', '.sqlite', '.gpkg', '.sql']
+        has_importable_version = False
+        
+        if context['can_import']:
+            # Check if any version has an importable file format
+            for version in dataset.versions.filter(is_current=True):
+                if version.file:
+                    file_extension = os.path.splitext(version.file.name)[1].lower()
+                    if file_extension in importable_formats:
+                        has_importable_version = True
+                        break
+                elif version.file_url:
+                    # For URL-based versions, we can still attempt import (will use basic info extraction)
+                    has_importable_version = True
+                    break
+        
+        context['has_importable_version'] = has_importable_version
+        
+        # Get import status for current user
+        if self.request.user.is_authenticated:
+            context['dataset_import'] = DatasetImport.objects.filter(
+                dataset=dataset,
+                imported_by=self.request.user
+            ).first()
+            
+            # Get queue status for current user
+            context['import_queue_entry'] = ImportQueue.objects.filter(
+                dataset=dataset,
+                requested_by=self.request.user,
+                status__in=['pending', 'processing']
+            ).first()
+            
+            # Get queue statistics
+            from datasets.etl_pipeline import ETLPipelineManager
+            context['queue_stats'] = ETLPipelineManager.get_queue_status()
         
         # Add comments to context
         context['comments'] = dataset.comments.filter(is_approved=True).select_related('author')
@@ -893,3 +938,398 @@ def assign_dataset_to_project(request, pk):
         'form': form,
         'dataset': dataset
     })
+
+
+@login_required
+def import_dataset(request, pk):
+    """Queue a dataset for import to the database"""
+    dataset = get_object_or_404(Dataset, pk=pk)
+    
+    # Check if user can import datasets
+    if not (request.user.is_superuser or 
+            (request.user.role and request.user.role.name in ['Editor', 'Administrator'])):
+        messages.error(request, 'You do not have permission to import datasets.')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    # Check if dataset is already imported by this user
+    existing_import = DatasetImport.objects.filter(
+        dataset=dataset, 
+        imported_by=request.user
+    ).first()
+    
+    if existing_import:
+        if existing_import.is_completed:
+            messages.info(request, f'Dataset "{dataset.title}" has already been imported by you.')
+        elif existing_import.is_in_progress:
+            messages.info(request, f'Dataset "{dataset.title}" is currently being imported.')
+        else:
+            messages.error(request, f'Previous import of "{dataset.title}" failed. Please try again.')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    # Check if there's already a pending or processing queue entry
+    existing_queue = ImportQueue.objects.filter(
+        dataset=dataset,
+        requested_by=request.user,
+        status__in=['pending', 'processing']
+    ).first()
+    
+    if existing_queue:
+        if existing_queue.is_processing:
+            messages.info(request, f'Dataset "{dataset.title}" is currently being processed in the import queue.')
+        else:
+            messages.info(request, f'Dataset "{dataset.title}" is already queued for import.')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    try:
+        # Determine priority based on user role
+        priority = 'high' if request.user.is_superuser else 'normal'
+        
+        # Create queue entry
+        queue_entry = ImportQueue.objects.create(
+            dataset=dataset,
+            requested_by=request.user,
+            status='pending',
+            priority=priority,
+            import_notes=f'Import queued for dataset: {dataset.title}'
+        )
+        
+        # Get queue position
+        queue_position = ImportQueue.objects.filter(
+            status='pending',
+            priority__gte=priority,
+            created_at__lt=queue_entry.created_at
+        ).count() + 1
+        
+        messages.success(
+            request, 
+            f'Dataset "{dataset.title}" has been queued for import. '
+            f'Position in queue: {queue_position}. '
+            f'The import will be processed automatically by the ETL pipeline.'
+        )
+        
+    except Exception as e:
+        messages.error(
+            request, 
+            f'Failed to queue dataset "{dataset.title}" for import: {str(e)}'
+        )
+    
+    return redirect('datasets:dataset_detail', pk=pk)
+
+
+class ImportDatabaseManagementView(LoginRequiredMixin, AdministratorOnlyMixin, ListView):
+    """View for managing database and queue"""
+    
+    template_name = 'datasets/import_management.html'
+    context_object_name = 'import_entries'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        """Get import queue entries with related data"""
+        return ImportQueue.objects.select_related(
+            'dataset', 'requested_by', 'dataset_import'
+        ).order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        """Add additional context for import management"""
+        context = super().get_context_data(**kwargs)
+        
+        # Import queue statistics
+        context['queue_stats'] = {
+            'total': ImportQueue.objects.count(),
+            'pending': ImportQueue.objects.filter(status='pending').count(),
+            'processing': ImportQueue.objects.filter(status='processing').count(),
+            'completed': ImportQueue.objects.filter(status='completed').count(),
+            'failed': ImportQueue.objects.filter(status='failed').count(),
+            'cancelled': ImportQueue.objects.filter(status='cancelled').count(),
+        }
+        
+        # Recent imports
+        context['recent_imports'] = ImportQueue.objects.filter(
+            status__in=['completed', 'failed']
+        ).select_related('dataset', 'requested_by')[:10]
+        
+        # Database statistics
+        try:
+            from django.db import connections
+            import_db = connections['import']
+            
+            with import_db.cursor() as cursor:
+                # Get table count
+                cursor.execute("""
+                    SELECT COUNT(*) 
+                    FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name LIKE 'imported_dataset_%'
+                """)
+                context['import_table_count'] = cursor.fetchone()[0]
+                
+                # Get total records across all import tables
+                cursor.execute("""
+                    SELECT SUM(n_tup_ins) as total_records
+                    FROM pg_stat_user_tables 
+                    WHERE schemaname = 'public' 
+                    AND relname LIKE 'imported_dataset_%'
+                """)
+                result = cursor.fetchone()
+                context['total_imported_records'] = result[0] if result[0] else 0
+                
+        except Exception as e:
+            context['import_table_count'] = 0
+            context['total_imported_records'] = 0
+            context['import_db_error'] = str(e)
+        
+        # Dataset import statistics
+        context['dataset_import_stats'] = {
+            'total': DatasetImport.objects.count(),
+            'completed': DatasetImport.objects.filter(status='completed').count(),
+            'failed': DatasetImport.objects.filter(status='failed').count(),
+            'importing': DatasetImport.objects.filter(status='importing').count(),
+        }
+        
+        # Pipeline status and controls
+        context['pipeline_status'] = self._get_pipeline_status()
+        
+        return context
+    
+    def _get_pipeline_status(self):
+        """Get current pipeline processing status"""
+        try:
+            from .etl_pipeline import ETLPipelineManager
+            
+            # Check if any imports are currently processing
+            is_processing = ImportQueue.is_processing_import()
+            
+            # Get next import in queue
+            next_import = ImportQueue.get_next_import()
+            
+            # Get queue statistics
+            queue_stats = ETLPipelineManager.get_queue_status()
+            
+            return {
+                'is_processing': is_processing,
+                'next_import': next_import,
+                'queue_stats': queue_stats,
+                'pipeline_available': True
+            }
+            
+        except Exception as e:
+            return {
+                'is_processing': False,
+                'next_import': None,
+                'queue_stats': {},
+                'pipeline_available': False,
+                'error': str(e)
+            }
+
+
+class ImportQueueDetailView(LoginRequiredMixin, AdministratorOnlyMixin, DetailView):
+    """View for detailed import queue entry information"""
+    
+    model = ImportQueue
+    template_name = 'datasets/import_queue_detail.html'
+    context_object_name = 'queue_entry'
+    
+    def get_context_data(self, **kwargs):
+        """Add additional context for queue detail"""
+        context = super().get_context_data(**kwargs)
+        
+        # Get related dataset import if exists
+        if self.object.dataset_import:
+            context['dataset_import'] = self.object.dataset_import
+        
+        # Get database table info if completed
+        if self.object.status == 'completed' and self.object.dataset_import:
+            try:
+                from django.db import connections
+                import_db = connections['import']
+                
+                table_name = self.object.dataset_import.import_database_table
+                with import_db.cursor() as cursor:
+                    # Get table structure
+                    cursor.execute("""
+                        SELECT column_name, data_type, is_nullable
+                        FROM information_schema.columns 
+                        WHERE table_name = %s
+                        ORDER BY ordinal_position
+                    """, [table_name])
+                    context['table_columns'] = cursor.fetchall()
+                    
+                    # Get record count
+                    cursor.execute(f'SELECT COUNT(*) FROM "{table_name}"')
+                    context['table_record_count'] = cursor.fetchone()[0]
+                    
+            except Exception as e:
+                context['table_error'] = str(e)
+        
+        return context
+
+
+@login_required
+def cancel_import(request, pk):
+    """Cancel a pending import"""
+    if not request.user.is_superuser and not (request.user.role and request.user.role.name == 'Administrator'):
+        messages.error(request, 'Access denied. Only Administrators can cancel imports.')
+        return redirect('datasets:import_management')
+    
+    queue_entry = get_object_or_404(ImportQueue, pk=pk)
+    
+    if queue_entry.status not in ['pending', 'processing']:
+        messages.error(request, f'Cannot cancel import with status: {queue_entry.status}')
+        return redirect('datasets:import_management')
+    
+    try:
+        queue_entry.status = 'cancelled'
+        queue_entry.completed_at = timezone.now()
+        queue_entry.error_message = 'Cancelled by administrator'
+        queue_entry.save()
+        
+        messages.success(request, f'Import for "{queue_entry.dataset.title}" has been cancelled.')
+        
+    except Exception as e:
+        messages.error(request, f'Failed to cancel import: {str(e)}')
+    
+    return redirect('datasets:import_management')
+
+
+@login_required
+def retry_import(request, pk):
+    """Retry a failed import"""
+    if not request.user.is_superuser and not (request.user.role and request.user.role.name == 'Administrator'):
+        messages.error(request, 'Access denied. Only Administrators can retry imports.')
+        return redirect('datasets:import_management')
+    
+    queue_entry = get_object_or_404(ImportQueue, pk=pk)
+    
+    if queue_entry.status != 'failed':
+        messages.error(request, f'Cannot retry import with status: {queue_entry.status}')
+        return redirect('datasets:import_management')
+    
+    try:
+        # Reset queue entry for retry
+        queue_entry.status = 'pending'
+        queue_entry.started_at = None
+        queue_entry.completed_at = None
+        queue_entry.error_message = ''
+        queue_entry.save()
+        
+        # Delete associated dataset import if exists
+        if queue_entry.dataset_import:
+            queue_entry.dataset_import.delete()
+            queue_entry.dataset_import = None
+            queue_entry.save()
+        
+        messages.success(request, f'Import for "{queue_entry.dataset.title}" has been queued for retry.')
+        
+    except Exception as e:
+        messages.error(request, f'Failed to retry import: {str(e)}')
+    
+    return redirect('datasets:import_management')
+
+
+
+
+@login_required
+def start_pipeline(request):
+    """Start the ETL pipeline processing"""
+    if not request.user.is_superuser and not (request.user.role and request.user.role.name == 'Administrator'):
+        messages.error(request, 'Access denied. Only Administrators can start the pipeline.')
+        return redirect('datasets:import_management')
+    
+    try:
+        from .etl_pipeline import ETLPipelineManager
+        
+        # Check if pipeline is already processing
+        if ImportQueue.is_processing_import():
+            messages.warning(request, 'Pipeline is already processing imports.')
+            return redirect('datasets:import_management')
+        
+        # Process the next import in queue
+        result = ETLPipelineManager.process_queue()
+        
+        if result:
+            messages.success(request, f'Pipeline started successfully. Processing: {result.dataset.title}')
+        else:
+            messages.info(request, 'No pending imports to process.')
+        
+    except Exception as e:
+        messages.error(request, f'Failed to start pipeline: {str(e)}')
+    
+    return redirect('datasets:import_management')
+
+
+@login_required
+def process_all_pending(request):
+    """Process all pending imports in the queue"""
+    if not request.user.is_superuser and not (request.user.role and request.user.role.name == 'Administrator'):
+        messages.error(request, 'Access denied. Only Administrators can process imports.')
+        return redirect('datasets:import_management')
+    
+    try:
+        from .etl_pipeline import ETLPipelineManager
+        
+        # Get pending imports count
+        pending_count = ImportQueue.objects.filter(status='pending').count()
+        
+        if pending_count == 0:
+            messages.info(request, 'No pending imports to process.')
+            return redirect('datasets:import_management')
+        
+        # Process all pending imports
+        processed_count = 0
+        failed_count = 0
+        
+        while ImportQueue.objects.filter(status='pending').exists():
+            try:
+                result = ETLPipelineManager.process_queue()
+                if result:
+                    processed_count += 1
+                else:
+                    break
+            except Exception as e:
+                failed_count += 1
+                # Log the error but continue processing
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f'Failed to process import: {str(e)}')
+        
+        if processed_count > 0:
+            messages.success(request, f'Processed {processed_count} imports successfully.')
+        if failed_count > 0:
+            messages.warning(request, f'{failed_count} imports failed to process.')
+        
+    except Exception as e:
+        messages.error(request, f'Failed to process imports: {str(e)}')
+    
+    return redirect('datasets:import_management')
+
+
+@login_required
+def get_pipeline_status(request):
+    """Get current pipeline status (AJAX endpoint)"""
+    if not request.user.is_superuser and not (request.user.role and request.user.role.name == 'Administrator'):
+        return JsonResponse({'error': 'Access denied'}, status=403)
+    
+    try:
+        from .etl_pipeline import ETLPipelineManager
+        
+        # Get current status
+        is_processing = ImportQueue.is_processing_import()
+        next_import = ImportQueue.get_next_import()
+        queue_stats = ETLPipelineManager.get_queue_status()
+        
+        status_data = {
+            'is_processing': is_processing,
+            'next_import': {
+                'id': next_import.id,
+                'dataset_title': next_import.dataset.title,
+                'priority': next_import.priority,
+                'created_at': next_import.created_at.isoformat()
+            } if next_import else None,
+            'queue_stats': queue_stats,
+            'timestamp': timezone.now().isoformat()
+        }
+        
+        return JsonResponse(status_data)
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

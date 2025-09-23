@@ -118,10 +118,34 @@ else:
         }
     }
 
+# Import database configuration for dataset imports
+# This database is specifically used for importing datasets from external sources
+if 'IMPORT_DATABASE_URL' in os.environ:
+    import dj_database_url
+    import_db_config = dj_database_url.parse(os.environ['IMPORT_DATABASE_URL'])
+    # Ensure we have the correct user - override if it's 'root'
+    if import_db_config.get('USER') == 'root':
+        import_db_config['USER'] = os.environ.get('IMPORT_POSTGRES_USER', 'postgres')
+    DATABASES['import'] = import_db_config
+else:
+    DATABASES['import'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('IMPORT_POSTGRES_DB', 'isrdatasets_import'),
+        'USER': os.environ.get('IMPORT_POSTGRES_USER', 'isruser'),
+        'PASSWORD': os.environ.get('IMPORT_POSTGRES_PASSWORD', 'isrpass'),
+        'HOST': os.environ.get('IMPORT_POSTGRES_HOST', 'import_db'),
+        'PORT': os.environ.get('IMPORT_POSTGRES_PORT', '5432'),
+    }
+
 # Test database configuration
 if 'test' in sys.argv or 'pytest' in sys.modules:
     # Use a separate test database to avoid conflicts
     DATABASES['default']['NAME'] = f"test_{DATABASES['default']['NAME']}"
+    # Also create a test import database
+    DATABASES['import']['NAME'] = f"test_{DATABASES['import']['NAME']}"
+
+# Database routing
+DATABASE_ROUTERS = ['main.database_router.ImportDatabaseRouter']
 
 
 # Password validation

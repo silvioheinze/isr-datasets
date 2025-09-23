@@ -74,32 +74,6 @@
                 </div>
             </div>
 
-            <!-- Dataset Statistics -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-bar-chart me-2"></i>
-                        {% trans "Dataset Statistics" %}
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p><strong>{% trans "Downloads" %}:</strong> {{ dataset.download_count }}</p>
-                            <p><strong>{% trans "Versions" %}:</strong> {{ dataset.versions.count }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <p><strong>{% trans "Views" %}:</strong> {{ dataset.view_count }}</p>
-                            <p><strong>{% trans "Status" %}:</strong> 
-                                <span class="badge bg-{% if dataset.status == 'published' %}success{% elif dataset.status == 'draft' %}warning{% else %}secondary{% endif %}">
-                                    {{ dataset.get_status_display }}
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Tags and Keywords -->
             {% if dataset.get_tags_list or dataset.keywords %}
             <div class="card mb-4">
@@ -201,6 +175,221 @@
                             <i class="bi bi-box-arrow-up-right ms-1"></i>
                         </a>
                     </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Database Section -->
+            {% if can_import %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-database me-2"></i>
+                        {% trans "Database" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if import_queue_entry %}
+                        <!-- Queue Status Information -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="mb-3">{% trans "Import Queue Status" %}</h6>
+                                
+                                {% if import_queue_entry.is_processing %}
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-gear me-2"></i>
+                                        <strong>{% trans "Currently Processing" %}</strong>
+                                        <p class="mb-0 mt-2">
+                                            {% trans "This dataset is currently being processed by the ETL pipeline." %}
+                                        </p>
+                                    </div>
+                                    
+                                    <p><strong>{% trans "Started" %}:</strong> {{ import_queue_entry.started_at|date:"F d, Y H:i" }}</p>
+                                    
+                                {% elif import_queue_entry.is_pending %}
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-clock me-2"></i>
+                                        <strong>{% trans "Queued for Import" %}</strong>
+                                        <p class="mb-0 mt-2">
+                                            {% trans "This dataset has been queued for import and will be processed by the ETL pipeline." %}
+                                        </p>
+                                    </div>
+                                    
+                                    <p><strong>{% trans "Queued" %}:</strong> {{ import_queue_entry.created_at|date:"F d, Y H:i" }}</p>
+                                    <p><strong>{% trans "Priority" %}:</strong> 
+                                        <span class="badge 
+                                            {% if import_queue_entry.priority == 'urgent' %}bg-danger
+                                            {% elif import_queue_entry.priority == 'high' %}bg-warning
+                                            {% elif import_queue_entry.priority == 'normal' %}bg-info
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ import_queue_entry.get_priority_display }}
+                                        </span>
+                                    </p>
+                                {% endif %}
+                                
+                                {% if import_queue_entry.import_notes %}
+                                    <div class="mt-3">
+                                        <strong>{% trans "Queue Notes" %}:</strong>
+                                        <p class="text-muted mb-0">{{ import_queue_entry.import_notes|linebreaks }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    {% if import_queue_entry.is_processing %}
+                                        <i class="bi bi-gear text-info" style="font-size: 3rem;"></i>
+                                        <p class="mt-2 text-info"><strong>{% trans "Processing..." %}</strong></p>
+                                    {% else %}
+                                        <i class="bi bi-clock text-warning" style="font-size: 3rem;"></i>
+                                        <p class="mt-2 text-warning"><strong>{% trans "In Queue" %}</strong></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Queue Statistics -->
+                        {% if queue_stats %}
+                        <div class="mt-4">
+                            <h6>{% trans "Import Queue Statistics" %}</h6>
+                            <div class="row text-center">
+                                <div class="col-3">
+                                    <div class="border-end">
+                                        <h5 class="text-warning mb-1">{{ queue_stats.pending }}</h5>
+                                        <small class="text-muted">{% trans "Pending" %}</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="border-end">
+                                        <h5 class="text-info mb-1">{{ queue_stats.processing }}</h5>
+                                        <small class="text-muted">{% trans "Processing" %}</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="border-end">
+                                        <h5 class="text-success mb-1">{{ queue_stats.completed }}</h5>
+                                        <small class="text-muted">{% trans "Completed" %}</small>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <h5 class="text-danger mb-1">{{ queue_stats.failed }}</h5>
+                                    <small class="text-muted">{% trans "Failed" %}</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                    {% elif dataset_import %}
+                        <!-- Import Status Information -->
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="mb-3">{% trans "Import Status" %}</h6>
+                                
+                                {% if dataset_import.is_completed %}
+                                    <div class="alert alert-success">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        <strong>{% trans "Import Completed" %}</strong>
+                                        <p class="mb-0 mt-2">
+                                            {% trans "This dataset has been successfully imported to the database." %}
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <p><strong>{% trans "Imported By" %}:</strong> {{ dataset_import.imported_by.get_full_name|default:dataset_import.imported_by.username }}</p>
+                                            <p><strong>{% trans "Import Date" %}:</strong> {{ dataset_import.import_completed_at|date:"F d, Y H:i" }}</p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            {% if dataset_import.records_imported %}
+                                                <p><strong>{% trans "Records Imported" %}:</strong> {{ dataset_import.records_imported|floatformat:0 }}</p>
+                                            {% endif %}
+                                            {% if dataset_import.import_database_table %}
+                                                <p><strong>{% trans "Table Name" %}:</strong> <code>{{ dataset_import.import_database_table }}</code></p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                {% elif dataset_import.is_failed %}
+                                    <div class="alert alert-danger">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>{% trans "Import Failed" %}</strong>
+                                        <p class="mb-0 mt-2">
+                                            {% trans "The import process failed. Please try again." %}
+                                        </p>
+                                    </div>
+                                    
+                                    {% if dataset_import.error_message %}
+                                        <div class="mt-3">
+                                            <strong>{% trans "Error Details" %}:</strong>
+                                            <div class="mt-2 p-3 bg-light rounded">
+                                                <code class="text-danger">{{ dataset_import.error_message }}</code>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-3">
+                                        <a href="{% url 'datasets:import_dataset' dataset.pk %}" class="btn btn-primary">
+                                            <i class="bi bi-arrow-clockwise me-2"></i>
+                                            {% trans "Retry Import" %}
+                                        </a>
+                                    </div>
+                                    
+                                {% elif dataset_import.is_in_progress %}
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-hourglass-split me-2"></i>
+                                        <strong>{% trans "Import in Progress" %}</strong>
+                                        <p class="mb-0 mt-2">
+                                            {% trans "This dataset is currently being imported. Please wait for the process to complete." %}
+                                        </p>
+                                    </div>
+                                    
+                                    <p><strong>{% trans "Started" %}:</strong> {{ dataset_import.import_started_at|date:"F d, Y H:i" }}</p>
+                                {% endif %}
+                                
+                                {% if dataset_import.import_notes %}
+                                    <div class="mt-3">
+                                        <strong>{% trans "Import Notes" %}:</strong>
+                                        <p class="text-muted mb-0">{{ dataset_import.import_notes|linebreaks }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    {% if dataset_import.is_completed %}
+                                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                                        <p class="mt-2 text-success"><strong>{% trans "Available in Import DB" %}</strong></p>
+                                    {% elif dataset_import.is_failed %}
+                                        <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                                        <p class="mt-2 text-danger"><strong>{% trans "Import Failed" %}</strong></p>
+                                    {% else %}
+                                        <i class="bi bi-hourglass-split text-info" style="font-size: 3rem;"></i>
+                                        <p class="mt-2 text-info"><strong>{% trans "Importing..." %}</strong></p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <!-- No Import Yet -->
+                        <div class="text-center py-4">
+                            <i class="bi bi-database text-muted" style="font-size: 3rem;"></i>
+                            <h6 class="mt-3 text-muted">{% trans "Not Imported Yet" %}</h6>
+                            <p class="text-muted mb-4">
+                                {% trans "This dataset has not been imported to the database yet." %}
+                            </p>
+                            {% if has_importable_version %}
+                                <a href="{% url 'datasets:import_dataset' dataset.pk %}" class="btn btn-primary">
+                                    <i class="bi bi-download me-2"></i>
+                                    {% trans "Import to Database" %}
+                                </a>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    {% trans "No importable file format found. Supported formats: CSV, JSON, GeoJSON, Excel, File Geodatabase, SpatiaLite, GeoPackage, SQL." %}
+                                </div>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
             </div>

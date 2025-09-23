@@ -12,6 +12,7 @@ urlpatterns = [
     path('<uuid:pk>/delete/', views.DatasetDeleteView.as_view(), name='dataset_delete'),
     path('<uuid:pk>/download/', views.dataset_download, name='dataset_download'),
     path('<uuid:pk>/assign-project/', views.assign_dataset_to_project, name='assign_to_project'),
+    path('<uuid:pk>/import/', views.import_dataset, name='import_dataset'),
     path('<uuid:dataset_pk>/version/create/', views.DatasetVersionCreateView.as_view(), name='dataset_version_create'),
     
     # Statistics (removed - template was deleted)
@@ -33,4 +34,15 @@ urlpatterns = [
     path('publishers/create/', views.PublisherCreateView.as_view(), name='publisher_create'),
     path('publishers/<int:pk>/edit/', views.PublisherUpdateView.as_view(), name='publisher_edit'),
     path('publishers/<int:pk>/delete/', views.PublisherDeleteView.as_view(), name='publisher_delete'),
+    
+    # Import management views
+    path('import-management/', views.ImportDatabaseManagementView.as_view(), name='import_management'),
+    path('import-queue/<int:pk>/', views.ImportQueueDetailView.as_view(), name='import_queue_detail'),
+    path('import-queue/<int:pk>/cancel/', views.cancel_import, name='cancel_import'),
+    path('import-queue/<int:pk>/retry/', views.retry_import, name='retry_import'),
+    
+    # Pipeline control views
+    path('pipeline/start/', views.start_pipeline, name='start_pipeline'),
+    path('pipeline/process-all/', views.process_all_pending, name='process_all_pending'),
+    path('pipeline/status/', views.get_pipeline_status, name='get_pipeline_status'),
 ]

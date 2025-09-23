@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher
+from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher, DatasetImport, ImportQueue
 
 
 @admin.register(Publisher)
@@ -178,3 +178,63 @@ class CommentAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('author', 'dataset')
+
+
+@admin.register(DatasetImport)
+class DatasetImportAdmin(admin.ModelAdmin):
+    list_display = ['dataset', 'imported_by', 'status', 'import_started_at', 'import_completed_at', 'records_imported']
+    list_filter = ['status', 'import_started_at', 'import_completed_at']
+    search_fields = ['dataset__title', 'imported_by__username', 'import_notes', 'error_message']
+    readonly_fields = ['import_started_at', 'import_completed_at']
+    ordering = ['-import_started_at']
+    
+    fieldsets = (
+        ('Import Information', {
+            'fields': ('dataset', 'imported_by', 'status')
+        }),
+        ('Timing', {
+            'fields': ('import_started_at', 'import_completed_at')
+        }),
+        ('Results', {
+            'fields': ('records_imported', 'import_database_table', 'import_notes')
+        }),
+        ('Error Information', {
+            'fields': ('error_message',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('dataset', 'imported_by')
+
+
+@admin.register(ImportQueue)
+class ImportQueueAdmin(admin.ModelAdmin):
+    list_display = ['dataset', 'requested_by', 'status', 'priority', 'created_at', 'started_at', 'completed_at']
+    list_filter = ['status', 'priority', 'created_at', 'started_at']
+    search_fields = ['dataset__title', 'requested_by__username', 'import_notes', 'error_message']
+    readonly_fields = ['created_at', 'started_at', 'completed_at']
+    ordering = ['-priority', '-created_at']
+    
+    fieldsets = (
+        ('Queue Information', {
+            'fields': ('dataset', 'requested_by', 'status', 'priority')
+        }),
+        ('Timing', {
+            'fields': ('created_at', 'started_at', 'completed_at')
+        }),
+        ('Notes', {
+            'fields': ('import_notes',)
+        }),
+        ('Error Information', {
+            'fields': ('error_message',),
+            'classes': ('collapse',)
+        }),
+        ('Related Import', {
+            'fields': ('dataset_import',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('dataset', 'requested_by', 'dataset_import')

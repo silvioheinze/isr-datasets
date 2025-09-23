@@ -1,0 +1,270 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block title %}Import Queue Detail - {{ queue_entry.dataset.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-list"></i> Import Queue Detail</h1>
+                <div>
+                    <a href="{% url 'datasets:import_management' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Management
+                    </a>
+                </div>
+            </div>
+
+            <!-- Import Queue Entry Information -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-info-circle"></i> Import Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Dataset</h6>
+                                    <p>
+                                        <a href="{% url 'datasets:dataset_detail' queue_entry.dataset.pk %}">
+                                            {{ queue_entry.dataset.title }}
+                                        </a>
+                                    </p>
+                                    
+                                    <h6>Requested By</h6>
+                                    <p>{{ queue_entry.requested_by.username }}</p>
+                                    
+                                    <h6>Priority</h6>
+                                    <p>
+                                        {% if queue_entry.priority == 'urgent' %}
+                                            <span class="badge bg-danger">Urgent</span>
+                                        {% elif queue_entry.priority == 'high' %}
+                                            <span class="badge bg-warning">High</span>
+                                        {% elif queue_entry.priority == 'normal' %}
+                                            <span class="badge bg-primary">Normal</span>
+                                        {% elif queue_entry.priority == 'low' %}
+                                            <span class="badge bg-secondary">Low</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Status</h6>
+                                    <p>
+                                        {% if queue_entry.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif queue_entry.status == 'processing' %}
+                                            <span class="badge bg-info">Processing</span>
+                                        {% elif queue_entry.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% elif queue_entry.status == 'failed' %}
+                                            <span class="badge bg-danger">Failed</span>
+                                        {% elif queue_entry.status == 'cancelled' %}
+                                            <span class="badge bg-secondary">Cancelled</span>
+                                        {% endif %}
+                                    </p>
+                                    
+                                    <h6>Created</h6>
+                                    <p>{{ queue_entry.created_at|date:"M d, Y H:i:s" }}</p>
+                                    
+                                    {% if queue_entry.started_at %}
+                                        <h6>Started</h6>
+                                        <p>{{ queue_entry.started_at|date:"M d, Y H:i:s" }}</p>
+                                    {% endif %}
+                                    
+                                    {% if queue_entry.completed_at %}
+                                        <h6>Completed</h6>
+                                        <p>{{ queue_entry.completed_at|date:"M d, Y H:i:s" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if queue_entry.import_notes %}
+                                <h6>Import Notes</h6>
+                                <p class="text-muted">{{ queue_entry.import_notes }}</p>
+                            {% endif %}
+                            
+                            {% if queue_entry.error_message %}
+                                <h6>Error Message</h6>
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    {{ queue_entry.error_message }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-cogs"></i> Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if queue_entry.status == 'pending' or queue_entry.status == 'processing' %}
+                                <a href="{% url 'datasets:cancel_import' queue_entry.pk %}" 
+                                   class="btn btn-danger btn-sm w-100 mb-2"
+                                   onclick="return confirm('Are you sure you want to cancel this import?')">
+                                    <i class="fas fa-times"></i> Cancel Import
+                                </a>
+                            {% elif queue_entry.status == 'failed' %}
+                                <a href="{% url 'datasets:retry_import' queue_entry.pk %}" 
+                                   class="btn btn-success btn-sm w-100 mb-2"
+                                   onclick="return confirm('Are you sure you want to retry this import?')">
+                                    <i class="fas fa-redo"></i> Retry Import
+                                </a>
+                            {% endif %}
+                            
+                            <a href="{% url 'datasets:dataset_detail' queue_entry.dataset.pk %}" 
+                               class="btn btn-primary btn-sm w-100">
+                                <i class="fas fa-eye"></i> View Dataset
+                            </a>
+                        </div>
+                    </div>
+                    
+                    {% if queue_entry.processing_time %}
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5><i class="fas fa-clock"></i> Processing Time</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-0">{{ queue_entry.processing_time }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Dataset Import Information -->
+            {% if dataset_import %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-upload"></i> Dataset Import Details</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Import Status</h6>
+                                        <p>
+                                            {% if dataset_import.status == 'pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% elif dataset_import.status == 'importing' %}
+                                                <span class="badge bg-info">Importing</span>
+                                            {% elif dataset_import.status == 'completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% elif dataset_import.status == 'failed' %}
+                                                <span class="badge bg-danger">Failed</span>
+                                            {% elif dataset_import.status == 'cancelled' %}
+                                                <span class="badge bg-secondary">Cancelled</span>
+                                            {% endif %}
+                                        </p>
+                                        
+                                        <h6>Import Started</h6>
+                                        <p>{{ dataset_import.import_started_at|date:"M d, Y H:i:s" }}</p>
+                                        
+                                        {% if dataset_import.import_completed_at %}
+                                            <h6>Import Completed</h6>
+                                            <p>{{ dataset_import.import_completed_at|date:"M d, Y H:i:s" }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% if dataset_import.records_imported %}
+                                            <h6>Records Imported</h6>
+                                            <p>{{ dataset_import.records_imported }}</p>
+                                        {% endif %}
+                                        
+                                        {% if dataset_import.import_database_table %}
+                                            <h6>Import Table</h6>
+                                            <p><code>{{ dataset_import.import_database_table }}</code></p>
+                                        {% endif %}
+                                        
+                                        {% if dataset_import.import_notes %}
+                                            <h6>Import Notes</h6>
+                                            <p class="text-muted">{{ dataset_import.import_notes }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                {% if dataset_import.error_message %}
+                                    <h6>Error Message</h6>
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        {{ dataset_import.error_message }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Database Table Information -->
+            {% if queue_entry.status == 'completed' and queue_entry.dataset_import and queue_entry.dataset_import.import_database_table %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-table"></i> Database Table</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if table_error %}
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Database Error:</strong> {{ table_error }}
+                                    </div>
+                                {% else %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Table Name</h6>
+                                            <p><code>{{ queue_entry.dataset_import.import_database_table }}</code></p>
+                                            
+                                            {% if table_record_count %}
+                                                <h6>Record Count</h6>
+                                                <p>{{ table_record_count }}</p>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% if table_columns %}
+                                                <h6>Table Structure</h6>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Column</th>
+                                                                <th>Type</th>
+                                                                <th>Nullable</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for column in table_columns %}
+                                                                <tr>
+                                                                    <td><code>{{ column.0 }}</code></td>
+                                                                    <td>{{ column.1 }}</td>
+                                                                    <td>
+                                                                        {% if column.2 == 'YES' %}
+                                                                            <span class="badge bg-warning">Yes</span>
+                                                                        {% else %}
+                                                                            <span class="badge bg-success">No</span>
+                                                                        {% endif %}
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
