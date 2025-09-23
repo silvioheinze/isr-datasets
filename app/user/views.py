@@ -346,8 +346,12 @@ class UsersUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return reverse_lazy('user-list')
 
     def test_func(self):
-        # Allow access if user is superuser or has user.edit permission
-        return self.request.user.is_superuser or self.request.user.has_role_permission('user.edit')
+        # Allow access if user is superuser, has user.edit permission, or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            self.request.user.has_role_permission('user.edit') or
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
     
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
@@ -388,8 +392,11 @@ class UsersListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     paginate_by = 20
 
     def test_func(self):
-        # Allow access only if user is superuser
-        return self.request.user.is_superuser
+        # Allow access if user is superuser or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
 
     def get_queryset(self):
         queryset = CustomUser.objects.select_related('role').all().order_by('username')
@@ -434,8 +441,11 @@ class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     success_url = reverse_lazy('user-list')
 
     def test_func(self):
-        # Allow access only if user is superuser
-        return self.request.user.is_superuser
+        # Allow access if user is superuser or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -464,10 +474,11 @@ class PendingUsersView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     paginate_by = 20
 
     def test_func(self):
-        # Allow access only if user is superuser or has admin role
+        # Allow access if user is superuser, has admin role, or has Administrator role
         return (
             self.request.user.is_superuser or 
-            self.request.user.has_role_permission('admin')
+            self.request.user.has_role_permission('admin') or
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
         )
 
     def get_queryset(self):
@@ -518,8 +529,11 @@ class RoleListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     paginate_by = 20
 
     def test_func(self):
-        # Allow access only if user is superuser
-        return self.request.user.is_superuser
+        # Allow access if user is superuser or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
 
     def get_queryset(self):
         queryset = Role.objects.all().order_by('name')
@@ -555,8 +569,11 @@ class RoleCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     success_url = reverse_lazy('role-list')
 
     def test_func(self):
-        # Allow access only if user is superuser
-        return self.request.user.is_superuser
+        # Allow access if user is superuser or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
 
     def form_valid(self, form):
         messages.success(self.request, f"Role '{form.instance.name}' created successfully.")
@@ -570,8 +587,11 @@ class RoleUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     success_url = reverse_lazy('role-list')
 
     def test_func(self):
-        # Allow access only if user is superuser
-        return self.request.user.is_superuser
+        # Allow access if user is superuser or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
 
     def form_valid(self, form):
         messages.success(self.request, f"Role '{form.instance.name}' updated successfully.")
@@ -584,8 +604,11 @@ class RoleDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     success_url = reverse_lazy('role-list')
 
     def test_func(self):
-        # Allow access only if user is superuser
-        return self.request.user.is_superuser
+        # Allow access if user is superuser or has Administrator role
+        return (
+            self.request.user.is_superuser or 
+            (self.request.user.role and self.request.user.role.name == 'Administrator')
+        )
 
     def delete(self, request, *args, **kwargs):
         role = self.get_object()

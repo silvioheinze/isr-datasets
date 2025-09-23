@@ -79,15 +79,8 @@ class DatasetListView(LoginRequiredMixin, ListView):
     paginate_by = 12
 
     def get_queryset(self):
-        # All authenticated users can see all published datasets
-        # Superusers can see all datasets including drafts
-        if self.request.user.is_superuser:
-            queryset = Dataset.objects.all().select_related('owner', 'category').prefetch_related('contributors', 'versions')
-        else:
-            # Regular authenticated users can see all published datasets
-            queryset = Dataset.objects.filter(
-                status='published'
-            ).select_related('owner', 'category').prefetch_related('contributors', 'versions')
+        # All authenticated users can see all datasets regardless of status
+        queryset = Dataset.objects.all().select_related('owner', 'category').prefetch_related('contributors', 'versions')
         
         # Filter by category
         category = self.request.GET.get('category')
@@ -127,7 +120,6 @@ class DatasetListView(LoginRequiredMixin, ListView):
         else:
             # Featured datasets including user's private datasets
             featured_queryset = Dataset.objects.filter(
-                status='published',
                 is_featured=True,
                 access_level__in=['public', 'restricted']
             ).select_related('owner', 'category').prefetch_related('versions')
@@ -156,18 +148,10 @@ class DatasetDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'dataset'
 
     def get_queryset(self):
-        # All authenticated users can see all published datasets
-        # Superusers can see all datasets including drafts
-        if self.request.user.is_superuser:
-            return Dataset.objects.select_related('owner', 'category', 'publisher').prefetch_related(
-                'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
-            )
-        else:
-            return Dataset.objects.filter(
-                status='published'
-            ).select_related('owner', 'category', 'publisher').prefetch_related(
-                'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
-            )
+        # All authenticated users can see all datasets regardless of status
+        return Dataset.objects.select_related('owner', 'category', 'publisher').prefetch_related(
+            'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
+        )
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -183,12 +167,7 @@ class DatasetDetailView(LoginRequiredMixin, DetailView):
         dataset = self.get_object()
         
         # Add related datasets to context (from model relationship)
-        if self.request.user.is_superuser:
-            context['related_datasets'] = dataset.related_datasets.all().select_related('owner', 'category')[:8]
-        else:
-            context['related_datasets'] = dataset.related_datasets.filter(
-                status='published'
-            ).select_related('owner', 'category')[:8]
+        context['related_datasets'] = dataset.related_datasets.all().select_related('owner', 'category')[:8]
         
         context['can_edit'] = (
             self.request.user == dataset.owner or 
@@ -272,10 +251,7 @@ def dataset_download(request, pk):
     """Handle dataset downloads (requires authentication)"""
     dataset = get_object_or_404(Dataset, pk=pk)
     
-    # All authenticated users can download published datasets
-    # Superusers can download all datasets including drafts
-    if not request.user.is_superuser and dataset.status != 'published':
-        raise Http404("Dataset not found or access denied")
+    # All authenticated users can download all datasets regardless of status
     
     # Get the current version of the dataset
     current_version = dataset.versions.filter(is_current=True).first()
@@ -317,10 +293,8 @@ def dataset_statistics(request):
     """Display dataset statistics (requires authentication)"""
     # All authenticated users can see statistics for all published datasets
     # Superusers can see statistics for all datasets including drafts
-    if request.user.is_superuser:
-        dataset_filter = Q()
-    else:
-        dataset_filter = Q(status='published')
+    # All authenticated users can see all datasets regardless of status
+    dataset_filter = Q()
     
     stats = {
         'total_datasets': Dataset.objects.filter(dataset_filter).count(),
@@ -332,7 +306,7 @@ def dataset_statistics(request):
         'categories_with_counts': DatasetCategory.objects.filter(
             is_active=True
         ).annotate(
-            dataset_count=Count('datasets', filter=Q(datasets__status='published'))
+            dataset_count=Count('datasets')
         ).order_by('-dataset_count'),
     }
     

@@ -219,8 +219,10 @@
                              <li><a class="dropdown-item" href="{% url 'user-profile' %}">My Profile</a></li>
                              <li><a class="dropdown-item" href="{% url 'user-settings' %}">Settings</a></li>
                              <li><a class="dropdown-item" href="{% url 'documentation' %}">Documentation</a></li>
-                             {% if user.is_superuser %}
+                             {% if user.is_superuser or user.role.name == 'Administrator' %}
                              <li><a class="dropdown-item" href="{% url 'user-management' %}">Users</a></li>
+                             {% endif %}
+                             {% if user.is_superuser %}
                              <li><a class="dropdown-item" href="{% url 'logs' %}">Logs</a></li>
                              {% endif %}
                              <li><hr class="dropdown-divider"></li>
