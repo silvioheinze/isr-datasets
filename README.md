@@ -4,12 +4,16 @@ A comprehensive Django-based platform for managing, accessing, and analyzing res
 
 ## 🚀 Features
 
-- **Dataset Management**: Upload, organize, and manage research datasets
+- **Dataset Management**: Upload, organize, and manage research datasets with comprehensive import/export capabilities
+- **ETL Pipeline**: Advanced Extract, Transform, Load pipeline for dataset processing with error handling and recovery
+- **Import Management**: Queue-based dataset import system with priority handling and status monitoring
 - **User Authentication**: Secure user registration and login with Django Allauth
 - **Modern UI**: Responsive design with Bootstrap 5 and custom ISR branding
-- **Database Support**: PostgreSQL with PostGIS for geospatial data
+- **Database Support**: PostgreSQL with PostGIS for geospatial data and dedicated import database
 - **Docker Deployment**: Containerized application for easy deployment
 - **Admin Interface**: Django admin panel for system administration
+- **System Monitoring**: Comprehensive logging system with level filtering and real-time monitoring
+- **Error Recovery**: Automated error diagnosis and fixing for import failures
 - **Audit Logging**: Track user actions and system changes
 - **Multi-language Support**: Internationalization ready
 
@@ -21,122 +25,8 @@ A comprehensive Django-based platform for managing, accessing, and analyzing res
 - **Authentication**: Django Allauth
 - **Containerization**: Docker & Docker Compose
 - **Web Server**: Nginx
-- **Geospatial**: GDAL 3.6.2
-- **Python**: 3.13
-
-## 📋 Prerequisites
-
-- Docker and Docker Compose
-- Git
-
-## 🚀 Quick Start
-
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
-cd isr-datasets
-```
-
-### 2. Environment Configuration
-
-Create a `.env` file in the project root with the following variables:
-
-```env
-# Database Configuration
-POSTGRES_DB=isrdatasets
-POSTGRES_USER=isruser
-POSTGRES_PASSWORD=your_secure_password
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-
-# Django Configuration
-DJANGO_SECRET_KEY=your-secret-key-here
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-
-# Email Configuration (optional)
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USE_TLS=True
-EMAIL_HOST_USER=your-email@gmail.com
-EMAIL_HOST_PASSWORD=your-app-password
-```
-
-### 3. Build and Run
-
-```bash
-# Build and start all services
-docker compose up --build -d
-
-# Check service status
-docker compose ps
-
-# View logs
-docker compose logs app
-```
-
-### 4. Access the Application
-
-- **Main Application**: http://localhost
-- **Admin Panel**: http://localhost/admin
-- **Database Admin**: http://localhost:8080 (pgAdmin)
-
-## 🏗️ Project Structure
-
-```
-isr-datasets/
-├── app/                          # Django application
-│   ├── main/                     # Main Django project
-│   │   ├── settings.py           # Django settings
-│   │   ├── urls.py              # Main URL configuration
-│   │   └── wsgi.py              # WSGI configuration
-│   ├── pages/                    # Pages app
-│   │   ├── views.py             # Page views
-│   │   ├── urls.py              # Page URLs
-│   │   └── models.py            # Page models
-│   ├── user/                     # User management app
-│   │   ├── views.py             # User views
-│   │   ├── models.py            # User models
-│   │   ├── forms.py             # User forms
-│   │   └── urls.py              # User URLs
-│   ├── templates/                # Django templates
-│   │   ├── _base.html           # Base template
-│   │   ├── home.html            # Home page
-│   │   ├── account/             # Allauth templates
-│   │   └── user/                # User templates
-│   ├── static/                   # Static files
-│   ├── media/                    # Media files
-│   └── manage.py                 # Django management script
-├── nginx/                        # Nginx configuration
-│   ├── Dockerfile               # Nginx Dockerfile
-│   └── nginx.conf               # Nginx configuration
-├── docker compose.yml            # Docker Compose configuration
-├── Dockerfile                    # Main application Dockerfile
-├── entrypoint.sh                 # Container entrypoint script
-├── requirements.txt              # Python dependencies
-└── README.md                     # This file
-```
 
 ## 🔧 Development
-
-### Local Development Setup
-
-1. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Database Setup**:
-   ```bash
-   python manage.py migrate
-   python manage.py createsuperuser
-   ```
-
-3. **Run Development Server**:
-   ```bash
-   python manage.py runserver
-   ```
 
 ### Docker Development
 
@@ -174,6 +64,101 @@ docker compose exec -T db psql -U isruser -d isrdatasets < backup.sql
 Access pgAdmin at http://localhost:8080:
 - **Email**: admin@example.com
 - **Password**: admin
+
+## 🔄 ETL Pipeline & Import Management
+
+The application features a sophisticated Extract, Transform, Load (ETL) pipeline for processing datasets with comprehensive error handling and recovery mechanisms.
+
+### ETL Pipeline Features
+
+- **Queue-Based Processing**: Import requests are queued and processed sequentially to prevent system overload
+- **Priority Handling**: Support for urgent, high, normal, and low priority imports
+- **Error Recovery**: Automated error diagnosis and fixing for failed imports
+- **Status Monitoring**: Real-time tracking of import progress and status
+- **Multiple File Formats**: Support for CSV, JSON, GeoJSON, Excel, GDB, SQLite, GeoPackage, and SQL files
+- **Database Integration**: Direct import to dedicated import database with table creation
+
+### Import Management Interface
+
+Access the import management system at `/datasets/import-management/` (Administrator access required):
+
+#### Key Features
+
+- **Queue Statistics**: Overview of pending, processing, completed, and failed imports
+- **Pipeline Controls**: Start/stop pipeline processing with status monitoring
+- **Error Diagnosis**: Automated error detection and fix suggestions
+- **Import History**: Track all import operations with detailed logs
+- **Bulk Processing**: Process multiple imports simultaneously
+
+#### Import Queue Operations
+
+```bash
+# Start pipeline processing
+curl -X POST http://localhost/datasets/pipeline/start/
+
+# Process all pending imports
+curl -X POST http://localhost/datasets/pipeline/process-all/
+
+# Get pipeline status
+curl http://localhost/datasets/pipeline/status/
+```
+
+### Error Recovery System
+
+The application includes an intelligent error recovery system:
+
+#### Automatic Error Diagnosis
+
+- **File Accessibility**: Checks for missing or inaccessible files
+- **Database Connectivity**: Verifies import database availability
+- **Format Validation**: Ensures file formats are supported
+- **Status Reset**: Automatically resets stuck processing states
+- **Cleanup Operations**: Removes orphaned database tables and records
+
+#### Manual Error Fixing
+
+Administrators can manually trigger error diagnosis and fixing:
+
+1. Navigate to failed import: `/datasets/import-queue/{id}/`
+2. Click "Fix Import Error" button
+3. Review diagnosis results and applied fixes
+4. Retry the import if issues are resolved
+
+### ETL Pipeline Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Extract       │    │   Transform     │    │   Load          │
+│                 │    │                 │    │                 │
+│ • File Reading  │───▶│ • Data Cleaning │───▶│ • Database      │
+│ • URL Fetching  │    │ • Validation    │    │   Import        │
+│ • Format Parse  │    │ • Structure     │    │ • Table Create  │
+│                 │    │   Mapping       │    │ • Indexing      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Supported File Formats
+
+| Format | Extension | Description |
+|--------|-----------|-------------|
+| CSV | `.csv` | Comma-separated values |
+| JSON | `.json` | JavaScript Object Notation |
+| GeoJSON | `.geojson` | Geographic JSON format |
+| Excel | `.xlsx`, `.xls` | Microsoft Excel files |
+| GDB | `.gdb` | Esri File Geodatabase |
+| SQLite | `.sqlite` | SQLite database files |
+| GeoPackage | `.gpkg` | OGC GeoPackage format |
+| SQL | `.sql` | SQL script files |
+
+### Monitoring & Logging
+
+The ETL pipeline provides comprehensive monitoring:
+
+- **Real-time Status**: Live updates of processing status
+- **Detailed Logs**: Complete operation logs with timestamps
+- **Error Tracking**: Detailed error messages and stack traces
+- **Performance Metrics**: Processing time and resource usage
+- **Audit Trail**: Complete history of all import operations
 
 ## 📧 Email Configuration & Testing
 
@@ -336,9 +321,71 @@ conn.close()
 "
 ```
 
-## 🎨 Customization
+## 🎨 User Interface & Customization
 
-### Branding
+The application features a modern, responsive user interface with consistent design patterns and comprehensive customization options.
+
+### UI Features
+
+- **Responsive Design**: Mobile-first approach with Bootstrap 5.3.3
+- **Consistent Layout**: Unified design patterns across all pages
+- **Bootstrap Icons**: Modern icon system throughout the interface
+- **ISR Branding**: Custom color scheme and branding elements
+- **Accessibility**: WCAG compliant design with proper contrast and navigation
+- **Internationalization**: Multi-language support with Django i18n
+
+### Template Architecture
+
+The application uses a hierarchical template system:
+
+```
+templates/
+├── _base.html              # Base template with navigation and layout
+├── account/                # Authentication templates
+├── datasets/               # Dataset management templates
+│   ├── dataset_detail.html # Enhanced dataset detail view
+│   ├── import_management.html # Import management interface
+│   └── import_queue_detail.html # Import queue detail view
+├── main/                   # System administration templates
+│   └── logs.html          # System logs with filtering
+├── user/                   # User management templates
+│   ├── email_confirm.html  # Enhanced email confirmation
+│   └── list.html          # User listing interface
+└── projects/               # Project management templates
+```
+
+### Enhanced Templates
+
+#### Import Management Interface
+
+The import management system features:
+
+- **Statistics Dashboard**: Real-time overview of import queue status
+- **Pipeline Controls**: Start/stop pipeline with status monitoring
+- **Error Recovery**: Automated error diagnosis and fixing
+- **Queue Management**: Comprehensive import queue administration
+- **Database Statistics**: Import database health and metrics
+
+#### System Logs Interface
+
+The logging system provides:
+
+- **Level Filtering**: Filter logs by ERROR, WARNING, INFO, DEBUG levels
+- **Real-time Updates**: Live log monitoring with automatic refresh
+- **Multi-log Support**: Django and email log viewing
+- **Pagination**: Efficient browsing of large log files
+- **Status Indicators**: Visual feedback for log file availability
+
+#### Email Confirmation
+
+Enhanced email confirmation template with:
+
+- **Modern Layout**: Card-based design with clear visual hierarchy
+- **Status Indicators**: Visual feedback for confirmation states
+- **Error Handling**: Comprehensive error messaging and recovery
+- **User Guidance**: Clear instructions and next steps
+
+### Branding & Styling
 
 The application uses custom ISR branding with the following color scheme:
 
@@ -352,9 +399,69 @@ The application uses custom ISR branding with the following color scheme:
 }
 ```
 
-### Templates
+#### Color Usage
 
-Templates are located in `app/templates/` and use Django's template system with Bootstrap 5.
+- **Primary Blue (#0047BB)**: Main brand color for buttons, links, and headers
+- **Secondary Blue (#001A70)**: Darker shade for navigation and footers
+- **Accent Blue (#92C1E9)**: Light accent for highlights and secondary elements
+- **Status Colors**: Green (success), Red (error), Yellow (warning), Blue (info)
+
+### Responsive Design
+
+The interface is fully responsive with:
+
+- **Mobile-First**: Optimized for mobile devices
+- **Tablet Support**: Enhanced layouts for tablet screens
+- **Desktop Optimization**: Full-featured desktop experience
+- **Touch-Friendly**: Large touch targets for mobile interaction
+
+### Accessibility Features
+
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Screen Reader Support**: Proper ARIA labels and semantic HTML
+- **Color Contrast**: WCAG AA compliant color combinations
+- **Focus Indicators**: Clear focus states for interactive elements
+- **Alternative Text**: Descriptive alt text for images and icons
+
+### Customization Options
+
+#### Template Customization
+
+Templates are located in `app/templates/` and can be customized:
+
+```bash
+# Override base template
+cp app/templates/_base.html app/templates/custom_base.html
+
+# Customize specific pages
+cp app/templates/datasets/dataset_detail.html app/templates/datasets/custom_detail.html
+```
+
+#### Styling Customization
+
+```css
+/* Custom CSS overrides */
+:root {
+    --custom-primary: #your-color;
+    --custom-secondary: #your-color;
+}
+
+/* Component-specific styling */
+.dataset-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+```
+
+### Internationalization
+
+The application supports multiple languages:
+
+- **English**: Default language
+- **German**: Full German translation support
+- **Template Tags**: All text uses Django's `{% trans %}` tags
+- **Dynamic Language**: User-selectable language preferences
+- **Email Templates**: Localized email content
 
 ## 🔐 Security
 
@@ -364,30 +471,90 @@ Templates are located in `app/templates/` and use Django's template system with 
 - Audit logging for user actions
 - Environment-based configuration
 
-## 📊 Monitoring
+## 📊 System Monitoring & Logging
 
-### Logs
+The application provides comprehensive monitoring and logging capabilities with advanced filtering and real-time monitoring.
+
+### Log Management Interface
+
+Access the system logs at `/logs/` (Superuser access required):
+
+
+#### Log Types
+
+| Log Type | Description | Location |
+|----------|-------------|----------|
+| Django | Application logs | `logs/django.log` |
+| Email | Email operation logs | `logs/email.log` |
+
+#### Log Level Filtering
+
+The system supports filtering by log levels:
+
+- **ERROR**: Critical errors requiring immediate attention
+- **WARNING**: Warning messages and potential issues
+- **INFO**: General information and status updates
+- **DEBUG**: Detailed debugging information
+- **All Levels**: View all log entries (default)
+
+### Log Monitoring Features
+
+#### Real-time Monitoring
 
 ```bash
-# View application logs
-docker compose logs app
+# Monitor Django logs in real-time
+docker compose exec app tail -f logs/django.log
 
-# View database logs
-docker compose logs db
+# Monitor email logs in real-time
+docker compose exec app tail -f logs/email.log
 
-# View nginx logs
-docker compose logs nginx
-
-# Follow logs in real-time
+# Monitor all logs
 docker compose logs -f app
 ```
 
-### Health Checks
+#### Log Analysis
 
-The application includes health checks for:
-- Database connectivity
-- Service availability
-- Container status
+```bash
+# Count error messages
+docker compose exec app grep -c "ERROR" logs/django.log
+
+# Find specific error patterns
+docker compose exec app grep -i "database" logs/django.log
+
+# Monitor email operations
+docker compose exec app grep "email" logs/email.log
+```
+
+### System Health Monitoring
+
+The application includes comprehensive health checks:
+
+#### Database Health
+
+- **Connection Status**: Verify database connectivity
+- **Import Database**: Check dedicated import database status
+- **Table Integrity**: Validate database table structures
+- **Performance Metrics**: Monitor query performance and resource usage
+
+#### Service Health
+
+- **Application Status**: Django application health
+- **Email Service**: SMTP connectivity and configuration
+- **File System**: Media and static file accessibility
+- **Container Status**: Docker container health and resource usage
+
+#### Monitoring Endpoints
+
+```bash
+# Check application health
+curl http://localhost/health/
+
+# Check database connectivity
+curl http://localhost/datasets/import-management/
+
+# Check log system status
+curl http://localhost/logs/
+```
 
 ## 🚀 Deployment
 
@@ -409,13 +576,6 @@ The application includes health checks for:
    docker compose exec app python manage.py migrate
    ```
 
-### Scaling
-
-The application is designed to be horizontally scalable:
-- Stateless application containers
-- External database
-- Shared static/media storage
-
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -426,41 +586,40 @@ The application is designed to be horizontally scalable:
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GPL-3.0 license - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## Management Commands
 
-For support and questions:
-- Create an issue in the repository
-- Check the documentation
-- Review the logs for troubleshooting
-
-## 🔄 Updates
-
-To update the application:
+### ETL Pipeline Commands
 
 ```bash
-# Pull latest changes
-git pull origin main
+# Process import queue
+docker compose exec app python manage.py process_import_queue
 
-# Rebuild and restart
-docker compose down
-docker compose up --build -d
+# Clean up old imports
+docker compose exec app python manage.py shell -c "
+from datasets.etl_pipeline import ETLPipelineManager
+ETLPipelineManager.cleanup_old_imports(days=30)
+"
 
-# Run migrations if needed
-docker compose exec app python manage.py migrate
+# Check pipeline status
+docker compose exec app python manage.py shell -c "
+from datasets.etl_pipeline import ETLPipelineManager
+status = ETLPipelineManager.get_queue_status()
+print(f'Queue Status: {status}')
+"
 ```
 
-## 📈 Roadmap
+### Database Management
 
-- [ ] Dataset upload and management interface
-- [ ] Advanced search and filtering
-- [ ] Data visualization tools
-- [ ] API endpoints for data access
-- [ ] User role management
-- [ ] Data export functionality
-- [ ] Integration with external data sources
+```bash
+# Create database backup
+docker compose exec app python manage.py dumpdata > backup.json
 
----
+# Restore database
+docker compose exec app python manage.py loaddata backup.json
 
-**ISR Datasets** - Empowering research through data management
+# Check database integrity
+docker compose exec app python manage.py check --database default
+docker compose exec app python manage.py check --database import
+```

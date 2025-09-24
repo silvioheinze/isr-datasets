@@ -1226,6 +1226,43 @@ def retry_import(request, pk):
     return redirect('datasets:import_management')
 
 
+@login_required
+def fix_import_error(request, pk):
+    """Diagnose and fix import errors"""
+    if not request.user.is_superuser and not (request.user.role and request.user.role.name == 'Administrator'):
+        messages.error(request, 'Access denied. Only Administrators can fix import errors.')
+        return redirect('datasets:import_management')
+    
+    try:
+        from .etl_pipeline import ETLPipelineManager
+        
+        queue_entry = get_object_or_404(ImportQueue, pk=pk)
+        
+        # Run diagnosis and fix
+        result = ETLPipelineManager.diagnose_and_fix_import_error(queue_entry)
+        
+        if result['success']:
+            if result['fixes_applied']:
+                messages.success(request, f'Import error fixed successfully. Applied fixes: {", ".join(result["fixes_applied"])}')
+            else:
+                messages.info(request, 'No fixes were needed. Import is ready for retry.')
+        else:
+            if result['diagnosis']:
+                messages.warning(request, f'Diagnosis completed. Issues found: {", ".join(result["diagnosis"])}')
+            if result['remaining_issues']:
+                messages.error(request, f'Remaining issues: {", ".join(result["remaining_issues"])}')
+            if result['recommendations']:
+                messages.info(request, f'Recommendations: {", ".join(result["recommendations"])}')
+        
+        # Store detailed results in session for display
+        request.session['import_fix_result'] = result
+        
+    except ImportQueue.DoesNotExist:
+        messages.error(request, 'Import queue entry not found.')
+    except Exception as e:
+        messages.error(request, f'Failed to fix import error: {str(e)}')
+    
+    return redirect('datasets:import_queue_detail', pk=pk)
 
 
 @login_required
@@ -1244,10 +1281,10 @@ def start_pipeline(request):
             return redirect('datasets:import_management')
         
         # Process the next import in queue
-        result = ETLPipelineManager.process_queue()
+        result = ETLPipelineManager.process_next_import()
         
         if result:
-            messages.success(request, f'Pipeline started successfully. Processing: {result.dataset.title}')
+            messages.success(request, 'Pipeline started successfully. Processing next import in queue.')
         else:
             messages.info(request, 'No pending imports to process.')
         
@@ -1280,7 +1317,7 @@ def process_all_pending(request):
         
         while ImportQueue.objects.filter(status='pending').exists():
             try:
-                result = ETLPipelineManager.process_queue()
+                result = ETLPipelineManager.process_next_import()
                 if result:
                     processed_count += 1
                 else:

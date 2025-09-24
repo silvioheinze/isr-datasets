@@ -24,6 +24,7 @@ class LogView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         
         # Get log type from URL parameter (default to 'django')
         log_type = self.request.GET.get('type', 'django')
+        level_filter = self.request.GET.get('level', None)
         page_number = self.request.GET.get('page', 1)
         
         # Define available log files
@@ -42,6 +43,7 @@ class LogView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         if not os.path.exists(full_log_path):
             context.update({
                 'log_type': log_type,
+                'level_filter': level_filter,
                 'log_content': [],
                 'log_file_exists': False,
                 'log_file_path': log_file_path,
@@ -94,12 +96,17 @@ class LogView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                             'raw_line': line
                         })
             
+            # Apply level filter if specified
+            if level_filter:
+                log_entries = [entry for entry in log_entries if entry['level'] == level_filter]
+            
             # Paginate log entries
             paginator = Paginator(log_entries, 50)  # 50 entries per page
             page_obj = paginator.get_page(page_number)
             
             context.update({
                 'log_type': log_type,
+                'level_filter': level_filter,
                 'log_content': page_obj,
                 'log_file_exists': True,
                 'log_file_path': log_file_path,
@@ -112,6 +119,7 @@ class LogView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
             logger.error(f"Error reading log file {full_log_path}: {str(e)}")
             context.update({
                 'log_type': log_type,
+                'level_filter': level_filter,
                 'log_content': [],
                 'log_file_exists': True,
                 'log_file_path': log_file_path,

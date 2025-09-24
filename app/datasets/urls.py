@@ -40,6 +40,7 @@ urlpatterns = [
     path('import-queue/<int:pk>/', views.ImportQueueDetailView.as_view(), name='import_queue_detail'),
     path('import-queue/<int:pk>/cancel/', views.cancel_import, name='cancel_import'),
     path('import-queue/<int:pk>/retry/', views.retry_import, name='retry_import'),
+    path('import-queue/<int:pk>/fix/', views.fix_import_error, name='fix_import_error'),
     
     # Pipeline control views
     path('pipeline/start/', views.start_pipeline, name='start_pipeline'),

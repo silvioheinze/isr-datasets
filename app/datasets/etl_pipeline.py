@@ -790,3 +790,148 @@ class ETLPipelineManager:
         ).delete()[0]
         
         logger.info(f"Cleaned up {deleted_count} old import records")
+    
+    @staticmethod
+    def diagnose_and_fix_import_error(queue_entry: ImportQueue) -> Dict[str, Any]:
+        """
+        Diagnose and attempt to fix import errors.
+        
+        Args:
+            queue_entry: The failed ImportQueue entry to diagnose
+            
+        Returns:
+            Dict with diagnosis results and fix attempts
+        """
+        result = {
+            'success': False,
+            'diagnosis': [],
+            'fixes_applied': [],
+            'remaining_issues': [],
+            'recommendations': []
+        }
+        
+        try:
+            logger.info(f"Diagnosing import error for queue entry: {queue_entry.pk}")
+            
+            # 1. Check dataset and version availability
+            if not queue_entry.dataset:
+                result['diagnosis'].append("Dataset not found")
+                result['remaining_issues'].append("Dataset reference is missing")
+                return result
+            
+            if not queue_entry.dataset.versions.exists():
+                result['diagnosis'].append("No dataset versions available")
+                result['recommendations'].append("Upload a dataset version before importing")
+                return result
+            
+            # 2. Check file accessibility
+            latest_version = queue_entry.dataset.versions.first()
+            if not latest_version.file:
+                result['diagnosis'].append("No file attached to dataset version")
+                result['remaining_issues'].append("Dataset version has no file")
+                return result
+            
+            # 3. Check file existence and accessibility
+            try:
+                if not latest_version.file.storage.exists(latest_version.file.name):
+                    result['diagnosis'].append("File not found in storage")
+                    result['remaining_issues'].append("File is missing from storage")
+                    return result
+            except Exception as e:
+                result['diagnosis'].append(f"File access error: {str(e)}")
+                result['remaining_issues'].append("Cannot access file")
+                return result
+            
+            # 4. Check database connection
+            try:
+                import_db = connections['import']
+                with import_db.cursor() as cursor:
+                    cursor.execute("SELECT 1")
+            except Exception as e:
+                result['diagnosis'].append(f"Database connection error: {str(e)}")
+                result['remaining_issues'].append("Import database is not accessible")
+                return result
+            
+            # 5. Check for specific error patterns and apply fixes
+            error_message = queue_entry.error_message or ""
+            
+            # Fix 1: Reset status if stuck in processing
+            if queue_entry.status == 'processing':
+                queue_entry.status = 'pending'
+                queue_entry.error_message = ""
+                queue_entry.save()
+                result['fixes_applied'].append("Reset status from 'processing' to 'pending'")
+                result['success'] = True
+            
+            # Fix 2: Clear error message and reset to pending for retry
+            elif queue_entry.status == 'failed' and error_message:
+                queue_entry.status = 'pending'
+                queue_entry.error_message = ""
+                queue_entry.save()
+                result['fixes_applied'].append("Cleared error message and reset to pending")
+                result['success'] = True
+            
+            # Fix 3: Check for file format issues
+            file_extension = os.path.splitext(latest_version.file.name)[1].lower()
+            supported_formats = ['.csv', '.json', '.geojson', '.xlsx', '.xls', '.gdb', '.sqlite', '.gpkg', '.sql']
+            
+            if file_extension not in supported_formats:
+                result['diagnosis'].append(f"Unsupported file format: {file_extension}")
+                result['recommendations'].append(f"Convert file to one of: {', '.join(supported_formats)}")
+            
+            # Fix 4: Check for corrupted dataset import record
+            if queue_entry.dataset_import:
+                try:
+                    # Check if dataset import is in a bad state
+                    if queue_entry.dataset_import.status == 'importing':
+                        queue_entry.dataset_import.status = 'failed'
+                        queue_entry.dataset_import.error_message = "Import was interrupted and reset"
+                        queue_entry.dataset_import.save()
+                        result['fixes_applied'].append("Reset stuck dataset import status")
+                except Exception as e:
+                    result['diagnosis'].append(f"Dataset import record issue: {str(e)}")
+            
+            # Fix 5: Clean up any orphaned database tables
+            if queue_entry.dataset_import and queue_entry.dataset_import.import_database_table:
+                try:
+                    import_db = connections['import']
+                    table_name = queue_entry.dataset_import.import_database_table
+                    
+                    with import_db.cursor() as cursor:
+                        # Check if table exists and is empty (orphaned)
+                        cursor.execute("""
+                            SELECT COUNT(*) FROM information_schema.tables 
+                            WHERE table_name = %s
+                        """, [table_name])
+                        
+                        if cursor.fetchone()[0] > 0:
+                            cursor.execute(f'SELECT COUNT(*) FROM "{table_name}"')
+                            record_count = cursor.fetchone()[0]
+                            
+                            if record_count == 0:
+                                # Drop empty orphaned table
+                                cursor.execute(f'DROP TABLE IF EXISTS "{table_name}"')
+                                result['fixes_applied'].append(f"Cleaned up empty orphaned table: {table_name}")
+                except Exception as e:
+                    result['diagnosis'].append(f"Database cleanup issue: {str(e)}")
+            
+            # Fix 6: Reset timestamps for retry
+            if queue_entry.started_at:
+                queue_entry.started_at = None
+                queue_entry.completed_at = None
+                queue_entry.save()
+                result['fixes_applied'].append("Reset processing timestamps")
+            
+            # If we get here and no specific issues were found, mark as ready for retry
+            if not result['remaining_issues'] and not result['diagnosis']:
+                result['success'] = True
+                result['fixes_applied'].append("Import is ready for retry")
+                result['recommendations'].append("Try running the import again")
+            
+            logger.info(f"Diagnosis completed for queue entry {queue_entry.pk}: {result}")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error during diagnosis: {str(e)}")
+            result['diagnosis'].append(f"Diagnosis failed: {str(e)}")
+            return result

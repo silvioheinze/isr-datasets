@@ -326,7 +326,7 @@ class ImportManagementViewsTestCase(TestCase):
         # Mock the ETL pipeline to return a successful result
         mock_result = MagicMock()
         mock_result.dataset.title = 'Test Dataset'
-        mock_manager.process_queue.return_value = mock_result
+        mock_manager.process_next_import.return_value = mock_result
         
         # Ensure queue entry is pending
         self.queue_entry.status = 'pending'
@@ -335,7 +335,7 @@ class ImportManagementViewsTestCase(TestCase):
         response = self.client.post(reverse('datasets:start_pipeline'))
         
         self.assertEqual(response.status_code, 302)  # Redirected to management
-        mock_manager.process_queue.assert_called_once()
+        mock_manager.process_next_import.assert_called_once()
     
     def test_start_pipeline_already_processing(self):
         """Test starting pipeline when already processing"""
@@ -364,7 +364,7 @@ class ImportManagementViewsTestCase(TestCase):
         # Mock the ETL pipeline to return a successful result
         mock_result = MagicMock()
         mock_result.dataset.title = 'Test Dataset'
-        mock_manager.process_queue.return_value = mock_result
+        mock_manager.process_next_import.return_value = mock_result
         
         # Create additional pending imports
         for i in range(3):
@@ -385,7 +385,7 @@ class ImportManagementViewsTestCase(TestCase):
         
         self.assertEqual(response.status_code, 302)  # Redirected to management
         # Should be called multiple times for each pending import
-        self.assertGreater(mock_manager.process_queue.call_count, 0)
+        self.assertGreater(mock_manager.process_next_import.call_count, 0)
     
     def test_process_all_pending_no_pending(self):
         """Test processing when no pending imports exist"""
@@ -437,7 +437,7 @@ class ImportManagementViewsTestCase(TestCase):
         self.client.login(username='admin', password='testpass123')
         
         # Mock ETL error
-        mock_manager.process_queue.side_effect = Exception('ETL processing failed')
+        mock_manager.process_next_import.side_effect = Exception('ETL processing failed')
         
         response = self.client.post(reverse('datasets:start_pipeline'))
         
