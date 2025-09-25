@@ -65,6 +65,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
         # Apply filters
         search = self.request.GET.get('search')
         status = self.request.GET.get('status')
+        tags = self.request.GET.get('tags')
         
         if search:
             queryset = queryset.filter(
@@ -78,6 +79,11 @@ class ProjectListView(LoginRequiredMixin, ListView):
         if status:
             queryset = queryset.filter(status=status)
         
+        if tags:
+            tag_list = [tag.strip() for tag in tags.split(',')]
+            for tag in tag_list:
+                queryset = queryset.filter(tags__icontains=tag)
+        
         return queryset.order_by('-created_at')
     
     def get_context_data(self, **kwargs):
@@ -85,6 +91,7 @@ class ProjectListView(LoginRequiredMixin, ListView):
         context['filter_form'] = ProjectFilterForm(self.request.GET)
         context['search_query'] = self.request.GET.get('search', '')
         context['selected_status'] = self.request.GET.get('status', '')
+        context['selected_tags'] = self.request.GET.get('tags', '')
         return context
 
 

@@ -199,3 +199,11 @@ class ProjectFilterForm(forms.Form):
         }),
         label=_('Status')
     )
+    tags = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Filter by tags...')
+        }),
+        label=_('Tags')
+    )
