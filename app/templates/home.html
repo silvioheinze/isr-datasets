@@ -254,9 +254,11 @@
                         {% for category in categories_with_counts %}
                         <div class="col-md-6 mb-3">
                             <div class="d-flex align-items-center">
-                                <span class="badge me-2" style="background-color: {{ category.color }}; color: {% if category.color == '#ffffff' or category.color == '#fff' %}#000{% else %}#fff{% endif %};">
-                                    {{ category.name }}
-                                </span>
+                                <a href="{% url 'datasets:dataset_list' %}?category={{ category.name|urlencode }}" class="text-decoration-none">
+                                    <span class="badge me-2" style="background-color: {{ category.color }}; color: {% if category.color == '#ffffff' or category.color == '#fff' %}#000{% else %}#fff{% endif %};">
+                                        {{ category.name }}
+                                    </span>
+                                </a>
                                 <small class="text-muted">{{ category.dataset_count }} {% trans "datasets" %}</small>
                             </div>
                         </div>
