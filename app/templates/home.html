@@ -10,7 +10,6 @@
         <div class="col-12">
             <div class="text-center">
                 <h1 class="display-4 fw-bold text-primary mb-3">
-                    <i class="bi bi-database-fill me-3"></i>
                     {% trans "Welcome to ISR Datasets" %}
                 </h1>
                 <p class="lead text-muted">
@@ -84,7 +83,7 @@
     {% endif %}
 
     <!-- Announcements Section -->
-    {% if active_announcements %}
+    {% if active_announcements or user.is_superuser or user.has_role_permission|default:False %}
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -99,44 +98,57 @@
                 </a>
                 {% endif %}
             </div>
-            {% for announcement in active_announcements %}
-            <div class="alert alert-{{ announcement.get_priority_class }} border-0 shadow-sm mb-3">
-                <div class="d-flex align-items-start">
-                    <div class="flex-shrink-0 me-3">
-                        {% if announcement.priority == 'urgent' %}
-                            <i class="bi bi-exclamation-triangle-fill fs-4"></i>
-                        {% elif announcement.priority == 'high' %}
-                            <i class="bi bi-exclamation-circle-fill fs-4"></i>
-                        {% elif announcement.priority == 'normal' %}
-                            <i class="bi bi-info-circle-fill fs-4"></i>
-                        {% else %}
-                            <i class="bi bi-info-circle fs-4"></i>
-                        {% endif %}
-                    </div>
-                    <div class="flex-grow-1">
-                        <h5 class="alert-heading mb-2">
-                            {{ announcement.title }}
+            {% if active_announcements %}
+                {% for announcement in active_announcements %}
+                <div class="alert alert-{{ announcement.get_priority_class }} border-0 shadow-sm mb-3">
+                    <div class="d-flex align-items-start">
+                        <div class="flex-shrink-0 me-3">
                             {% if announcement.priority == 'urgent' %}
-                                <span class="badge bg-danger ms-2">{% trans "URGENT" %}</span>
+                                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
                             {% elif announcement.priority == 'high' %}
-                                <span class="badge bg-warning ms-2">{% trans "HIGH" %}</span>
+                                <i class="bi bi-exclamation-circle-fill fs-4"></i>
+                            {% elif announcement.priority == 'normal' %}
+                                <i class="bi bi-info-circle-fill fs-4"></i>
+                            {% else %}
+                                <i class="bi bi-info-circle fs-4"></i>
                             {% endif %}
-                        </h5>
-                        <p class="mb-2">{{ announcement.message|linebreaks }}</p>
-                        <small class="text-muted">
-                            <i class="bi bi-person me-1"></i>
-                            {% trans "Posted by" %} {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
-                            <i class="bi bi-calendar me-1 ms-2"></i>
-                            {{ announcement.created_at|date:"M d, Y" }}
-                            {% if announcement.valid_until %}
-                                <i class="bi bi-clock me-1 ms-2"></i>
-                                {% trans "Valid until" %} {{ announcement.valid_until|date:"M d, Y" }}
-                            {% endif %}
-                        </small>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h5 class="alert-heading mb-2">
+                                {{ announcement.title }}
+                                {% if announcement.priority == 'urgent' %}
+                                    <span class="badge bg-danger ms-2">{% trans "URGENT" %}</span>
+                                {% elif announcement.priority == 'high' %}
+                                    <span class="badge bg-warning ms-2">{% trans "HIGH" %}</span>
+                                {% endif %}
+                            </h5>
+                            <p class="mb-2">{{ announcement.message|linebreaks }}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-person me-1"></i>
+                                {% trans "Posted by" %} {{ announcement.created_by.get_full_name|default:announcement.created_by.username }}
+                                <i class="bi bi-calendar me-1 ms-2"></i>
+                                {{ announcement.created_at|date:"M d, Y" }}
+                                {% if announcement.valid_until %}
+                                    <i class="bi bi-clock me-1 ms-2"></i>
+                                    {% trans "Valid until" %} {{ announcement.valid_until|date:"M d, Y" }}
+                                {% endif %}
+                            </small>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="bi bi-megaphone fs-1 text-muted mb-3"></i>
+                    <p class="text-muted">{% trans "No active announcements" %}</p>
+                    {% if user.is_superuser or user.has_role_permission|default:False %}
+                    <a href="{% url 'announcement-management' %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        {% trans "Create Announcement" %}
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -261,7 +273,7 @@
         </div>
         {% endif %}
         
-        {% if user_datasets %}
+        {% if user.is_authenticated %}
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
@@ -271,28 +283,39 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        {% for dataset in user_datasets %}
-                        <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ dataset.title }}</h6>
-                                <span class="badge {% if dataset.status == 'published' %}bg-success{% elif dataset.status == 'draft' %}bg-warning{% else %}bg-secondary{% endif %}">
-                                    {{ dataset.get_status_display }}
-                                </span>
-                            </div>
-                            <p class="mb-1">{{ dataset.description|truncatechars:50 }}</p>
-                            <small class="text-muted">
-                                {{ dataset.versions.count }} {% trans "versions" %} • {{ dataset.updated_at|timesince }} {% trans "ago" %}
-                            </small>
-                        </a>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center mt-3">
-                        <a href="{% url 'datasets:dataset_create' %}" class="btn btn-outline-success btn-sm">
-                            <i class="bi bi-plus-circle me-2"></i>
-                            {% trans "Add New Dataset" %}
-                        </a>
-                    </div>
+                    {% if user_datasets %}
+                        <div class="list-group list-group-flush">
+                            {% for dataset in user_datasets %}
+                            <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ dataset.title }}</h6>
+                                    <span class="badge {% if dataset.status == 'published' %}bg-success{% elif dataset.status == 'draft' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                        {{ dataset.get_status_display }}
+                                    </span>
+                                </div>
+                                <p class="mb-1">{{ dataset.description|truncatechars:50 }}</p>
+                                <small class="text-muted">
+                                    {{ dataset.versions.count }} {% trans "versions" %} • {{ dataset.updated_at|timesince }} {% trans "ago" %}
+                                </small>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Add New Dataset" %}
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-collection fs-1 text-muted mb-3"></i>
+                            <p class="text-muted">{% trans "You haven't created any datasets yet" %}</p>
+                            <a href="{% url 'datasets:dataset_create' %}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                {% trans "Create Your First Dataset" %}
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
