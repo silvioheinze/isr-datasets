@@ -36,13 +36,13 @@
             <div class="card">
                 <div class="card-body">
                     <form method="get" class="row g-3">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label for="{{ filter_form.search.id_for_label }}" class="form-label">
                                 {% trans "Search" %}
                             </label>
                             {{ filter_form.search }}
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label for="{{ filter_form.status.id_for_label }}" class="form-label">
                                 {% trans "Status" %}
                             </label>
@@ -54,12 +54,12 @@
                             </label>
                             {{ filter_form.tags }}
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">&nbsp;</label>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-outline-primary">
-                                    <i class="bi bi-funnel me-2"></i>
-                                    {% trans "Filter" %}
+                                    <i class="bi bi-search me-1"></i>
+                                    {% trans "Search" %}
                                 </button>
                             </div>
                         </div>

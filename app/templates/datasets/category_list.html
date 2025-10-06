@@ -89,9 +89,11 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <span class="badge me-2" style="background-color: {{ category.color }}; color: white;">
-                                                    {{ category.name }}
-                                                </span>
+                                                <a href="{% url 'datasets:dataset_list' %}?category={{ category.name|urlencode }}" class="text-decoration-none">
+                                                    <span class="badge me-2" style="background-color: {{ category.color }}; color: white;">
+                                                        {{ category.name }}
+                                                    </span>
+                                                </a>
                                             </div>
                                         </td>
                                         <td>
