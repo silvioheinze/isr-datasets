@@ -633,6 +633,11 @@ class ImportQueue(models.Model):
     @classmethod
     def get_next_import(cls):
         """Get the next import to process (highest priority, oldest first)"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info("=== ImportQueue.get_next_import() ===")
+        
         # Define priority order (higher number = higher priority)
         priority_order = {
             'urgent': 4,
@@ -642,18 +647,44 @@ class ImportQueue(models.Model):
         }
         
         # Get all pending imports and sort by priority (descending) then by creation time (ascending)
+        logger.info("Querying for pending imports")
         pending_imports = cls.objects.filter(status='pending').all()
+        logger.info(f"Found {len(pending_imports)} pending imports")
+        
+        for import_entry in pending_imports:
+            logger.info(f"  - Import {import_entry.id}: {import_entry.dataset.title} (priority: {import_entry.priority}, created: {import_entry.created_at})")
+        
         sorted_imports = sorted(
             pending_imports,
             key=lambda x: (-priority_order.get(x.priority, 0), x.created_at)
         )
         
-        return sorted_imports[0] if sorted_imports else None
+        if sorted_imports:
+            next_import = sorted_imports[0]
+            logger.info(f"Selected next import: {next_import.id} - {next_import.dataset.title}")
+            return next_import
+        else:
+            logger.info("No pending imports found")
+            return None
     
     @classmethod
     def is_processing_import(cls):
         """Check if any import is currently being processed"""
-        return cls.objects.filter(status='processing').exists()
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info("=== ImportQueue.is_processing_import() ===")
+        
+        processing_imports = cls.objects.filter(status='processing')
+        count = processing_imports.count()
+        logger.info(f"Found {count} processing imports")
+        
+        for import_entry in processing_imports:
+            logger.info(f"  - Processing import {import_entry.id}: {import_entry.dataset.title} (started: {import_entry.started_at})")
+        
+        result = count > 0
+        logger.info(f"is_processing_import result: {result}")
+        return result
 
 
 # Register models for audit logging

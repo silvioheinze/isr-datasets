@@ -72,28 +72,58 @@ class DatasetETLPipeline:
             bool: True if successful, False otherwise
         """
         try:
-            self.logger.info(f"Starting ETL pipeline for dataset: {self.dataset.title}")
+            self.logger.info(f"=== ETL PIPELINE START ===")
+            self.logger.info(f"Dataset: {self.dataset.title} (ID: {self.dataset.id})")
+            self.logger.info(f"Queue Entry: {self.queue_entry.id}")
+            self.logger.info(f"Requested by: {self.requested_by.username}")
+            self.logger.info(f"Current status: {self.queue_entry.status}")
             
             # Update queue status to processing
+            self.logger.info("Updating queue status to 'processing'")
             self._update_queue_status('processing')
+            self.logger.info("Queue status updated successfully")
             
-            # Execute ETL steps
+            # Execute ETL steps with detailed logging
+            self.logger.info("=== EXTRACT PHASE ===")
             self._extract()
+            self.logger.info(f"Extract completed. Data type: {type(self.extracted_data)}")
+            if self.extracted_data:
+                self.logger.info(f"Extracted data keys: {list(self.extracted_data.keys()) if isinstance(self.extracted_data, dict) else 'Not a dict'}")
+            
+            self.logger.info("=== TRANSFORM PHASE ===")
             self._transform()
+            self.logger.info(f"Transform completed. Data type: {type(self.transformed_data)}")
+            if self.transformed_data:
+                self.logger.info(f"Transformed data keys: {list(self.transformed_data.keys()) if isinstance(self.transformed_data, dict) else 'Not a dict'}")
+                if 'records' in self.transformed_data:
+                    self.logger.info(f"Number of records to load: {len(self.transformed_data['records'])}")
+            
+            self.logger.info("=== LOAD PHASE ===")
             self._load()
+            self.logger.info("Load completed successfully")
             
             # Mark as completed
+            self.logger.info("=== COMPLETION PHASE ===")
             self._update_queue_status('completed')
             self.logger.info(f"ETL pipeline completed successfully for dataset: {self.dataset.title}")
+            self.logger.info("=== ETL PIPELINE END ===")
             
             return True
             
         except ETLError as e:
-            self.logger.error(f"ETL pipeline failed for dataset {self.dataset.title}: {str(e)}")
+            self.logger.error(f"=== ETL PIPELINE FAILED (ETLError) ===")
+            self.logger.error(f"Dataset: {self.dataset.title}")
+            self.logger.error(f"Error: {str(e)}")
+            self.logger.error(f"Error type: {type(e).__name__}")
             self._update_queue_status('failed', str(e))
             return False
         except Exception as e:
-            self.logger.error(f"Unexpected error in ETL pipeline for dataset {self.dataset.title}: {str(e)}")
+            self.logger.error(f"=== ETL PIPELINE FAILED (Unexpected Error) ===")
+            self.logger.error(f"Dataset: {self.dataset.title}")
+            self.logger.error(f"Error: {str(e)}")
+            self.logger.error(f"Error type: {type(e).__name__}")
+            import traceback
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
             self._update_queue_status('failed', f"Unexpected error: {str(e)}")
             return False
     
@@ -102,18 +132,29 @@ class DatasetETLPipeline:
         self.logger.info(f"Extracting data for dataset: {self.dataset.title}")
         
         # Get the latest version of the dataset
+        self.logger.info("Looking for current dataset version")
         latest_version = self.dataset.versions.filter(is_current=True).first()
         if not latest_version:
+            self.logger.error("No current version found for dataset")
             raise ExtractionError("No current version found for dataset")
+        
+        self.logger.info(f"Found current version: {latest_version.id}")
+        self.logger.info(f"Version file: {latest_version.file}")
+        self.logger.info(f"Version file_url: {latest_version.file_url}")
         
         # Extract data based on file type
         if latest_version.file:
+            self.logger.info("Extracting from file")
             self.extracted_data = self._extract_from_file(latest_version)
         elif latest_version.file_url:
+            self.logger.info("Extracting from URL")
             self.extracted_data = self._extract_from_url(latest_version)
         else:
+            self.logger.info("No file or URL found, using basic info extraction")
             # Use basic info extraction for versions without files
             self.extracted_data = self._extract_basic_info(latest_version)
+        
+        self.logger.info(f"Extraction completed. Data extracted: {bool(self.extracted_data)}")
         
         self.logger.info(f"Extracted {len(self.extracted_data.get('records', []))} records from dataset")
     
@@ -398,21 +439,34 @@ class DatasetETLPipeline:
         self.logger.info(f"Transforming data for dataset: {self.dataset.title}")
         
         if not self.extracted_data:
+            self.logger.error("No data extracted to transform")
             raise TransformationError("No data extracted to transform")
         
+        self.logger.info(f"Extracted data format: {self.extracted_data.get('format', 'unknown')}")
+        self.logger.info(f"Extracted data keys: {list(self.extracted_data.keys())}")
+        self.logger.info(f"Number of records to transform: {len(self.extracted_data.get('records', []))}")
+        
         # Apply transformations based on data format
-        if self.extracted_data['format'] in ['csv', 'excel']:
+        format_type = self.extracted_data.get('format', 'unknown')
+        self.logger.info(f"Processing format: {format_type}")
+        
+        if format_type in ['csv', 'excel']:
+            self.logger.info("Transforming tabular data (CSV/Excel)")
             self.transformed_data = self._transform_tabular_data()
-        elif self.extracted_data['format'] in ['json', 'geojson']:
+        elif format_type in ['json', 'geojson']:
+            self.logger.info("Transforming JSON data")
             self.transformed_data = self._transform_json_data()
-        elif self.extracted_data['format'] in ['gdb', 'spatialite', 'gpkg']:
+        elif format_type in ['gdb', 'spatialite', 'gpkg']:
+            self.logger.info("Transforming Geospatial data")
             self.transformed_data = self._transform_geospatial_data()
-        elif self.extracted_data['format'] in ['sql']:
+        elif format_type in ['sql']:
+            self.logger.info("Transforming SQL data")
             self.transformed_data = self._transform_sql_data()
         else:
+            self.logger.info("Using extracted data as-is (no transformation)")
             self.transformed_data = self.extracted_data
         
-        self.logger.info(f"Transformed {len(self.transformed_data.get('records', []))} records")
+        self.logger.info(f"Transform completed. Records: {len(self.transformed_data.get('records', []))}")
     
     def _transform_tabular_data(self) -> Dict[str, Any]:
         """Transform tabular data (CSV, Excel)"""
@@ -591,23 +645,39 @@ class DatasetETLPipeline:
         self.logger.info(f"Loading data into import database for dataset: {self.dataset.title}")
         
         if not self.transformed_data:
+            self.logger.error("No transformed data to load")
             raise LoadingError("No transformed data to load")
+        
+        self.logger.info(f"Transformed data keys: {list(self.transformed_data.keys())}")
+        self.logger.info(f"Number of records to load: {len(self.transformed_data.get('records', []))}")
         
         # Create table name
         table_name = f"imported_dataset_{self.dataset.id}_{self.requested_by.id}"
+        self.logger.info(f"Target table name: {table_name}")
         
         try:
+            self.logger.info("Starting database transaction")
             with transaction.atomic(using='import'):
+                self.logger.info("Creating import table")
                 # Create table
                 self._create_import_table(table_name)
+                self.logger.info("Table created successfully")
                 
+                self.logger.info("Inserting data into table")
                 # Insert data
                 self._insert_data(table_name)
+                self.logger.info("Data inserted successfully")
                 
+                self.logger.info("Creating DatasetImport record")
                 # Create DatasetImport record
                 self._create_dataset_import_record(table_name)
+                self.logger.info("DatasetImport record created successfully")
                 
         except Exception as e:
+            self.logger.error(f"Load phase failed: {str(e)}")
+            self.logger.error(f"Error type: {type(e).__name__}")
+            import traceback
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
             raise LoadingError(f"Failed to load data: {str(e)}")
         
         self.logger.info(f"Successfully loaded {len(self.transformed_data['records'])} records into table: {table_name}")
@@ -624,6 +694,9 @@ class DatasetETLPipeline:
             # Fallback to basic columns
             columns = ['_dataset_id', '_dataset_title', '_import_timestamp', '_imported_by']
         
+        # Check if there's already an ID column in the data
+        has_id_column = self._check_for_id_column(columns)
+        
         # Build CREATE TABLE statement
         column_defs = []
         for column in columns:
@@ -633,6 +706,14 @@ class DatasetETLPipeline:
             else:
                 # Data columns - use TEXT for simplicity
                 column_defs.append(f'"{column}" TEXT')
+        
+        # Add ID column if not present in the data
+        if not has_id_column:
+            self.logger.info(f"No ID column found in data, adding auto-generated ID column")
+            # Add auto-generated ID column at the beginning
+            column_defs.insert(0, 'data_id SERIAL')
+        else:
+            self.logger.info(f"ID column found in data, using existing column")
         
         # Add standard columns
         column_defs.extend([
@@ -649,6 +730,43 @@ class DatasetETLPipeline:
         with self.import_db.cursor() as cursor:
             cursor.execute(create_sql)
     
+    def _check_for_id_column(self, columns: List[str]) -> bool:
+        """
+        Check if the data already contains an ID column.
+        
+        Args:
+            columns: List of column names from the data
+            
+        Returns:
+            bool: True if ID column exists, False otherwise
+        """
+        # Common ID column names to check for
+        id_column_names = [
+            'id', 'ID', 'Id', 'iD',
+            'pk', 'PK', 'Pk', 'pK',
+            'key', 'Key', 'KEY',
+            'identifier', 'Identifier', 'IDENTIFIER',
+            'uuid', 'UUID', 'Uuid',
+            'row_id', 'rowid', 'ROWID',
+            'record_id', 'recordid', 'RECORDID'
+        ]
+        
+        # Check if any column matches ID patterns
+        for column in columns:
+            # Direct match
+            if column in id_column_names:
+                return True
+            
+            # Case-insensitive match
+            if column.lower() in [name.lower() for name in id_column_names]:
+                return True
+            
+            # Pattern matching for common ID formats
+            if any(pattern in column.lower() for pattern in ['_id', '_key', '_pk']):
+                return True
+        
+        return False
+    
     def _insert_data(self, table_name: str):
         """Insert data into import table"""
         records = self.transformed_data['records']
@@ -663,9 +781,21 @@ class DatasetETLPipeline:
             # Derive columns from the first record
             columns = list(records[0].keys())
         
+        # Check if we need to add auto-generated ID column
+        has_id_column = self._check_for_id_column(columns)
+        
+        # Prepare columns for insertion
+        if not has_id_column:
+            # Add data_id column at the beginning for auto-generated IDs
+            insert_columns = ['data_id'] + columns
+            self.logger.info(f"Adding auto-generated data_id column for {len(records)} records")
+        else:
+            insert_columns = columns
+            self.logger.info(f"Using existing ID column in data")
+        
         # Prepare insert statement
-        column_names = [f'"{col}"' for col in columns]
-        placeholders = ', '.join(['%s'] * len(columns))
+        column_names = [f'"{col}"' for col in insert_columns]
+        placeholders = ', '.join(['%s'] * len(insert_columns))
         
         insert_sql = f"""
         INSERT INTO "{table_name}" ({', '.join(column_names)})
@@ -674,8 +804,13 @@ class DatasetETLPipeline:
         
         # Prepare data for insertion
         insert_data = []
-        for record in records:
-            row_data = [record.get(col) for col in columns]
+        for i, record in enumerate(records):
+            if not has_id_column:
+                # Add auto-generated ID (starting from 1)
+                row_data = [i + 1] + [record.get(col) for col in columns]
+            else:
+                # Use existing data
+                row_data = [record.get(col) for col in columns]
             insert_data.append(row_data)
         
         # Execute batch insert
@@ -730,22 +865,34 @@ class ETLPipelineManager:
         Returns:
             bool: True if an import was processed, False if queue is empty
         """
+        logger.info("=== ETL PIPELINE MANAGER: process_next_import() ===")
+        
         # Check if any import is currently processing
-        if ImportQueue.is_processing_import():
+        is_processing = ImportQueue.is_processing_import()
+        logger.info(f"Checking if import is already processing: {is_processing}")
+        
+        if is_processing:
             logger.info("Import already in progress, skipping queue processing")
             return False
         
         # Get next import to process
+        logger.info("Getting next import from queue")
         queue_entry = ImportQueue.get_next_import()
         if not queue_entry:
             logger.info("No imports in queue")
             return False
         
-        logger.info(f"Processing import queue entry: {queue_entry}")
+        logger.info(f"Found queue entry: {queue_entry.id}")
+        logger.info(f"Queue entry status: {queue_entry.status}")
+        logger.info(f"Queue entry dataset: {queue_entry.dataset.title}")
+        logger.info(f"Queue entry requested by: {queue_entry.requested_by.username}")
         
         # Create and execute ETL pipeline
+        logger.info("Creating ETL pipeline instance")
         pipeline = DatasetETLPipeline(queue_entry)
+        logger.info("Executing ETL pipeline")
         success = pipeline.execute()
+        logger.info(f"ETL pipeline execution result: {success}")
         
         return success
     
