@@ -226,20 +226,27 @@ class DatasetUpdateView(LoginRequiredMixin, UpdateView):
         return reverse('datasets:dataset_detail', kwargs={'pk': self.object.pk})
 
 
-class DatasetDeleteView(LoginRequiredMixin, DeleteView):
-    """Delete a dataset"""
+class DatasetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Delete a dataset (superusers only)"""
     model = Dataset
     template_name = 'datasets/dataset_confirm_delete.html'
     success_url = reverse_lazy('datasets:dataset_list')
 
-    def get_queryset(self):
-        # Allow owners, contributors, and staff/superusers to delete
-        if self.request.user.is_staff or self.request.user.is_superuser:
-            return Dataset.objects.all()
-        return Dataset.objects.filter(
-            Q(owner=self.request.user) | 
-            Q(contributors=self.request.user)
-        ).distinct()
+    def test_func(self):
+        """Check if user is a superuser"""
+        return self.request.user.is_superuser
+    
+    def handle_no_permission(self):
+        """Handle access denied - redirect with error message"""
+        messages.error(
+            self.request, 
+            'Access denied. Only superusers can delete datasets.'
+        )
+        # Try to redirect to the dataset detail page if we have the pk
+        pk = self.kwargs.get('pk')
+        if pk:
+            return redirect('datasets:dataset_detail', pk=pk)
+        return redirect('datasets:dataset_list')
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Dataset deleted successfully!')
