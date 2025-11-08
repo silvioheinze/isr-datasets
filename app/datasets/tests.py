@@ -919,3 +919,237 @@ class DatasetDownloadModelTests(TestCase):
         download.save()
         expected_str = f'{self.dataset.title} - Anonymous'
         self.assertEqual(str(download), expected_str)
+
+
+class DatasetDeleteViewTests(TestCase):
+    """Test cases for DatasetDeleteView - superuser only deletion"""
+    
+    def setUp(self):
+        """Set up test data"""
+        # Create regular user
+        self.regular_user = User.objects.create_user(
+            username='regularuser',
+            email='regular@example.com',
+            password='testpass123'
+        )
+        
+        # Create staff user (not superuser)
+        self.staff_user = User.objects.create_user(
+            username='staffuser',
+            email='staff@example.com',
+            password='testpass123',
+            is_staff=True
+        )
+        
+        # Create superuser
+        self.superuser = User.objects.create_superuser(
+            username='superuser',
+            email='super@example.com',
+            password='testpass123'
+        )
+        
+        # Create a publisher and category for datasets
+        self.publisher = Publisher.objects.create(
+            name='Test Publisher',
+            description='Test publisher description'
+        )
+        
+        self.category = DatasetCategory.objects.create(
+            name='Test Category',
+            description='Test category description'
+        )
+        
+        # Create datasets owned by regular user
+        self.dataset1 = Dataset.objects.create(
+            title='Test Dataset 1',
+            description='Test description 1',
+            owner=self.regular_user,
+            publisher=self.publisher,
+            category=self.category,
+            status='published'
+        )
+        
+        self.dataset2 = Dataset.objects.create(
+            title='Test Dataset 2',
+            description='Test description 2',
+            owner=self.regular_user,
+            publisher=self.publisher,
+            status='draft'
+        )
+        
+        # Create dataset version for dataset1
+        self.version = DatasetVersion.objects.create(
+            dataset=self.dataset1,
+            version_number='1.0',
+            description='Initial version',
+            created_by=self.regular_user
+        )
+        
+        # Create download record for dataset1
+        self.download = DatasetDownload.objects.create(
+            dataset=self.dataset1,
+            user=self.regular_user,
+            ip_address='192.168.1.1',
+            user_agent='Mozilla/5.0'
+        )
+        
+        # Create comment for dataset1
+        self.comment = Comment.objects.create(
+            dataset=self.dataset1,
+            author=self.regular_user,
+            content='Test comment'
+        )
+        
+        self.client = Client()
+    
+    def test_superuser_can_access_delete_page(self):
+        """Test that superuser can access the delete confirmation page"""
+        self.client.login(username='superuser', password='testpass123')
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'datasets/dataset_confirm_delete.html')
+        self.assertContains(response, 'Delete Dataset')
+        self.assertContains(response, self.dataset1.title)
+    
+    def test_superuser_can_delete_dataset(self):
+        """Test that superuser can successfully delete a dataset"""
+        self.client.login(username='superuser', password='testpass123')
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        
+        # Verify dataset exists before deletion
+        self.assertTrue(Dataset.objects.filter(pk=self.dataset1.pk).exists())
+        
+        # Delete the dataset
+        response = self.client.post(url, follow=True)
+        
+        # Check that dataset was deleted
+        self.assertFalse(Dataset.objects.filter(pk=self.dataset1.pk).exists())
+        
+        # Check redirect to dataset list
+        self.assertRedirects(response, reverse('datasets:dataset_list'))
+        
+        # Check success message
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Dataset deleted successfully!', str(messages[0]))
+    
+    def test_superuser_can_delete_dataset_with_related_objects(self):
+        """Test that superuser can delete a dataset and related objects are cascaded"""
+        self.client.login(username='superuser', password='testpass123')
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        
+        dataset_id = self.dataset1.pk
+        version_id = self.version.pk
+        download_id = self.download.pk
+        comment_id = self.comment.pk
+        
+        # Verify related objects exist
+        self.assertTrue(DatasetVersion.objects.filter(pk=version_id).exists())
+        self.assertTrue(DatasetDownload.objects.filter(pk=download_id).exists())
+        self.assertTrue(Comment.objects.filter(pk=comment_id).exists())
+        
+        # Delete the dataset
+        response = self.client.post(url, follow=True)
+        
+        # Check that dataset was deleted
+        self.assertFalse(Dataset.objects.filter(pk=dataset_id).exists())
+        
+        # Related objects should also be deleted (CASCADE)
+        self.assertFalse(DatasetVersion.objects.filter(pk=version_id).exists())
+        self.assertFalse(DatasetDownload.objects.filter(pk=download_id).exists())
+        self.assertFalse(Comment.objects.filter(pk=comment_id).exists())
+    
+    def test_regular_user_cannot_access_delete_page(self):
+        """Test that regular user cannot access the delete confirmation page"""
+        self.client.login(username='regularuser', password='testpass123')
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        response = self.client.get(url)
+        
+        # Should redirect with error message
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('datasets:dataset_detail', kwargs={'pk': self.dataset1.pk}))
+        
+        # Follow redirect and check for error message
+        response = self.client.get(url, follow=True)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Access denied. Only superusers can delete datasets.', str(messages[0]))
+    
+    def test_regular_user_cannot_delete_own_dataset(self):
+        """Test that even dataset owners cannot delete their own datasets (only superusers can)"""
+        self.client.login(username='regularuser', password='testpass123')
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        
+        # Try to delete (even though user owns the dataset)
+        response = self.client.post(url, follow=True)
+        
+        # Should redirect with error message
+        self.assertEqual(response.status_code, 302)
+        
+        # Dataset should still exist
+        self.assertTrue(Dataset.objects.filter(pk=self.dataset1.pk).exists())
+        
+        # Check error message
+        response = self.client.post(url, follow=True)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Access denied. Only superusers can delete datasets.', str(messages[0]))
+    
+    def test_staff_user_cannot_delete_dataset(self):
+        """Test that staff users (non-superuser) cannot delete datasets"""
+        self.client.login(username='staffuser', password='testpass123')
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        response = self.client.get(url)
+        
+        # Should redirect with error message
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('datasets:dataset_detail', kwargs={'pk': self.dataset1.pk}))
+        
+        # Dataset should still exist
+        self.assertTrue(Dataset.objects.filter(pk=self.dataset1.pk).exists())
+        
+        # Check error message
+        response = self.client.post(url, follow=True)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertIn('Access denied. Only superusers can delete datasets.', str(messages[0]))
+    
+    def test_unauthenticated_user_cannot_delete_dataset(self):
+        """Test that unauthenticated users cannot delete datasets"""
+        url = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        response = self.client.get(url)
+        
+        # Should redirect to login page
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
+        
+        # Dataset should still exist
+        self.assertTrue(Dataset.objects.filter(pk=self.dataset1.pk).exists())
+    
+    def test_superuser_can_delete_multiple_datasets(self):
+        """Test that superuser can delete multiple datasets"""
+        self.client.login(username='superuser', password='testpass123')
+        
+        # Delete first dataset
+        url1 = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset1.pk})
+        response1 = self.client.post(url1, follow=True)
+        self.assertFalse(Dataset.objects.filter(pk=self.dataset1.pk).exists())
+        
+        # Delete second dataset
+        url2 = reverse('datasets:dataset_delete', kwargs={'pk': self.dataset2.pk})
+        response2 = self.client.post(url2, follow=True)
+        self.assertFalse(Dataset.objects.filter(pk=self.dataset2.pk).exists())
+        
+        # Both should be deleted
+        self.assertEqual(Dataset.objects.count(), 0)
+    
+    def test_delete_nonexistent_dataset_returns_404(self):
+        """Test that deleting a non-existent dataset returns 404"""
+        self.client.login(username='superuser', password='testpass123')
+        fake_uuid = uuid.uuid4()
+        url = reverse('datasets:dataset_delete', kwargs={'pk': fake_uuid})
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 404)
