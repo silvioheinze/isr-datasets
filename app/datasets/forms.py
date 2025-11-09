@@ -200,6 +200,35 @@ class MultiFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
 
+class MultiFileField(forms.FileField):
+    def clean(self, data, initial=None):
+        if data is None:
+            data = []
+        if isinstance(data, (list, tuple)):
+            files = list(data)
+        else:
+            files = [data] if data else []
+
+        cleaned_files = []
+        errors = []
+
+        for uploaded_file in files:
+            if uploaded_file in (None, ''):
+                continue
+            try:
+                cleaned_files.append(super().clean(uploaded_file, initial))
+            except forms.ValidationError as exc:
+                errors.extend(exc.error_list)
+
+        if errors:
+            raise forms.ValidationError(errors)
+
+        if self.required and not cleaned_files:
+            raise forms.ValidationError(self.error_messages['required'], code='required')
+
+        return cleaned_files
+
+
 class DatasetVersionForm(forms.ModelForm):
     """Form for creating new dataset versions"""
     
@@ -212,7 +241,7 @@ class DatasetVersionForm(forms.ModelForm):
         initial='upload',
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
-    files = forms.FileField(
+    files = MultiFileField(
         required=False,
         widget=MultiFileInput(attrs={
             'class': 'form-control',
@@ -280,7 +309,7 @@ class DatasetVersionForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         input_method = cleaned_data.get('input_method')
-        uploaded_files = self.files.getlist('files') if hasattr(self, 'files') else []
+        uploaded_files = cleaned_data.get('files') or []
         file_url = cleaned_data.get('file_url')
         file_url_description = cleaned_data.get('file_url_description')
         file_size_text = cleaned_data.get('file_size_text')

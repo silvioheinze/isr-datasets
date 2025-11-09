@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.contrib import messages
 from django.http import HttpResponse, Http404, FileResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
@@ -247,6 +248,8 @@ class DatasetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def handle_no_permission(self):
         """Handle access denied - redirect with error message"""
+        if not self.request.user.is_authenticated:
+            return redirect_to_login(self.request.get_full_path())
         messages.error(
             self.request, 
             'Access denied. Only superusers can delete datasets.'
