@@ -1,16 +1,26 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import redirect_to_login
 from django.contrib import messages
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, FileResponse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.utils import timezone
 from django.db import transaction
+from pathlib import Path
 
-from .models import Dataset, DatasetCategory, DatasetVersion, DatasetDownload, Comment, Publisher
+from .models import (
+    Dataset,
+    DatasetCategory,
+    DatasetVersion,
+    DatasetVersionFile,
+    DatasetDownload,
+    Comment,
+    Publisher,
+)
 from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm
 
 
@@ -80,7 +90,7 @@ class DatasetListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         # All authenticated users can see all datasets regardless of status
-        queryset = Dataset.objects.all().select_related('owner', 'category').prefetch_related('contributors', 'versions')
+        queryset = Dataset.objects.all().select_related('owner', 'category').prefetch_related('contributors', 'versions', 'versions__files')
         
         # Filter by category
         category = self.request.GET.get('category')
@@ -116,13 +126,13 @@ class DatasetListView(LoginRequiredMixin, ListView):
         if self.request.user and self.request.user.is_authenticated and self.request.user.is_superuser:
             featured_queryset = Dataset.objects.filter(
                 is_featured=True
-            ).select_related('owner', 'category').prefetch_related('versions')
+            ).select_related('owner', 'category').prefetch_related('versions', 'versions__files')
         else:
             # Featured datasets including user's private datasets
             featured_queryset = Dataset.objects.filter(
                 is_featured=True,
                 access_level__in=['public', 'restricted']
-            ).select_related('owner', 'category').prefetch_related('versions')
+            ).select_related('owner', 'category').prefetch_related('versions', 'versions__files')
             
             # Add user's private featured datasets
             if self.request.user and self.request.user.is_authenticated:
@@ -130,7 +140,7 @@ class DatasetListView(LoginRequiredMixin, ListView):
                     owner=self.request.user,
                     is_featured=True,
                     access_level='private'
-                ).select_related('owner', 'category').prefetch_related('versions')
+                ).select_related('owner', 'category').prefetch_related('versions', 'versions__files')
                 
                 featured_queryset = featured_queryset.union(user_private_featured)
         
@@ -150,7 +160,7 @@ class DatasetDetailView(LoginRequiredMixin, DetailView):
     def get_queryset(self):
         # All authenticated users can see all datasets regardless of status
         return Dataset.objects.select_related('owner', 'category', 'publisher').prefetch_related(
-            'contributors', 'versions', 'related_datasets', 'comments__author', 'projects'
+            'contributors', 'versions', 'versions__files', 'related_datasets', 'comments__author', 'projects'
         )
 
     def get_object(self, queryset=None):
@@ -238,6 +248,8 @@ class DatasetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     
     def handle_no_permission(self):
         """Handle access denied - redirect with error message"""
+        if not self.request.user.is_authenticated:
+            return redirect_to_login(self.request.get_full_path())
         messages.error(
             self.request, 
             'Access denied. Only superusers can delete datasets.'
@@ -260,15 +272,47 @@ def dataset_download(request, pk):
     
     # All authenticated users can download all datasets regardless of status
     
-    # Get the current version of the dataset
-    current_version = dataset.versions.filter(is_current=True).first()
-    
-    if not current_version:
+    version_id = request.GET.get('version')
+    version = None
+
+    if version_id:
+        try:
+            version = dataset.versions.get(id=version_id)
+        except DatasetVersion.DoesNotExist:
+            messages.error(request, 'Requested dataset version was not found.')
+            return redirect('datasets:dataset_detail', pk=pk)
+    else:
+        version = dataset.versions.filter(is_current=True).first()
+
+    if not version:
         messages.error(request, 'No version available for download.')
         return redirect('datasets:dataset_detail', pk=pk)
     
-    # Check if there's a file to download
-    if not current_version.file and not current_version.file_url:
+    # Determine which file (if any) should be served
+    file_id = request.GET.get('file')
+    attachment = None
+
+    if file_id:
+        attachment = version.files.filter(id=file_id).first()
+        if not attachment:
+            messages.error(request, 'Requested file was not found for this dataset version.')
+            return redirect('datasets:dataset_detail', pk=pk)
+    else:
+        attachment = version.files.order_by('uploaded_at', 'id').first()
+    
+    storage_file = None
+    download_filename = None
+    redirect_url = None
+    
+    if attachment:
+        storage_file = attachment.file
+        download_filename = attachment.display_name
+    elif version.file:
+        storage_file = version.file
+        download_filename = Path(version.file.name).name
+    elif version.file_url:
+        redirect_url = version.file_url
+    else:
         messages.error(request, 'No file available for download.')
         return redirect('datasets:dataset_detail', pk=pk)
     
@@ -285,14 +329,12 @@ def dataset_download(request, pk):
     dataset.save(update_fields=['download_count'])
     
     # Serve file or redirect to URL
-    if current_version.file:
-        # Serve uploaded file
-        response = HttpResponse(current_version.file.read(), content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename="{current_version.file.name}"'
+    if storage_file:
+        file_handle = storage_file.open('rb')
+        response = FileResponse(file_handle, as_attachment=True, filename=download_filename)
         return response
     else:
-        # Redirect to external URL
-        return redirect(current_version.file_url)
+        return redirect(redirect_url)
 
 
 @login_required
@@ -345,18 +387,48 @@ class DatasetVersionCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        form.instance.dataset = self.dataset
-        form.instance.created_by = self.request.user
-        form.instance.is_current = True  # New version becomes current
-        
-        # Set previous versions to not current
-        DatasetVersion.objects.filter(dataset=self.dataset).update(is_current=False)
-        
+        input_method = form.cleaned_data.get('input_method')
+        uploaded_files = form.cleaned_data.get('uploaded_files', [])
+        total_upload_size = form.cleaned_data.get('uploaded_files_total_size', 0)
+
+        with transaction.atomic():
+            # Set previous versions to not current
+            DatasetVersion.objects.filter(dataset=self.dataset).update(is_current=False)
+
+            self.object = form.save(commit=False)
+            self.object.dataset = self.dataset
+            self.object.created_by = self.request.user
+            self.object.is_current = True  # New version becomes current
+
+            # Ensure legacy single-file fields are cleared for upload flow
+            self.object.file = None
+
+            if input_method == 'upload':
+                self.object.file_url = ''
+                self.object.file_url_description = ''
+                self.object.file_size_text = ''
+                self.object.file_size = total_upload_size
+            else:
+                # For external URLs, rely on provided metadata but keep computed size at zero
+                self.object.file_size = 0
+
+            self.object.save()
+
+            # Persist uploaded files as separate attachments
+            if input_method == 'upload':
+                for upload in uploaded_files:
+                    DatasetVersionFile.objects.create(
+                        version=self.object,
+                        file=upload,
+                        file_size=upload.size,
+                        original_name=upload.name,
+                    )
+
         # Send notification about new version
-        send_new_version_notification_email(self.dataset, form.instance)
-        
-        messages.success(self.request, f'Version {form.instance.version_number} created successfully!')
-        return super().form_valid(form)
+        send_new_version_notification_email(self.dataset, self.object)
+
+        messages.success(self.request, f'Version {self.object.version_number} created successfully!')
+        return redirect(self.get_success_url())
 
     def form_invalid(self, form):
         messages.error(self.request, 'Please correct the errors below.')

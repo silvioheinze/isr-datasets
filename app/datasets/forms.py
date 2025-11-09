@@ -196,6 +196,39 @@ class DatasetCategoryForm(forms.ModelForm):
         return name
 
 
+class MultiFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultiFileField(forms.FileField):
+    def clean(self, data, initial=None):
+        if data is None:
+            data = []
+        if isinstance(data, (list, tuple)):
+            files = list(data)
+        else:
+            files = [data] if data else []
+
+        cleaned_files = []
+        errors = []
+
+        for uploaded_file in files:
+            if uploaded_file in (None, ''):
+                continue
+            try:
+                cleaned_files.append(super().clean(uploaded_file, initial))
+            except forms.ValidationError as exc:
+                errors.extend(exc.error_list)
+
+        if errors:
+            raise forms.ValidationError(errors)
+
+        if self.required and not cleaned_files:
+            raise forms.ValidationError(self.error_messages['required'], code='required')
+
+        return cleaned_files
+
+
 class DatasetVersionForm(forms.ModelForm):
     """Form for creating new dataset versions"""
     
@@ -208,10 +241,18 @@ class DatasetVersionForm(forms.ModelForm):
         initial='upload',
         widget=forms.RadioSelect(attrs={'class': 'form-check-input'})
     )
+    files = MultiFileField(
+        required=False,
+        widget=MultiFileInput(attrs={
+            'class': 'form-control',
+            'multiple': True,
+            'accept': '.csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql'
+        })
+    )
     
     class Meta:
         model = DatasetVersion
-        fields = ['version_number', 'description', 'file', 'file_url', 'file_url_description', 'file_size_text']
+        fields = ['version_number', 'description', 'file_url', 'file_url_description', 'file_size_text']
         widgets = {
             'version_number': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -221,10 +262,6 @@ class DatasetVersionForm(forms.ModelForm):
                 'class': 'form-control',
                 'rows': 4,
                 'placeholder': 'Describe the changes in this version...'
-            }),
-            'file': forms.FileInput(attrs={
-                'class': 'form-control',
-                'accept': '.csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql'
             }),
             'file_url': forms.URLInput(attrs={
                 'class': 'form-control',
@@ -248,7 +285,7 @@ class DatasetVersionForm(forms.ModelForm):
         # Add help text for fields
         self.fields['version_number'].help_text = 'Use semantic versioning (e.g., 1.0, 1.1, 2.0)'
         self.fields['description'].help_text = 'Optional: Describe what changed in this version'
-        self.fields['file'].help_text = 'Upload the new version file (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL formats supported, max 1GB)'
+        self.fields['files'].help_text = 'Upload one or more files for this version (CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL formats supported, max 1GB per file)'
         self.fields['file_url'].help_text = 'External URL where the file can be accessed'
         self.fields['file_url_description'].help_text = 'Optional: Describe where the file is located'
         self.fields['file_size_text'].help_text = 'Human-readable file size (e.g., "2.5 MB", "1.2 GB")'
@@ -272,53 +309,45 @@ class DatasetVersionForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         input_method = cleaned_data.get('input_method')
-        file = cleaned_data.get('file')
+        uploaded_files = cleaned_data.get('files') or []
         file_url = cleaned_data.get('file_url')
         file_url_description = cleaned_data.get('file_url_description')
         file_size_text = cleaned_data.get('file_size_text')
+        total_upload_size = 0
         
         # Validate based on input method
         if input_method == 'upload':
-            if not file:
-                raise forms.ValidationError('Please upload a file when using the upload method.')
+            if not uploaded_files:
+                self.add_error('files', 'Please upload at least one file when using the upload method.')
+                raise forms.ValidationError('Please upload at least one file when using the upload method.')
             if file_url:
                 raise forms.ValidationError('Please do not provide a URL when uploading a file.')
             if file_size_text:
                 raise forms.ValidationError('File size will be calculated automatically when uploading.')
-                
-            # Check file size (limit to 1GB)
-            if file.size > 1024 * 1024 * 1024:
-                raise forms.ValidationError('File size cannot exceed 1GB.')
             
-            # Update file_size field
-            self.instance.file_size = file.size
+            for upload in uploaded_files:
+                if upload.size > 1024 * 1024 * 1024:
+                    self.add_error('files', f'File "{upload.name}" exceeds the 1GB size limit.')
+                    raise forms.ValidationError('Each uploaded file must be 1GB or smaller.')
+                total_upload_size += upload.size
+            
+            # Update file_size field with total upload size
+            self.instance.file_size = total_upload_size
             
         elif input_method == 'url':
             # Either URL or description must be provided (or both)
             if not file_url and not file_url_description:
                 raise forms.ValidationError('Please provide either a URL or description (or both) when using the external URL method.')
-            if file:
-                raise forms.ValidationError('Please do not upload a file when using the external URL method.')
+            if uploaded_files:
+                raise forms.ValidationError('Please do not upload files when using the external URL method.')
             if not file_size_text:
                 raise forms.ValidationError('Please provide the file size when using external URL.')
             
-            # Clear file field
-            cleaned_data['file'] = None
             self.instance.file_size = 0
         
+        cleaned_data['uploaded_files'] = uploaded_files
+        cleaned_data['uploaded_files_total_size'] = total_upload_size
         return cleaned_data
-
-    def clean_file(self):
-        file = self.cleaned_data.get('file')
-        input_method = self.cleaned_data.get('input_method')
-        
-        # Only validate file if upload method is selected
-        if input_method == 'upload' and file:
-            # Check file size (limit to 1GB)
-            if file.size > 1024 * 1024 * 1024:
-                raise forms.ValidationError('File size cannot exceed 1GB.')
-        
-        return file
 
 
 class DatasetCategoryForm(forms.ModelForm):
