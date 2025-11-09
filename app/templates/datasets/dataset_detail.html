@@ -377,8 +377,19 @@
                                     <td>
                                         {{ version.get_file_size_display }}
                                     </td>
+                                    {% with attachments=version.files.all %}
                                     <td>
-                                        {% if version.file %}
+                                        {% if attachments %}
+                                            <span class="badge bg-primary">
+                                                <i class="bi bi-upload me-1"></i>
+                                                {% trans "Uploaded files" %} ({{ attachments|length }})
+                                            </span>
+                                            {% if attachments|length > 1 %}
+                                                <div class="small text-muted mt-1">
+                                                    {{ attachments|length }} {% trans "files attached" %}
+                                                </div>
+                                            {% endif %}
+                                        {% elif version.file %}
                                             <span class="badge bg-primary">
                                                 <i class="bi bi-upload me-1"></i>
                                                 {% trans "Uploaded" %}
@@ -410,12 +421,23 @@
                                         <small class="text-muted">{{ version.created_at|date:"M d, Y H:i" }}</small>
                                     </td>
                                     <td>
-                                        {% if version.file %}
-                                        <a href="{% url 'datasets:dataset_download' dataset.pk %}?version={{ version.id }}" 
-                                           class="btn btn-outline-primary btn-sm" 
-                                           title="{% trans 'Download this version' %}">
-                                            <i class="bi bi-download"></i>
-                                        </a>
+                                        {% if attachments %}
+                                            <div class="d-flex flex-column gap-2">
+                                                {% for attachment in attachments %}
+                                                    <a href="{% url 'datasets:dataset_download' dataset.pk %}?version={{ version.id }}&file={{ attachment.id }}"
+                                                       class="btn btn-outline-primary btn-sm text-start"
+                                                       title="{% trans 'Download this file' %}">
+                                                        <i class="bi bi-download me-2"></i>
+                                                        {{ attachment.display_name }}
+                                                    </a>
+                                                {% endfor %}
+                                            </div>
+                                        {% elif version.file %}
+                                            <a href="{% url 'datasets:dataset_download' dataset.pk %}?version={{ version.id }}" 
+                                               class="btn btn-outline-primary btn-sm" 
+                                               title="{% trans 'Download this version' %}">
+                                                <i class="bi bi-download"></i>
+                                            </a>
                                         {% elif version.file_url %}
                                         <a href="{{ version.file_url }}" 
                                            class="btn btn-outline-info btn-sm" 
@@ -427,6 +449,7 @@
                                         <span class="text-muted">{% trans "No file" %}</span>
                                         {% endif %}
                                     </td>
+                                    {% endwith %}
                                 </tr>
                                 {% endfor %}
                             </tbody>

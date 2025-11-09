@@ -32,6 +32,25 @@ def dataset_version_upload_path(instance, filename):
     return f'datasets/versions/{year}/{month}/{day}/{safe_filename}'
 
 
+def dataset_version_attachment_upload_path(instance, filename):
+    """
+    Upload path for additional files associated with a dataset version.
+    Mirrors the main dataset version upload path but uses the DatasetVersionFile instance.
+    """
+    now = timezone.now()
+    year = now.strftime('%Y')
+    month = now.strftime('%m')
+    day = now.strftime('%d')
+    
+    dataset_id = instance.version.dataset.id
+    version_number = instance.version.version_number
+    
+    safe_filename = f"dataset_{dataset_id}_version_{version_number}_{filename}"
+    
+    # Return the full path
+    return f'datasets/versions/{year}/{month}/{day}/{safe_filename}'
+
+
 class Publisher(models.Model):
     """Model for dataset publishers"""
     name = models.CharField(
@@ -264,7 +283,14 @@ class Dataset(models.Model):
                     # Remove the dot and convert to uppercase
                     format_name = ext[1:].upper()
                     formats.add(format_name)
-            elif version.file_url:
+            # Include additional uploaded files
+            if hasattr(version, 'files'):
+                for attachment in version.files.all():
+                    _, ext = os.path.splitext(attachment.file.name)
+                    if ext:
+                        format_name = ext[1:].upper()
+                        formats.add(format_name)
+            if version.file_url:
                 # For external URLs, try to extract format from URL
                 url_lower = version.file_url.lower()
                 supported_extensions = [
@@ -317,6 +343,21 @@ class DatasetVersion(models.Model):
         """Return human-readable file size"""
         if self.file_size_text:
             return self.file_size_text
+        attachments_manager = getattr(self, 'files', None)
+        if attachments_manager and attachments_manager.exists():
+            attachments = list(attachments_manager.all())
+            total_size = self.file_size or sum(f.file_size for f in attachments)
+            size_names = ["B", "KB", "MB", "GB", "TB"]
+            i = 0
+            size = total_size
+            
+            while size >= 1024 and i < len(size_names) - 1:
+                size /= 1024
+                i += 1
+            
+            human_size = f"{size:.1f} {size_names[i]}"
+            count = len(attachments)
+            return f"{count} file{'s' if count != 1 else ''}, {human_size}"
         elif self.file_size > 0:
             size_names = ["B", "KB", "MB", "GB", "TB"]
             i = 0
@@ -331,7 +372,37 @@ class DatasetVersion(models.Model):
     
     def has_file(self):
         """Check if version has either uploaded file, external URL, or URL description"""
-        return bool(self.file or self.file_url or self.file_url_description)
+        if self.file:
+            return True
+        if hasattr(self, 'files') and self.files.exists():
+            return True
+        return bool(self.file_url or self.file_url_description)
+
+
+class DatasetVersionFile(models.Model):
+    """Individual files associated with a dataset version."""
+    version = models.ForeignKey(
+        DatasetVersion,
+        on_delete=models.CASCADE,
+        related_name='files'
+    )
+    file = models.FileField(upload_to=dataset_version_attachment_upload_path)
+    file_size = models.BigIntegerField(default=0)
+    original_name = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['uploaded_at', 'id']
+
+    def __str__(self):
+        display_name = self.display_name
+        return f"{self.version.dataset.title} v{self.version.version_number} - {display_name}"
+
+    @property
+    def display_name(self):
+        if self.original_name:
+            return self.original_name
+        return os.path.basename(self.file.name)
 
 
 class DatasetDownload(models.Model):
@@ -417,5 +488,6 @@ auditlog.register(Publisher)
 auditlog.register(Dataset)
 auditlog.register(DatasetCategory)
 auditlog.register(DatasetVersion)
+auditlog.register(DatasetVersionFile)
 auditlog.register(Comment)
 auditlog.register(DatasetDownload)
