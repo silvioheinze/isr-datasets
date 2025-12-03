@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
@@ -265,10 +266,30 @@ class DatasetDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-@login_required
 def dataset_download(request, pk):
-    """Handle dataset downloads (requires authentication)"""
+    """Handle dataset downloads (requires authentication via session or API key)"""
     dataset = get_object_or_404(Dataset, pk=pk)
+    
+    # Authenticate user - either via session login or API key
+    if not request.user.is_authenticated:
+        # Try API key authentication
+        from user.authentication import APIKeyBackend
+        backend = APIKeyBackend()
+        user = backend.authenticate(request)
+        if user:
+            # Set the authenticated user
+            request.user = user
+        else:
+            # No valid authentication found
+            if request.headers.get('Accept', '').startswith('application/json'):
+                # API request - return JSON error
+                from django.http import JsonResponse
+                return JsonResponse({
+                    'error': 'Authentication required. Please provide a valid API key via Authorization header or api_key parameter.'
+                }, status=401)
+            else:
+                # Web request - redirect to login
+                return redirect_to_login(request.get_full_path())
     
     # All authenticated users can download all datasets regardless of status
     

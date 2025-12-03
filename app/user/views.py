@@ -17,8 +17,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserNotificationForm, UserProfileForm, DataExportForm
-from .models import Role
+from .forms import CustomUserCreationForm, CustomUserEditForm, RoleForm, RoleFilterForm, UserSettingsForm, UserNotificationForm, UserProfileForm, DataExportForm, APIKeyCreateForm, APIKeyRevokeForm
+from .models import Role, APIKey
 
 CustomUser = get_user_model()
 
@@ -91,6 +91,12 @@ def SettingsView(request):
         profile_form = UserProfileForm(instance=request.user)
         settings_form = UserSettingsForm(instance=request.user)
         notification_form = UserNotificationForm(instance=request.user)
+        api_key_create_form = APIKeyCreateForm()
+        api_key_revoke_form = APIKeyRevokeForm()
+        new_api_key = None
+        
+        # Get user's API keys
+        api_keys = APIKey.objects.filter(user=request.user).order_by('-created_at')
         
         # Handle form submissions
         if request.method == 'POST':
@@ -121,12 +127,47 @@ def SettingsView(request):
                     notification_form.save()
                     messages.success(request, 'Your notification preferences have been updated successfully.')
                     return redirect('user-settings')
+            
+            elif 'api_key_create' in request.POST:
+                api_key_create_form = APIKeyCreateForm(request.POST)
+                if api_key_create_form.is_valid():
+                    name = api_key_create_form.cleaned_data['name']
+                    expires_at = api_key_create_form.cleaned_data.get('expires_at')
+                    
+                    # Generate the API key
+                    api_key_obj = APIKey.generate_key(
+                        user=request.user,
+                        name=name,
+                        expires_at=expires_at
+                    )
+                    new_api_key = api_key_obj.key  # Store for display (shown only once)
+                    
+                    messages.success(request, f'API key "{name}" has been created successfully. Please copy it now - you won\'t be able to see it again!')
+                    # Reload API keys
+                    api_keys = APIKey.objects.filter(user=request.user).order_by('-created_at')
+            
+            elif 'api_key_revoke' in request.POST:
+                api_key_revoke_form = APIKeyRevokeForm(request.POST)
+                if api_key_revoke_form.is_valid():
+                    api_key_id = api_key_revoke_form.cleaned_data['api_key_id']
+                    try:
+                        api_key_obj = APIKey.objects.get(id=api_key_id, user=request.user)
+                        api_key_obj.revoke()
+                        messages.success(request, f'API key "{api_key_obj.name}" has been revoked successfully.')
+                        # Reload API keys
+                        api_keys = APIKey.objects.filter(user=request.user).order_by('-created_at')
+                    except APIKey.DoesNotExist:
+                        messages.error(request, 'API key not found or you do not have permission to revoke it.')
         
         context = {
             'user': request.user,
             'profile_form': profile_form,
             'settings_form': settings_form,
             'notification_form': notification_form,
+            'api_key_create_form': api_key_create_form,
+            'api_key_revoke_form': api_key_revoke_form,
+            'api_keys': api_keys,
+            'new_api_key': new_api_key,
         }
         return render(request, "user/settings.html", context)
     else:

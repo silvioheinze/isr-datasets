@@ -61,6 +61,10 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=your-email@gmail.com
 EMAIL_HOST_PASSWORD=your-app-password
+
+# Site Configuration
+SITE_NAME=ISR Datasets
+SITE_URL=http://localhost:8000
 ```
 
 ### 3. Build and Run
@@ -150,6 +154,112 @@ docker compose up app
 # Execute commands in container
 docker compose exec app python manage.py migrate
 docker compose exec app python manage.py createsuperuser
+```
+
+## 🧪 Testing
+
+The application includes comprehensive unit tests for all major features, including API key functionality.
+
+### Running Tests
+
+#### Run All Tests
+
+```bash
+# Run all tests
+docker compose exec app python manage.py test
+
+# Run tests with verbosity
+docker compose exec app python manage.py test --verbosity=2
+```
+
+#### Run Tests for Specific App
+
+```bash
+# Run all user app tests
+docker compose exec app python manage.py test user
+
+# Run all dataset app tests
+docker compose exec app python manage.py test datasets
+```
+
+#### Run Specific Test Classes
+
+```bash
+# API Key Model Tests
+docker compose exec app python manage.py test user.APIKeyModelTests
+
+# API Key Authentication Tests
+docker compose exec app python manage.py test user.APIKeyAuthenticationTests
+
+# API Key Form Tests
+docker compose exec app python manage.py test user.APIKeyFormTests
+
+# API Key View Tests
+docker compose exec app python manage.py test user.APIKeyViewTests
+
+# API Key Dataset Download Tests
+docker compose exec app python manage.py test user.APIKeyDatasetDownloadTests
+```
+
+#### Run Tests Matching Pattern
+
+```bash
+# Run all API key related tests
+docker compose exec app python manage.py test user -k APIKey
+
+# Run tests matching a specific pattern
+docker compose exec app python manage.py test -k test_api_key
+```
+
+#### Run Specific Test Method
+
+```bash
+# Run a specific test method
+docker compose exec app python manage.py test user.APIKeyModelTests.test_api_key_creation
+
+# Run multiple specific tests
+docker compose exec app python manage.py test user.APIKeyModelTests.test_api_key_creation user.APIKeyModelTests.test_api_key_is_valid
+```
+
+### Test Coverage
+
+The test suite includes comprehensive coverage for:
+
+- **API Key Model**: Creation, validation, expiration, revocation, relationships
+- **API Key Authentication**: Header-based and query parameter authentication, expiration handling
+- **API Key Forms**: Validation, expiration date handling, revocation confirmation
+- **API Key Views**: Creation, listing, revocation, permissions
+- **API Key Integration**: Dataset downloads with API key authentication, download tracking
+
+### Test Options
+
+```bash
+# Keep test database (faster for repeated runs)
+docker compose exec app python manage.py test --keepdb
+
+# Run tests in parallel (faster execution)
+docker compose exec app python manage.py test --parallel
+
+# Show all output including print statements
+docker compose exec app python manage.py test --verbosity=2
+
+# Stop at first failure
+docker compose exec app python manage.py test --failfast
+
+# Run tests without creating migrations check
+docker compose exec app python manage.py test --noinput
+```
+
+### Running Tests in Development
+
+For faster test iteration during development:
+
+```bash
+# Keep test database and run specific test class
+docker compose exec app python manage.py test user.APIKeyModelTests --keepdb --verbosity=2
+
+# Run tests matching pattern with keepdb
+docker compose exec app python manage.py test user -k APIKey --keepdb
 ```
 
 ## 🗄️ Database
@@ -337,6 +447,24 @@ conn.close()
 ```
 
 ## 🎨 Customization
+
+### Site Configuration
+
+The application uses environment variables to configure the site name and URL, which are used throughout the application for links, page titles, email templates, and front-end elements.
+
+#### Environment Variables
+
+- **`SITE_NAME`**: The name of the site displayed in the navbar, page titles, email templates, and footer. Default: `ISR Datasets`
+- **`SITE_URL`**: The base URL of the installation used for generating absolute links in emails and notifications. Default: `http://localhost:8000`
+
+These variables are automatically available in all templates via the context processor as `{{ SITE_NAME }}` and `{{ SITE_URL }}`.
+
+#### Example Configuration
+
+```env
+SITE_NAME=My Research Datasets
+SITE_URL=https://datasets.example.com
+```
 
 ### Branding
 

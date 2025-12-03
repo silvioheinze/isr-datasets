@@ -84,6 +84,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'pages.context_processors.group_memberships',
+                'main.context_processors.site_settings',
             ],
         },
     },
@@ -195,6 +196,7 @@ SITE_ID = 1
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
+    'user.authentication.APIKeyBackend',
 ]
 
 # Allauth settings
@@ -253,6 +255,10 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o755
 
 API_URL = ''
+
+# Site settings
+SITE_NAME = os.environ.get('SITE_NAME', 'ISR Datasets')
+SITE_URL = os.environ.get('SITE_URL', 'http://localhost:8000').rstrip('/')
 
 # Logging configuration
 import os
