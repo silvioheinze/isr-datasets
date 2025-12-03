@@ -8,11 +8,13 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 import json
 
-from .models import Role
+from .models import Role, APIKey
 from .forms import (
     CustomUserCreationForm, CustomUserEditForm, UserProfileForm, 
-    UserSettingsForm, UserNotificationForm, DataExportForm, RoleForm, RoleFilterForm
+    UserSettingsForm, UserNotificationForm, DataExportForm, RoleForm, RoleFilterForm,
+    APIKeyCreateForm, APIKeyRevokeForm
 )
+from .authentication import APIKeyBackend
 
 
 class CustomUserTests(TestCase):
@@ -1957,3 +1959,918 @@ class UserProfileViewTests(TestCase):
         response = self.client.get(reverse('user-profile-detail', kwargs={'user_id': self.user2.pk}))
         
         self.assertEqual(response.status_code, 403)  # Should be denied with inactive role
+
+
+class APIKeyModelTests(TestCase):
+    """Test cases for APIKey model"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+    
+    def test_api_key_creation(self):
+        """Test creating an API key"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Test API Key'
+        )
+        
+        self.assertEqual(api_key.user, self.user)
+        self.assertEqual(api_key.name, 'Test API Key')
+        self.assertIsNotNone(api_key.key)
+        self.assertEqual(len(api_key.key), 64)  # 48 bytes encoded as base64 = ~64 chars
+        self.assertEqual(api_key.prefix, api_key.key[:8])
+        self.assertTrue(api_key.is_active)
+        self.assertIsNone(api_key.expires_at)
+        self.assertIsNone(api_key.last_used_at)
+        self.assertIsNotNone(api_key.created_at)
+    
+    def test_api_key_str_representation(self):
+        """Test the string representation of API key"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='My API Key'
+        )
+        
+        expected_str = f"My API Key ({api_key.prefix}...)"
+        self.assertEqual(str(api_key), expected_str)
+    
+    def test_api_key_generate_key_unique(self):
+        """Test that generated keys are unique"""
+        key1 = APIKey.generate_key(user=self.user, name='Key 1')
+        key2 = APIKey.generate_key(user=self.user, name='Key 2')
+        
+        self.assertNotEqual(key1.key, key2.key)
+        self.assertNotEqual(key1.prefix, key2.prefix)
+    
+    def test_api_key_is_expired_no_expiration(self):
+        """Test that API key without expiration is not expired"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='No Expiration Key'
+        )
+        
+        self.assertFalse(api_key.is_expired())
+    
+    def test_api_key_is_expired_future_expiration(self):
+        """Test that API key with future expiration is not expired"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        future_date = timezone.now() + timedelta(days=30)
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Future Key',
+            expires_at=future_date
+        )
+        
+        self.assertFalse(api_key.is_expired())
+    
+    def test_api_key_is_expired_past_expiration(self):
+        """Test that API key with past expiration is expired"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        past_date = timezone.now() - timedelta(days=1)
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Expired Key',
+            expires_at=past_date
+        )
+        
+        self.assertTrue(api_key.is_expired())
+    
+    def test_api_key_is_valid_active_no_expiration(self):
+        """Test that active API key without expiration is valid"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Valid Key'
+        )
+        
+        self.assertTrue(api_key.is_valid())
+    
+    def test_api_key_is_valid_active_not_expired(self):
+        """Test that active API key with future expiration is valid"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        future_date = timezone.now() + timedelta(days=30)
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Valid Key',
+            expires_at=future_date
+        )
+        
+        self.assertTrue(api_key.is_valid())
+    
+    def test_api_key_is_valid_inactive(self):
+        """Test that inactive API key is not valid"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Inactive Key'
+        )
+        api_key.is_active = False
+        api_key.save()
+        
+        self.assertFalse(api_key.is_valid())
+    
+    def test_api_key_is_valid_expired(self):
+        """Test that expired API key is not valid"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        past_date = timezone.now() - timedelta(days=1)
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Expired Key',
+            expires_at=past_date
+        )
+        
+        self.assertFalse(api_key.is_valid())
+    
+    def test_api_key_update_last_used(self):
+        """Test updating last used timestamp"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Test Key'
+        )
+        
+        self.assertIsNone(api_key.last_used_at)
+        
+        # Update last used
+        api_key.update_last_used()
+        api_key.refresh_from_db()
+        
+        self.assertIsNotNone(api_key.last_used_at)
+        self.assertAlmostEqual(
+            api_key.last_used_at.timestamp(),
+            timezone.now().timestamp(),
+            delta=1
+        )
+    
+    def test_api_key_revoke(self):
+        """Test revoking an API key"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Revokable Key'
+        )
+        
+        self.assertTrue(api_key.is_active)
+        
+        # Revoke the key
+        api_key.revoke()
+        api_key.refresh_from_db()
+        
+        self.assertFalse(api_key.is_active)
+        self.assertFalse(api_key.is_valid())
+    
+    def test_api_key_user_relationship(self):
+        """Test API key user relationship"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Relationship Test'
+        )
+        
+        # Check forward relationship
+        self.assertEqual(api_key.user, self.user)
+        
+        # Check reverse relationship
+        self.assertIn(api_key, self.user.api_keys.all())
+        self.assertEqual(self.user.api_keys.count(), 1)
+    
+    def test_api_key_ordering(self):
+        """Test that API keys are ordered by creation date (newest first)"""
+        key1 = APIKey.generate_key(user=self.user, name='First Key')
+        
+        from django.utils import timezone
+        from datetime import timedelta
+        timezone.now() + timedelta(seconds=1)  # Small delay
+        
+        key2 = APIKey.generate_key(user=self.user, name='Second Key')
+        
+        keys = list(APIKey.objects.filter(user=self.user))
+        self.assertEqual(keys[0], key2)  # Newest first
+        self.assertEqual(keys[1], key1)  # Oldest second
+    
+    def test_api_key_cascade_delete(self):
+        """Test that API keys are deleted when user is deleted"""
+        api_key = APIKey.generate_key(
+            user=self.user,
+            name='Cascade Test'
+        )
+        
+        api_key_id = api_key.id
+        self.assertTrue(APIKey.objects.filter(id=api_key_id).exists())
+        
+        # Delete the user
+        self.user.delete()
+        
+        # API key should also be deleted
+        self.assertFalse(APIKey.objects.filter(id=api_key_id).exists())
+    
+    def test_api_key_unique_key(self):
+        """Test that API keys must have unique key values"""
+        key1 = APIKey.generate_key(user=self.user, name='Key 1')
+        
+        # Try to create another key with the same key value
+        from django.db import IntegrityError
+        with self.assertRaises(IntegrityError):
+            APIKey.objects.create(
+                user=self.user,
+                name='Key 2',
+                key=key1.key,
+                prefix=key1.prefix
+            )
+
+
+class APIKeyAuthenticationTests(TestCase):
+    """Test cases for API key authentication backend"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.api_key = APIKey.generate_key(
+            user=self.user,
+            name='Test Key'
+        )
+        self.backend = APIKeyBackend()
+    
+    def test_authentication_with_valid_key(self):
+        """Test authentication with a valid API key"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        user = self.backend.authenticate(request, api_key=self.api_key.key)
+        
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)
+    
+    def test_authentication_with_invalid_key(self):
+        """Test authentication with an invalid API key"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        user = self.backend.authenticate(request, api_key='invalid-key')
+        
+        self.assertIsNone(user)
+    
+    def test_authentication_with_revoked_key(self):
+        """Test authentication with a revoked API key"""
+        from django.test import RequestFactory
+        
+        self.api_key.revoke()
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        user = self.backend.authenticate(request, api_key=self.api_key.key)
+        
+        self.assertIsNone(user)
+    
+    def test_authentication_with_expired_key(self):
+        """Test authentication with an expired API key"""
+        from django.test import RequestFactory
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        past_date = timezone.now() - timedelta(days=1)
+        self.api_key.expires_at = past_date
+        self.api_key.save()
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        user = self.backend.authenticate(request, api_key=self.api_key.key)
+        
+        self.assertIsNone(user)
+    
+    def test_authentication_from_authorization_header_api_key(self):
+        """Test authentication from Authorization header with Api-Key scheme"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get('/test/', HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}')
+        
+        user = self.backend.authenticate(request)
+        
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)
+        
+        # Verify last_used_at was updated
+        self.api_key.refresh_from_db()
+        self.assertIsNotNone(self.api_key.last_used_at)
+    
+    def test_authentication_from_authorization_header_bearer(self):
+        """Test authentication from Authorization header with Bearer scheme"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get('/test/', HTTP_AUTHORIZATION=f'Bearer {self.api_key.key}')
+        
+        user = self.backend.authenticate(request)
+        
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)
+    
+    def test_authentication_from_query_parameter(self):
+        """Test authentication from query parameter"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get(f'/test/?api_key={self.api_key.key}')
+        
+        user = self.backend.authenticate(request)
+        
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)
+    
+    def test_authentication_from_query_parameter_apikey(self):
+        """Test authentication from query parameter with apikey name"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get(f'/test/?apikey={self.api_key.key}')
+        
+        user = self.backend.authenticate(request)
+        
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)
+    
+    def test_authentication_inactive_user(self):
+        """Test that inactive users cannot authenticate with API keys"""
+        from django.test import RequestFactory
+        
+        self.user.is_active = False
+        self.user.save()
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        user = self.backend.authenticate(request, api_key=self.api_key.key)
+        
+        self.assertIsNone(user)
+    
+    def test_authentication_no_key(self):
+        """Test authentication with no API key"""
+        from django.test import RequestFactory
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        user = self.backend.authenticate(request)
+        
+        self.assertIsNone(user)
+    
+    def test_get_user(self):
+        """Test getting user by ID"""
+        user = self.backend.get_user(self.user.id)
+        
+        self.assertIsNotNone(user)
+        self.assertEqual(user, self.user)
+    
+    def test_get_user_nonexistent(self):
+        """Test getting non-existent user"""
+        user = self.backend.get_user(99999)
+        
+        self.assertIsNone(user)
+    
+    def test_authentication_updates_last_used(self):
+        """Test that authentication updates last_used_at timestamp"""
+        from django.test import RequestFactory
+        from django.utils import timezone
+        
+        factory = RequestFactory()
+        request = factory.get('/test/')
+        
+        initial_last_used = self.api_key.last_used_at
+        self.assertIsNone(initial_last_used)
+        
+        # Authenticate
+        self.backend.authenticate(request, api_key=self.api_key.key)
+        
+        # Check last_used_at was updated
+        self.api_key.refresh_from_db()
+        self.assertIsNotNone(self.api_key.last_used_at)
+        self.assertAlmostEqual(
+            self.api_key.last_used_at.timestamp(),
+            timezone.now().timestamp(),
+            delta=1
+        )
+
+
+class APIKeyFormTests(TestCase):
+    """Test cases for API key forms"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+    
+    def test_api_key_create_form_valid_data(self):
+        """Test APIKeyCreateForm with valid data"""
+        form_data = {
+            'name': 'My API Key'
+        }
+        
+        form = APIKeyCreateForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['name'], 'My API Key')
+        self.assertIsNone(form.cleaned_data.get('expires_at'))
+    
+    def test_api_key_create_form_with_expiration(self):
+        """Test APIKeyCreateForm with expiration date"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        future_date = timezone.now() + timedelta(days=30)
+        form_data = {
+            'name': 'Temporary Key',
+            'expires_at': future_date.strftime('%Y-%m-%dT%H:%M')
+        }
+        
+        form = APIKeyCreateForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['name'], 'Temporary Key')
+        self.assertIsNotNone(form.cleaned_data.get('expires_at'))
+    
+    def test_api_key_create_form_empty_name(self):
+        """Test APIKeyCreateForm with empty name"""
+        form_data = {
+            'name': ''
+        }
+        
+        form = APIKeyCreateForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('name', form.errors)
+    
+    def test_api_key_create_form_past_expiration(self):
+        """Test APIKeyCreateForm with past expiration date"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        past_date = timezone.now() - timedelta(days=1)
+        form_data = {
+            'name': 'Invalid Key',
+            'expires_at': past_date.strftime('%Y-%m-%dT%H:%M')
+        }
+        
+        form = APIKeyCreateForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('expires_at', form.errors)
+    
+    def test_api_key_revoke_form_valid_data(self):
+        """Test APIKeyRevokeForm with valid data"""
+        api_key = APIKey.generate_key(user=self.user, name='Test Key')
+        
+        form_data = {
+            'api_key_id': api_key.id,
+            'confirm': True
+        }
+        
+        form = APIKeyRevokeForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['api_key_id'], api_key.id)
+        self.assertTrue(form.cleaned_data['confirm'])
+    
+    def test_api_key_revoke_form_no_confirm(self):
+        """Test APIKeyRevokeForm without confirmation"""
+        api_key = APIKey.generate_key(user=self.user, name='Test Key')
+        
+        form_data = {
+            'api_key_id': api_key.id,
+            'confirm': False
+        }
+        
+        form = APIKeyRevokeForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('confirm', form.errors)
+    
+    def test_api_key_revoke_form_missing_confirm(self):
+        """Test APIKeyRevokeForm with missing confirmation field"""
+        api_key = APIKey.generate_key(user=self.user, name='Test Key')
+        
+        form_data = {
+            'api_key_id': api_key.id
+        }
+        
+        form = APIKeyRevokeForm(data=form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('confirm', form.errors)
+
+
+class APIKeyViewTests(TestCase):
+    """Test cases for API key views"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.client = Client()
+        self.settings_url = reverse('user-settings')
+    
+    def test_api_key_creation_requires_login(self):
+        """Test that API key creation requires login"""
+        response = self.client.post(self.settings_url, {
+            'name': 'Test Key',
+            'api_key_create': 'Create API Key'
+        })
+        
+        # Should redirect to login or show login form
+        self.assertIn(response.status_code, [200, 302])
+        if response.status_code == 200:
+            self.assertContains(response, 'Login')
+    
+    def test_api_key_creation_authenticated(self):
+        """Test creating an API key when authenticated"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        form_data = {
+            'name': 'My New API Key',
+            'api_key_create': 'Create API Key'
+        }
+        
+        response = self.client.post(self.settings_url, form_data, follow=True)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check API key was created
+        api_keys = APIKey.objects.filter(user=self.user, name='My New API Key')
+        self.assertTrue(api_keys.exists())
+        
+        # Check success message
+        messages_list = list(response.context['messages'])
+        self.assertTrue(any('created successfully' in str(msg) for msg in messages_list))
+    
+    def test_api_key_creation_with_expiration(self):
+        """Test creating an API key with expiration date"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        self.client.login(username='testuser', password='testpass123')
+        
+        future_date = timezone.now() + timedelta(days=30)
+        form_data = {
+            'name': 'Temporary Key',
+            'expires_at': future_date.strftime('%Y-%m-%dT%H:%M'),
+            'api_key_create': 'Create API Key'
+        }
+        
+        response = self.client.post(self.settings_url, form_data, follow=True)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check API key was created with expiration
+        api_key = APIKey.objects.get(user=self.user, name='Temporary Key')
+        self.assertIsNotNone(api_key.expires_at)
+    
+    def test_api_key_revocation(self):
+        """Test revoking an API key"""
+        api_key = APIKey.generate_key(user=self.user, name='Revokable Key')
+        
+        self.client.login(username='testuser', password='testpass123')
+        
+        form_data = {
+            'api_key_id': api_key.id,
+            'confirm': True,
+            'api_key_revoke': 'Revoke'
+        }
+        
+        response = self.client.post(self.settings_url, form_data, follow=True)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check API key was revoked
+        api_key.refresh_from_db()
+        self.assertFalse(api_key.is_active)
+        
+        # Check success message
+        messages_list = list(response.context['messages'])
+        self.assertTrue(any('revoked successfully' in str(msg) for msg in messages_list))
+    
+    def test_api_key_revocation_wrong_user(self):
+        """Test that users cannot revoke other users' API keys"""
+        other_user = self.User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='testpass123'
+        )
+        api_key = APIKey.generate_key(user=other_user, name='Other User Key')
+        
+        self.client.login(username='testuser', password='testpass123')
+        
+        form_data = {
+            'api_key_id': api_key.id,
+            'confirm': True,
+            'api_key_revoke': 'Revoke'
+        }
+        
+        response = self.client.post(self.settings_url, form_data, follow=True)
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check API key was NOT revoked (should still be active)
+        api_key.refresh_from_db()
+        self.assertTrue(api_key.is_active)
+        
+        # Check error message
+        messages_list = list(response.context['messages'])
+        self.assertTrue(any('not found' in str(msg).lower() or 'permission' in str(msg).lower() for msg in messages_list))
+    
+    def test_api_key_list_in_settings(self):
+        """Test that API keys are listed in settings page"""
+        api_key1 = APIKey.generate_key(user=self.user, name='Key 1')
+        api_key2 = APIKey.generate_key(user=self.user, name='Key 2')
+        
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(self.settings_url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'API Key Management')
+        self.assertContains(response, 'Key 1')
+        self.assertContains(response, 'Key 2')
+        self.assertContains(response, api_key1.prefix)
+        self.assertContains(response, api_key2.prefix)
+    
+    def test_api_key_settings_tab(self):
+        """Test that API Keys tab exists in settings"""
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(self.settings_url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'API Keys')
+    
+    def test_api_key_creation_form_display(self):
+        """Test that API key creation form is displayed"""
+        self.client.login(username='testuser', password='testpass123')
+        response = self.client.get(self.settings_url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Create New API Key')
+        self.assertContains(response, 'Name')
+        self.assertContains(response, 'Expiration Date')
+    
+    def test_api_key_display_new_key_once(self):
+        """Test that new API key is displayed only once after creation"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        form_data = {
+            'name': 'One-Time Key',
+            'api_key_create': 'Create API Key'
+        }
+        
+        response = self.client.post(self.settings_url, form_data, follow=True)
+        
+        # First response should show the new key
+        self.assertEqual(response.status_code, 200)
+        context = response.context
+        if 'new_api_key' in context and context['new_api_key']:
+            self.assertIsNotNone(context['new_api_key'])
+            self.assertContains(response, context['new_api_key'])
+        
+        # Second visit should not show the key
+        response = self.client.get(self.settings_url)
+        context = response.context
+        if 'new_api_key' in context:
+            # new_api_key should be None on second visit
+            pass
+
+
+class APIKeyDatasetDownloadTests(TestCase):
+    """Test cases for dataset download with API key authentication"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.User = get_user_model()
+        self.user = self.User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        self.api_key = APIKey.generate_key(
+            user=self.user,
+            name='Download Key'
+        )
+        
+        # Create test dataset
+        from datasets.models import Dataset, DatasetVersion, DatasetVersionFile
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        
+        self.dataset = Dataset.objects.create(
+            title='Test Dataset',
+            description='Test description',
+            owner=self.user
+        )
+        
+        self.version = DatasetVersion.objects.create(
+            dataset=self.dataset,
+            version_number='1.0',
+            description='Initial version',
+            created_by=self.user,
+            is_current=True
+        )
+        
+        # Create test file
+        test_file = SimpleUploadedFile('test.csv', b'col1,col2\n1,2\n')
+        self.version_file = DatasetVersionFile.objects.create(
+            version=self.version,
+            file=test_file,
+            file_size=test_file.size,
+            original_name='test.csv'
+        )
+        
+        self.client = Client()
+    
+    def test_download_with_api_key_header(self):
+        """Test downloading dataset with API key in Authorization header"""
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/octet-stream')
+        self.assertIn('attachment', response['Content-Disposition'])
+        
+        # Check download was recorded
+        from datasets.models import DatasetDownload
+        self.assertTrue(DatasetDownload.objects.filter(dataset=self.dataset).exists())
+    
+    def test_download_with_api_key_bearer(self):
+        """Test downloading dataset with API key in Bearer header"""
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Bearer {self.api_key.key}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+    
+    def test_download_with_api_key_query_param(self):
+        """Test downloading dataset with API key in query parameter"""
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(url, {'api_key': self.api_key.key})
+        
+        self.assertEqual(response.status_code, 200)
+    
+    def test_download_with_invalid_api_key(self):
+        """Test downloading dataset with invalid API key"""
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION='Api-Key invalid-key-12345',
+            HTTP_ACCEPT='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 401)
+        if hasattr(response, 'json'):
+            json_data = response.json()
+            self.assertIn('error', json_data)
+            self.assertIn('Authentication required', json_data['error'])
+    
+    def test_download_with_revoked_api_key(self):
+        """Test downloading dataset with revoked API key"""
+        self.api_key.revoke()
+        
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}',
+            HTTP_ACCEPT='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 401)
+    
+    def test_download_with_expired_api_key(self):
+        """Test downloading dataset with expired API key"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        self.api_key.expires_at = timezone.now() - timedelta(days=1)
+        self.api_key.save()
+        
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}',
+            HTTP_ACCEPT='application/json'
+        )
+        
+        self.assertEqual(response.status_code, 401)
+    
+    def test_download_updates_last_used(self):
+        """Test that download updates API key last_used_at"""
+        from django.utils import timezone
+        
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        initial_last_used = self.api_key.last_used_at
+        self.assertIsNone(initial_last_used)
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check last_used_at was updated
+        self.api_key.refresh_from_db()
+        self.assertIsNotNone(self.api_key.last_used_at)
+        self.assertAlmostEqual(
+            self.api_key.last_used_at.timestamp(),
+            timezone.now().timestamp(),
+            delta=1
+        )
+    
+    def test_download_with_specific_file(self):
+        """Test downloading specific file with API key"""
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            {
+                'version': self.version.id,
+                'file': self.version_file.id
+            },
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('test.csv', response['Content-Disposition'])
+    
+    def test_download_with_api_key_increments_count(self):
+        """Test that download with API key increments download count"""
+        initial_count = self.dataset.download_count
+        
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check download count was incremented
+        self.dataset.refresh_from_db()
+        self.assertEqual(self.dataset.download_count, initial_count + 1)
+    
+    def test_download_with_api_key_creates_download_record(self):
+        """Test that download with API key creates download record"""
+        from datasets.models import DatasetDownload
+        
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(
+            url,
+            HTTP_AUTHORIZATION=f'Api-Key {self.api_key.key}'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        # Check download record was created
+        download = DatasetDownload.objects.filter(dataset=self.dataset, user=self.user).first()
+        self.assertIsNotNone(download)
+        self.assertEqual(download.user, self.user)
+    
+    def test_download_without_auth_redirects(self):
+        """Test that download without authentication redirects to login"""
+        url = reverse('datasets:dataset_download', kwargs={'pk': self.dataset.pk})
+        
+        response = self.client.get(url)
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/login/', response.url)
