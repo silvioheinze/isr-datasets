@@ -61,6 +61,10 @@ EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER=your-email@gmail.com
 EMAIL_HOST_PASSWORD=your-app-password
+
+# Site Configuration
+SITE_NAME=ISR Datasets
+SITE_URL=http://localhost:8000
 ```
 
 ### 3. Build and Run
@@ -443,6 +447,24 @@ conn.close()
 ```
 
 ## 🎨 Customization
+
+### Site Configuration
+
+The application uses environment variables to configure the site name and URL, which are used throughout the application for links, page titles, email templates, and front-end elements.
+
+#### Environment Variables
+
+- **`SITE_NAME`**: The name of the site displayed in the navbar, page titles, email templates, and footer. Default: `ISR Datasets`
+- **`SITE_URL`**: The base URL of the installation used for generating absolute links in emails and notifications. Default: `http://localhost:8000`
+
+These variables are automatically available in all templates via the context processor as `{{ SITE_NAME }}` and `{{ SITE_URL }}`.
+
+#### Example Configuration
+
+```env
+SITE_NAME=My Research Datasets
+SITE_URL=https://datasets.example.com
+```
 
 ### Branding
 

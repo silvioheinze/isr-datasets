@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Dashboard" %} - {% trans "ISR Datasets" %}{% endblock %}
+{% block title %}{% trans "Dashboard" %} - {{ SITE_NAME }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -11,7 +11,7 @@
             <div class="text-center">
                 <h1 class="display-4 fw-bold text-primary mb-3">
                     <i class="bi bi-database-fill me-3"></i>
-                    {% trans "Welcome to ISR Datasets" %}
+                    {% blocktrans %}Welcome to {{ SITE_NAME }}{% endblocktrans %}
                 </h1>
                 <p class="lead text-muted">
                     {% trans "A comprehensive platform for managing, accessing, and analyzing research datasets" %}
