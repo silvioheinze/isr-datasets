@@ -21,8 +21,9 @@ from .models import (
     DatasetDownload,
     Comment,
     Publisher,
+    DatasetAnalysis,
 )
-from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm
+from .forms import DatasetForm, DatasetFilterForm, DatasetVersionForm, DatasetCategoryForm, DatasetCategoryFilterForm, CommentForm, CommentEditForm, PublisherForm, PublisherFilterForm, DatasetProjectAssignmentForm, DatasetAnalysisForm
 
 
 class AdministratorOnlyMixin(UserPassesTestMixin):
@@ -193,6 +194,11 @@ class DatasetDetailView(LoginRequiredMixin, DetailView):
         # Add comments to context
         context['comments'] = dataset.comments.filter(is_approved=True).select_related('author')
         context['comment_form'] = CommentForm(user=self.request.user, dataset=dataset)
+        
+        # Add analyses to context
+        context['analyses'] = dataset.analyses.all().select_related('uploaded_by').order_by('-uploaded_at')
+        context['analysis_form'] = DatasetAnalysisForm(dataset=dataset, user=self.request.user)
+        context['can_upload_analysis'] = self.request.user.is_authenticated
         
         return context
 
@@ -967,3 +973,65 @@ def assign_dataset_to_project(request, pk):
         'form': form,
         'dataset': dataset
     })
+
+
+@login_required
+def upload_dataset_analysis(request, pk):
+    """Upload an analysis/dataviz file for a dataset"""
+    dataset = get_object_or_404(Dataset, pk=pk)
+    
+    if request.method == 'POST':
+        form = DatasetAnalysisForm(request.POST, request.FILES, dataset=dataset, user=request.user)
+        if form.is_valid():
+            analysis = form.save()
+            messages.success(request, f'Analysis "{analysis.title}" uploaded successfully!')
+            return redirect('datasets:dataset_detail', pk=pk)
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = DatasetAnalysisForm(dataset=dataset, user=request.user)
+    
+    # If it's not a POST request, redirect to dataset detail
+    return redirect('datasets:dataset_detail', pk=pk)
+
+
+@login_required
+def delete_dataset_analysis(request, pk, analysis_id):
+    """Delete an analysis file"""
+    dataset = get_object_or_404(Dataset, pk=pk)
+    analysis = get_object_or_404(DatasetAnalysis, pk=analysis_id, dataset=dataset)
+    
+    # Check permissions
+    if not analysis.can_delete(request.user):
+        messages.error(request, 'You do not have permission to delete this analysis.')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    if request.method == 'POST':
+        title = analysis.title
+        analysis.file.delete()  # Delete the file from storage
+        analysis.delete()
+        messages.success(request, f'Analysis "{title}" deleted successfully!')
+        return redirect('datasets:dataset_detail', pk=pk)
+    
+    # If it's not a POST request, redirect to dataset detail
+    return redirect('datasets:dataset_detail', pk=pk)
+
+
+@login_required
+def download_dataset_analysis(request, pk, analysis_id):
+    """Download an analysis file"""
+    dataset = get_object_or_404(Dataset, pk=pk)
+    analysis = get_object_or_404(DatasetAnalysis, pk=analysis_id, dataset=dataset)
+    
+    # All authenticated users can download analyses
+    from django.http import FileResponse
+    from pathlib import Path
+    
+    if analysis.file:
+        file_handle = analysis.file.open('rb')
+        download_filename = analysis.display_name
+        response = FileResponse(file_handle, as_attachment=True, filename=download_filename)
+        return response
+    else:
+        messages.error(request, 'Analysis file not found.')
+        return redirect('datasets:dataset_detail', pk=pk)

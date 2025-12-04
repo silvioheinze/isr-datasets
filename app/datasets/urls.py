@@ -14,6 +14,11 @@ urlpatterns = [
     path('<uuid:pk>/assign-project/', views.assign_dataset_to_project, name='assign_to_project'),
     path('<uuid:dataset_pk>/version/create/', views.DatasetVersionCreateView.as_view(), name='dataset_version_create'),
     
+    # Analysis/DataViz views
+    path('<uuid:pk>/analysis/upload/', views.upload_dataset_analysis, name='upload_analysis'),
+    path('<uuid:pk>/analysis/<int:analysis_id>/delete/', views.delete_dataset_analysis, name='delete_analysis'),
+    path('<uuid:pk>/analysis/<int:analysis_id>/download/', views.download_dataset_analysis, name='download_analysis'),
+    
     # Statistics (removed - template was deleted)
     # path('statistics/', views.dataset_statistics, name='dataset_statistics'),
     
