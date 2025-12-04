@@ -11,3 +11,4 @@ def site_settings(request):
         'SITE_URL': getattr(settings, 'SITE_URL', 'http://localhost:8000').rstrip('/'),
     }
 
+
