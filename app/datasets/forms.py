@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Dataset, DatasetCategory, DatasetVersion, Comment, Publisher
+from .models import Dataset, DatasetCategory, DatasetVersion, Comment, Publisher, DatasetAnalysis
 from projects.models import Project
 
 User = get_user_model()
@@ -556,3 +556,69 @@ class DatasetProjectAssignmentForm(forms.Form):
             # Pre-select current projects if editing
             if dataset and dataset.pk:
                 self.fields['projects'].initial = dataset.projects.all()
+
+
+class DatasetAnalysisForm(forms.ModelForm):
+    """Form for uploading analysis/dataviz files"""
+    
+    class Meta:
+        model = DatasetAnalysis
+        fields = ['title', 'description', 'file']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'e.g., Population Growth Analysis, Revenue Trends Visualization'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Optional: Describe your analysis or visualization...'
+            }),
+            'file': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': '.pdf,.html,.png,.jpg,.jpeg,.svg,.csv,.xlsx,.xls,.json,.ipynb,.r,.py,.zip'
+            })
+        }
+    
+    def __init__(self, *args, **kwargs):
+        self.dataset = kwargs.pop('dataset', None)
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Add help text
+        self.fields['title'].help_text = 'Give your analysis or visualization a descriptive title'
+        self.fields['description'].help_text = 'Optional: Provide details about your analysis or visualization'
+        self.fields['file'].help_text = 'Upload your analysis file (PDF, HTML, images, CSV, Excel, JSON, Jupyter notebooks, R scripts, Python scripts, ZIP, max 100MB)'
+    
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            # Check file size (100MB limit)
+            if file.size > 100 * 1024 * 1024:
+                raise forms.ValidationError('File size exceeds the 100MB limit.')
+            
+            # Check file extension
+            allowed_extensions = [
+                '.pdf', '.html', '.png', '.jpg', '.jpeg', '.svg',
+                '.csv', '.xlsx', '.xls', '.json', '.ipynb', '.r', '.py', '.zip'
+            ]
+            import os
+            _, ext = os.path.splitext(file.name)
+            if ext.lower() not in allowed_extensions:
+                raise forms.ValidationError(
+                    f'File type "{ext}" is not allowed. Allowed types: {", ".join(allowed_extensions)}'
+                )
+        return file
+    
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self.dataset:
+            instance.dataset = self.dataset
+        if self.user:
+            instance.uploaded_by = self.user
+        if instance.file:
+            instance.file_size = instance.file.size
+            instance.original_name = instance.file.name
+        if commit:
+            instance.save()
+        return instance

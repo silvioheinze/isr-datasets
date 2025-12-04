@@ -51,6 +51,23 @@ def dataset_version_attachment_upload_path(instance, filename):
     return f'datasets/versions/{year}/{month}/{day}/{safe_filename}'
 
 
+def dataset_analysis_upload_path(instance, filename):
+    """
+    Custom upload path for dataset analysis/dataviz files.
+    Format: datasets/analysis/YYYY/MM/DD/dataset_{id}_{filename}
+    """
+    now = timezone.now()
+    year = now.strftime('%Y')
+    month = now.strftime('%m')
+    day = now.strftime('%d')
+    
+    dataset_id = instance.dataset.id
+    
+    safe_filename = f"dataset_{dataset_id}_{filename}"
+    
+    return f'datasets/analysis/{year}/{month}/{day}/{safe_filename}'
+
+
 class Publisher(models.Model):
     """Model for dataset publishers"""
     name = models.CharField(
@@ -483,6 +500,83 @@ class Comment(models.Model):
         return user == self.author or user.is_staff or user.is_superuser
 
 
+class DatasetAnalysis(models.Model):
+    """Model for storing analysis/dataviz files related to a dataset"""
+    dataset = models.ForeignKey(
+        Dataset,
+        on_delete=models.CASCADE,
+        related_name='analyses',
+        verbose_name=_('Dataset')
+    )
+    title = models.CharField(
+        max_length=200,
+        verbose_name=_('Title'),
+        help_text=_('Title or name of this analysis/visualization')
+    )
+    description = models.TextField(
+        blank=True,
+        verbose_name=_('Description'),
+        help_text=_('Optional description of the analysis or visualization')
+    )
+    file = models.FileField(
+        upload_to=dataset_analysis_upload_path,
+        verbose_name=_('File'),
+        help_text=_('Upload your analysis or visualization file')
+    )
+    file_size = models.BigIntegerField(default=0)
+    original_name = models.CharField(max_length=255, blank=True)
+    uploaded_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='dataset_analyses',
+        verbose_name=_('Uploaded by')
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-uploaded_at']
+        verbose_name = _('Dataset Analysis')
+        verbose_name_plural = _('Dataset Analyses')
+        indexes = [
+            models.Index(fields=['dataset', 'uploaded_at']),
+            models.Index(fields=['uploaded_by', 'uploaded_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.dataset.title} - {self.title}"
+    
+    @property
+    def display_name(self):
+        if self.original_name:
+            return self.original_name
+        return os.path.basename(self.file.name)
+    
+    def get_file_size_display(self):
+        """Return human-readable file size"""
+        if self.file_size == 0:
+            return "0 B"
+        
+        size_names = ["B", "KB", "MB", "GB", "TB"]
+        i = 0
+        size = self.file_size
+        
+        while size >= 1024 and i < len(size_names) - 1:
+            size /= 1024
+            i += 1
+        
+        return f"{size:.1f} {size_names[i]}"
+    
+    def can_delete(self, user):
+        """Check if user can delete this analysis"""
+        return (
+            user == self.uploaded_by or
+            user == self.dataset.owner or
+            user.is_staff or
+            user.is_superuser
+        )
+
+
 # Register models for audit logging
 auditlog.register(Publisher)
 auditlog.register(Dataset)
@@ -491,3 +585,4 @@ auditlog.register(DatasetVersion)
 auditlog.register(DatasetVersionFile)
 auditlog.register(Comment)
 auditlog.register(DatasetDownload)
+auditlog.register(DatasetAnalysis)

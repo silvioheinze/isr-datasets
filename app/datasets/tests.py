@@ -20,6 +20,7 @@ from .models import (
     Publisher,
     DatasetCategory,
     DatasetDownload,
+    DatasetAnalysis,
 )
 from .views import (
     send_comment_notification_email,
@@ -28,11 +29,12 @@ from .views import (
     DatasetListView, DatasetDetailView, DatasetCreateView, 
     DatasetUpdateView, DatasetDeleteView, DatasetVersionCreateView,
     add_comment, edit_comment, delete_comment, dataset_download,
-    assign_dataset_to_project
+    assign_dataset_to_project,
+    upload_dataset_analysis, delete_dataset_analysis, download_dataset_analysis,
 )
 from .forms import (
     DatasetForm, DatasetVersionForm, CommentForm, CommentEditForm,
-    DatasetProjectAssignmentForm
+    DatasetProjectAssignmentForm, DatasetAnalysisForm,
 )
 
 User = get_user_model()
@@ -1353,3 +1355,660 @@ class DatasetDeleteViewTests(TestCase):
         
         self.assertEqual(response.status_code, 404)
         self.assertTrue(any('Not Found' in entry for entry in log_capture.output))
+
+
+class DatasetAnalysisModelTests(TestCase):
+    """Test cases for DatasetAnalysis model"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        
+        self.dataset = Dataset.objects.create(
+            title='Test Dataset',
+            description='Test description',
+            owner=self.user
+        )
+        
+        self.test_file = SimpleUploadedFile(
+            'test_analysis.pdf',
+            b'PDF content here',
+            content_type='application/pdf'
+        )
+    
+    def test_dataset_analysis_creation(self):
+        """Test creating a DatasetAnalysis instance"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            description='Test description',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            original_name='test_analysis.pdf',
+            uploaded_by=self.user
+        )
+        
+        self.assertEqual(analysis.dataset, self.dataset)
+        self.assertEqual(analysis.title, 'Test Analysis')
+        self.assertEqual(analysis.description, 'Test description')
+        self.assertEqual(analysis.uploaded_by, self.user)
+        self.assertEqual(analysis.file_size, self.test_file.size)
+        self.assertEqual(analysis.original_name, 'test_analysis.pdf')
+    
+    def test_dataset_analysis_str_representation(self):
+        """Test string representation of DatasetAnalysis"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='My Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=self.user
+        )
+        
+        expected_str = f"{self.dataset.title} - My Analysis"
+        self.assertEqual(str(analysis), expected_str)
+    
+    def test_display_name_with_original_name(self):
+        """Test display_name property when original_name is set"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            original_name='my_original_file.pdf',
+            uploaded_by=self.user
+        )
+        
+        self.assertEqual(analysis.display_name, 'my_original_file.pdf')
+    
+    def test_display_name_without_original_name(self):
+        """Test display_name property when original_name is not set"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=self.user
+        )
+        
+        # Should extract filename from file.name
+        self.assertIn('test_analysis.pdf', analysis.display_name)
+    
+    def test_get_file_size_display_bytes(self):
+        """Test file size display for bytes"""
+        small_file = SimpleUploadedFile('small.txt', b'x' * 512)
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Small Analysis',
+            file=small_file,
+            file_size=512,
+            uploaded_by=self.user
+        )
+        
+        self.assertEqual(analysis.get_file_size_display(), '512.0 B')
+    
+    def test_get_file_size_display_kb(self):
+        """Test file size display for kilobytes"""
+        kb_file = SimpleUploadedFile('kb_file.txt', b'x' * 2048)
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='KB Analysis',
+            file=kb_file,
+            file_size=2048,
+            uploaded_by=self.user
+        )
+        
+        self.assertEqual(analysis.get_file_size_display(), '2.0 KB')
+    
+    def test_get_file_size_display_mb(self):
+        """Test file size display for megabytes"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='MB Analysis',
+            file=self.test_file,
+            file_size=2 * 1024 * 1024,  # 2 MB
+            uploaded_by=self.user
+        )
+        
+        self.assertEqual(analysis.get_file_size_display(), '2.0 MB')
+    
+    def test_get_file_size_display_zero(self):
+        """Test file size display for zero bytes"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Zero Analysis',
+            file=self.test_file,
+            file_size=0,
+            uploaded_by=self.user
+        )
+        
+        self.assertEqual(analysis.get_file_size_display(), '0 B')
+    
+    def test_can_delete_by_uploader(self):
+        """Test that uploader can delete their own analysis"""
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=self.user
+        )
+        
+        self.assertTrue(analysis.can_delete(self.user))
+    
+    def test_can_delete_by_dataset_owner(self):
+        """Test that dataset owner can delete any analysis"""
+        other_user = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='testpass123'
+        )
+        
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=other_user
+        )
+        
+        # Dataset owner should be able to delete
+        self.assertTrue(analysis.can_delete(self.user))
+    
+    def test_can_delete_by_staff(self):
+        """Test that staff users can delete analyses"""
+        staff_user = User.objects.create_user(
+            username='staffuser',
+            email='staff@example.com',
+            password='testpass123',
+            is_staff=True
+        )
+        
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=self.user
+        )
+        
+        self.assertTrue(analysis.can_delete(staff_user))
+    
+    def test_can_delete_by_superuser(self):
+        """Test that superusers can delete analyses"""
+        superuser = User.objects.create_superuser(
+            username='superuser',
+            email='super@example.com',
+            password='testpass123'
+        )
+        
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=self.user
+        )
+        
+        self.assertTrue(analysis.can_delete(superuser))
+    
+    def test_can_delete_by_unauthorized_user(self):
+        """Test that unauthorized users cannot delete analyses"""
+        other_user = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='testpass123'
+        )
+        
+        analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            uploaded_by=self.user
+        )
+        
+        self.assertFalse(analysis.can_delete(other_user))
+    
+    def test_dataset_analysis_ordering(self):
+        """Test that analyses are ordered by uploaded_at descending"""
+        file1 = SimpleUploadedFile('file1.pdf', b'content1')
+        file2 = SimpleUploadedFile('file2.pdf', b'content2')
+        
+        analysis1 = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='First Analysis',
+            file=file1,
+            file_size=file1.size,
+            uploaded_by=self.user
+        )
+        
+        # Add a small delay to ensure different timestamps
+        import time
+        time.sleep(0.01)
+        
+        analysis2 = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Second Analysis',
+            file=file2,
+            file_size=file2.size,
+            uploaded_by=self.user
+        )
+        
+        analyses = list(DatasetAnalysis.objects.all())
+        # Most recent should be first
+        self.assertEqual(analyses[0], analysis2)
+        self.assertEqual(analyses[1], analysis1)
+
+
+class DatasetAnalysisFormTests(TestCase):
+    """Test cases for DatasetAnalysisForm"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        
+        self.dataset = Dataset.objects.create(
+            title='Test Dataset',
+            description='Test description',
+            owner=self.user
+        )
+    
+    def test_form_valid_with_all_fields(self):
+        """Test form validation with all required fields"""
+        pdf_file = SimpleUploadedFile(
+            'analysis.pdf',
+            b'PDF content',
+            content_type='application/pdf'
+        )
+        
+        form = DatasetAnalysisForm(
+            data={
+                'title': 'Test Analysis',
+                'description': 'Test description'
+            },
+            files={'file': pdf_file},
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertTrue(form.is_valid())
+    
+    def test_form_valid_without_description(self):
+        """Test form validation without optional description"""
+        pdf_file = SimpleUploadedFile(
+            'analysis.pdf',
+            b'PDF content',
+            content_type='application/pdf'
+        )
+        
+        form = DatasetAnalysisForm(
+            data={'title': 'Test Analysis'},
+            files={'file': pdf_file},
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertTrue(form.is_valid())
+    
+    def test_form_invalid_without_title(self):
+        """Test form validation fails without title"""
+        pdf_file = SimpleUploadedFile(
+            'analysis.pdf',
+            b'PDF content',
+            content_type='application/pdf'
+        )
+        
+        form = DatasetAnalysisForm(
+            data={'description': 'Test description'},
+            files={'file': pdf_file},
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertFalse(form.is_valid())
+        self.assertIn('title', form.errors)
+    
+    def test_form_invalid_without_file(self):
+        """Test form validation fails without file"""
+        form = DatasetAnalysisForm(
+            data={
+                'title': 'Test Analysis',
+                'description': 'Test description'
+            },
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertFalse(form.is_valid())
+        self.assertIn('file', form.errors)
+    
+    def test_form_invalid_file_too_large(self):
+        """Test form validation fails with file exceeding 100MB"""
+        large_file = SimpleUploadedFile(
+            'large_file.pdf',
+            b'x' * (101 * 1024 * 1024),  # 101 MB
+            content_type='application/pdf'
+        )
+        
+        form = DatasetAnalysisForm(
+            data={'title': 'Test Analysis'},
+            files={'file': large_file},
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertFalse(form.is_valid())
+        self.assertIn('file', form.errors)
+    
+    def test_form_invalid_file_type(self):
+        """Test form validation fails with unsupported file type"""
+        invalid_file = SimpleUploadedFile(
+            'analysis.exe',
+            b'executable content',
+            content_type='application/x-msdownload'
+        )
+        
+        form = DatasetAnalysisForm(
+            data={'title': 'Test Analysis'},
+            files={'file': invalid_file},
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertFalse(form.is_valid())
+        self.assertIn('file', form.errors)
+    
+    def test_form_valid_file_types(self):
+        """Test form accepts all supported file types"""
+        supported_files = [
+            ('analysis.pdf', 'application/pdf'),
+            ('visualization.html', 'text/html'),
+            ('chart.png', 'image/png'),
+            ('data.csv', 'text/csv'),
+            ('notebook.ipynb', 'application/json'),
+            ('script.py', 'text/x-python'),
+            ('script.r', 'text/x-r'),
+            ('data.json', 'application/json'),
+        ]
+        
+        for filename, content_type in supported_files:
+            test_file = SimpleUploadedFile(
+                filename,
+                b'test content',
+                content_type=content_type
+            )
+            
+            form = DatasetAnalysisForm(
+                data={'title': 'Test Analysis'},
+                files={'file': test_file},
+                dataset=self.dataset,
+                user=self.user
+            )
+            
+            # File extension validation happens in clean_file
+            # We check the file extension, not content_type
+            if filename.endswith(('.pdf', '.html', '.png', '.csv', '.ipynb', '.py', '.r', '.json')):
+                # These should be valid based on extension
+                self.assertTrue(form.is_valid() or 'file' in form.errors and 'not allowed' not in str(form.errors['file']))
+    
+    def test_form_save(self):
+        """Test form save creates DatasetAnalysis instance"""
+        pdf_file = SimpleUploadedFile(
+            'analysis.pdf',
+            b'PDF content',
+            content_type='application/pdf'
+        )
+        
+        form = DatasetAnalysisForm(
+            data={
+                'title': 'Test Analysis',
+                'description': 'Test description'
+            },
+            files={'file': pdf_file},
+            dataset=self.dataset,
+            user=self.user
+        )
+        
+        self.assertTrue(form.is_valid())
+        analysis = form.save()
+        
+        self.assertIsNotNone(analysis.pk)
+        self.assertEqual(analysis.dataset, self.dataset)
+        self.assertEqual(analysis.uploaded_by, self.user)
+        self.assertEqual(analysis.title, 'Test Analysis')
+        self.assertEqual(analysis.description, 'Test description')
+        self.assertEqual(analysis.file_size, pdf_file.size)
+        self.assertEqual(analysis.original_name, 'analysis.pdf')
+
+
+class DatasetAnalysisViewTests(TestCase):
+    """Test cases for DatasetAnalysis views"""
+    
+    def setUp(self):
+        """Set up test data"""
+        self.temp_media = TemporaryDirectory()
+        self.addCleanup(self.temp_media.cleanup)
+        self.override_media = override_settings(MEDIA_ROOT=self.temp_media.name)
+        self.override_media.enable()
+        self.addCleanup(self.override_media.disable)
+        
+        self.owner = User.objects.create_user(
+            username='owner',
+            email='owner@example.com',
+            password='testpass123'
+        )
+        
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123'
+        )
+        
+        self.other_user = User.objects.create_user(
+            username='otheruser',
+            email='other@example.com',
+            password='testpass123'
+        )
+        
+        self.dataset = Dataset.objects.create(
+            title='Test Dataset',
+            description='Test description',
+            owner=self.owner
+        )
+        
+        self.test_file = SimpleUploadedFile(
+            'test_analysis.pdf',
+            b'PDF content here',
+            content_type='application/pdf'
+        )
+        
+        self.analysis = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Test Analysis',
+            description='Test description',
+            file=self.test_file,
+            file_size=self.test_file.size,
+            original_name='test_analysis.pdf',
+            uploaded_by=self.user
+        )
+        
+        self.client = Client()
+    
+    def test_upload_analysis_requires_login(self):
+        """Test that uploading analysis requires authentication"""
+        url = reverse('datasets:upload_analysis', args=[self.dataset.pk])
+        pdf_file = SimpleUploadedFile('new_analysis.pdf', b'content')
+        
+        response = self.client.post(url, {
+            'title': 'New Analysis',
+            'file': pdf_file
+        })
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/user/login/', response.url)
+    
+    def test_upload_analysis_authenticated(self):
+        """Test uploading analysis as authenticated user"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:upload_analysis', args=[self.dataset.pk])
+        pdf_file = SimpleUploadedFile('new_analysis.pdf', b'new content')
+        
+        response = self.client.post(url, {
+            'title': 'New Analysis',
+            'description': 'New description',
+            'file': pdf_file
+        })
+        
+        # Should redirect to dataset detail
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('datasets:dataset_detail', args=[self.dataset.pk]))
+        
+        # Check that analysis was created
+        self.assertTrue(DatasetAnalysis.objects.filter(title='New Analysis').exists())
+        
+        # Check success message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any('uploaded successfully' in str(msg) for msg in messages))
+    
+    def test_upload_analysis_invalid_form(self):
+        """Test uploading analysis with invalid form data"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:upload_analysis', args=[self.dataset.pk])
+        
+        # Missing required file
+        response = self.client.post(url, {
+            'title': 'New Analysis'
+        })
+        
+        # Should redirect to dataset detail with error message
+        self.assertEqual(response.status_code, 302)
+        
+        # Check error message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any('correct the errors' in str(msg).lower() for msg in messages))
+    
+    def test_delete_analysis_requires_login(self):
+        """Test that deleting analysis requires authentication"""
+        url = reverse('datasets:delete_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.post(url)
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/user/login/', response.url)
+    
+    def test_delete_analysis_by_uploader(self):
+        """Test deleting analysis by uploader"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:delete_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.post(url)
+        
+        # Should redirect to dataset detail
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('datasets:dataset_detail', args=[self.dataset.pk]))
+        
+        # Check that analysis was deleted
+        self.assertFalse(DatasetAnalysis.objects.filter(pk=self.analysis.pk).exists())
+        
+        # Check success message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any('deleted successfully' in str(msg) for msg in messages))
+    
+    def test_delete_analysis_by_dataset_owner(self):
+        """Test deleting analysis by dataset owner"""
+        self.client.login(username='owner', password='testpass123')
+        url = reverse('datasets:delete_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.post(url)
+        
+        # Should redirect to dataset detail
+        self.assertEqual(response.status_code, 302)
+        
+        # Check that analysis was deleted
+        self.assertFalse(DatasetAnalysis.objects.filter(pk=self.analysis.pk).exists())
+    
+    def test_delete_analysis_by_unauthorized_user(self):
+        """Test that unauthorized user cannot delete analysis"""
+        self.client.login(username='otheruser', password='testpass123')
+        url = reverse('datasets:delete_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.post(url)
+        
+        # Should redirect to dataset detail
+        self.assertEqual(response.status_code, 302)
+        
+        # Check that analysis was NOT deleted
+        self.assertTrue(DatasetAnalysis.objects.filter(pk=self.analysis.pk).exists())
+        
+        # Check error message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(any('permission' in str(msg).lower() for msg in messages))
+    
+    def test_delete_analysis_get_request(self):
+        """Test that GET request to delete redirects without deleting"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:delete_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.get(url)
+        
+        # Should redirect
+        self.assertEqual(response.status_code, 302)
+        
+        # Analysis should still exist
+        self.assertTrue(DatasetAnalysis.objects.filter(pk=self.analysis.pk).exists())
+    
+    def test_download_analysis_requires_login(self):
+        """Test that downloading analysis requires authentication"""
+        url = reverse('datasets:download_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.get(url)
+        
+        # Should redirect to login
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/user/login/', response.url)
+    
+    def test_download_analysis_authenticated(self):
+        """Test downloading analysis as authenticated user"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:download_analysis', args=[self.dataset.pk, self.analysis.pk])
+        
+        response = self.client.get(url)
+        
+        # Should return file response
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/pdf')
+        self.assertIn('attachment', response.get('Content-Disposition', ''))
+        self.assertIn('test_analysis.pdf', response.get('Content-Disposition', ''))
+    
+    def test_download_nonexistent_analysis(self):
+        """Test downloading non-existent analysis returns 404"""
+        self.client.login(username='testuser', password='testpass123')
+        fake_id = 99999
+        url = reverse('datasets:download_analysis', args=[self.dataset.pk, fake_id])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 404)
+    
+    def test_dataset_detail_includes_analyses(self):
+        """Test that dataset detail view includes analyses in context"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('analyses', response.context)
+        self.assertIn('analysis_form', response.context)
+        self.assertIn(self.analysis, response.context['analyses'])
