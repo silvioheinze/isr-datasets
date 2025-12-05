@@ -358,6 +358,7 @@ class DatasetVersionFormTests(TestCase):
             ('data.png', 'image/png'),
             ('data.sqlite', 'application/x-sqlite3'),
             ('data.sql', 'application/sql'),
+            ('data.pdf', 'application/pdf'),
         ]
         
         for filename, content_type in supported_formats:
@@ -409,7 +410,7 @@ class DatasetVersionFormTests(TestCase):
             '.csv', '.json', '.xlsx', '.xls', '.txt', '.zip',
             '.sav', '.zsav', '.por', '.dta', '.rds',  # Statistical formats
             '.gpkg', '.shp', '.geojson', '.kml', '.kmz',  # Geospatial formats
-            '.tif', '.png', '.sqlite', '.sql'  # Other formats
+            '.tif', '.png', '.sqlite', '.sql', '.pdf'  # Other formats
         ]
         
         for format_ext in required_formats:
