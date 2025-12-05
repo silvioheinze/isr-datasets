@@ -246,7 +246,7 @@ class DatasetVersionForm(forms.ModelForm):
         widget=MultiFileInput(attrs={
             'class': 'form-control',
             'multiple': True,
-            'accept': '.csv,.sav,.zsav,.por,.dta,.rds,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql,.pdf,application/x-stata,application/x-stata-dta,application/octet-stream,application/pdf,application/x-r-data'
+            'accept': '.csv,.sav,.zsav,.por,.dta,.rds,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql,.pdf'
         })
     )
     
