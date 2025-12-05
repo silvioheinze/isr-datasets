@@ -333,6 +333,151 @@ class DatasetVersionFormTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn('Please do not upload files when using the external URL method.', form.non_field_errors())
 
+    def test_form_accepts_supported_file_formats(self):
+        """Test that the form accepts all supported file formats including .dta and .rds"""
+        # All supported file formats
+        supported_formats = [
+            ('data.csv', 'text/csv'),
+            ('data.json', 'application/json'),
+            ('data.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+            ('data.xls', 'application/vnd.ms-excel'),
+            ('data.txt', 'text/plain'),
+            ('data.zip', 'application/zip'),
+            ('data.tar.gz', 'application/gzip'),
+            ('data.gpkg', 'application/geopackage+sqlite3'),
+            ('data.sav', 'application/x-spss-sav'),
+            ('data.zsav', 'application/x-spss-sav'),
+            ('data.por', 'application/x-spss-por'),
+            ('data.dta', 'application/x-stata'),
+            ('data.rds', 'application/octet-stream'),
+            ('data.shp', 'application/octet-stream'),
+            ('data.geojson', 'application/geo+json'),
+            ('data.kml', 'application/vnd.google-earth.kml+xml'),
+            ('data.kmz', 'application/vnd.google-earth.kmz'),
+            ('data.tif', 'image/tiff'),
+            ('data.png', 'image/png'),
+            ('data.sqlite', 'application/x-sqlite3'),
+            ('data.sql', 'application/sql'),
+        ]
+        
+        for filename, content_type in supported_formats:
+            with self.subTest(filename=filename):
+                test_file = SimpleUploadedFile(
+                    filename,
+                    b'test file content',
+                    content_type=content_type
+                )
+                
+                form = DatasetVersionForm(
+                    data={
+                        'version_number': '1.0',
+                        'description': f'Test upload for {filename}',
+                        'input_method': 'upload',
+                        'file_url': '',
+                        'file_url_description': '',
+                        'file_size_text': '',
+                    },
+                    files=MultiValueDict({'files': [test_file]}),
+                    dataset=self.dataset,
+                )
+                
+                # Form should be valid for all supported formats
+                self.assertTrue(
+                    form.is_valid(),
+                    f"Form should accept {filename} but got errors: {form.errors}"
+                )
+                
+                # Verify the file was processed
+                if form.is_valid():
+                    self.assertIn('uploaded_files', form.cleaned_data)
+                    self.assertEqual(len(form.cleaned_data['uploaded_files']), 1)
+                    self.assertEqual(
+                        form.cleaned_data['uploaded_files'][0].name,
+                        filename
+                    )
+
+    def test_form_widget_accept_attribute_includes_all_formats(self):
+        """Test that the file input widget's accept attribute includes all supported formats"""
+        form = DatasetVersionForm(dataset=self.dataset)
+        files_widget = form.fields['files'].widget
+        
+        # Get the accept attribute value
+        accept_attr = files_widget.attrs.get('accept', '')
+        
+        # Check that all key formats are included
+        required_formats = [
+            '.csv', '.json', '.xlsx', '.xls', '.txt', '.zip',
+            '.sav', '.zsav', '.por', '.dta', '.rds',  # Statistical formats
+            '.gpkg', '.shp', '.geojson', '.kml', '.kmz',  # Geospatial formats
+            '.tif', '.png', '.sqlite', '.sql'  # Other formats
+        ]
+        
+        for format_ext in required_formats:
+            with self.subTest(format=format_ext):
+                self.assertIn(
+                    format_ext,
+                    accept_attr,
+                    f"Accept attribute should include {format_ext}. Current value: {accept_attr}"
+                )
+
+    def test_form_accepts_new_statistical_formats(self):
+        """Specifically test that the newly added .dta and .rds formats are accepted"""
+        # Test Stata .dta format
+        stata_file = SimpleUploadedFile(
+            'dataset.dta',
+            b'Stata binary data content',
+            content_type='application/x-stata'
+        )
+        
+        form_dta = DatasetVersionForm(
+            data={
+                'version_number': '1.0',
+                'description': 'Stata dataset',
+                'input_method': 'upload',
+                'file_url': '',
+                'file_url_description': '',
+                'file_size_text': '',
+            },
+            files=MultiValueDict({'files': [stata_file]}),
+            dataset=self.dataset,
+        )
+        
+        self.assertTrue(
+            form_dta.is_valid(),
+            f"Form should accept .dta files but got errors: {form_dta.errors}"
+        )
+        
+        # Test R .rds format
+        r_file = SimpleUploadedFile(
+            'dataset.rds',
+            b'R serialized data content',
+            content_type='application/octet-stream'
+        )
+        
+        form_rds = DatasetVersionForm(
+            data={
+                'version_number': '1.0',
+                'description': 'R dataset',
+                'input_method': 'upload',
+                'file_url': '',
+                'file_url_description': '',
+                'file_size_text': '',
+            },
+            files=MultiValueDict({'files': [r_file]}),
+            dataset=self.dataset,
+        )
+        
+        self.assertTrue(
+            form_rds.is_valid(),
+            f"Form should accept .rds files but got errors: {form_rds.errors}"
+        )
+        
+        # Verify both files are in the accept attribute
+        form = DatasetVersionForm(dataset=self.dataset)
+        accept_attr = form.fields['files'].widget.attrs.get('accept', '')
+        self.assertIn('.dta', accept_attr, '.dta should be in accept attribute')
+        self.assertIn('.rds', accept_attr, '.rds should be in accept attribute')
+
 
 class DatasetModelTests(TestCase):
     """Test cases for Dataset model"""

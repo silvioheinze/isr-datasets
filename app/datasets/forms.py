@@ -246,7 +246,7 @@ class DatasetVersionForm(forms.ModelForm):
         widget=MultiFileInput(attrs={
             'class': 'form-control',
             'multiple': True,
-            'accept': '.csv,.sav,.zsav,.por,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql'
+            'accept': '.csv,.sav,.zsav,.por,.dta,.rds,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql'
         })
     )
     
@@ -285,7 +285,7 @@ class DatasetVersionForm(forms.ModelForm):
         # Add help text for fields
         self.fields['version_number'].help_text = 'Use semantic versioning (e.g., 1.0, 1.1, 2.0)'
         self.fields['description'].help_text = 'Optional: Describe what changed in this version'
-        self.fields['files'].help_text = 'Upload one or more files for this version (CSV, SPSS (.sav, .zsav, .por), JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL formats supported, max 1GB per file)'
+        self.fields['files'].help_text = 'Upload one or more files for this version (CSV, SPSS (.sav, .zsav, .por), Stata (.dta), R (.rds), JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL formats supported, max 1GB per file)'
         self.fields['file_url'].help_text = 'External URL where the file can be accessed'
         self.fields['file_url_description'].help_text = 'Optional: Describe where the file is located'
         self.fields['file_size_text'].help_text = 'Human-readable file size (e.g., "2.5 MB", "1.2 GB")'

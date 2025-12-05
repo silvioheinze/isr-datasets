@@ -315,7 +315,7 @@ class Dataset(models.Model):
                     '.shp', '.shx', '.dbf', '.prj', '.sbn', '.sbx', '.shp.xml', '.cpg',
                     '.geojson', '.kml', '.kmz', '.tif', '.tiff', '.jpg', '.jpeg', '.png', '.img',
                     '.gdb', '.mdb', '.lyr', '.lyrx', '.mpk', '.mpkx', '.qgs', '.qgz', '.qml',
-                    '.sqlite', '.sql'
+                    '.sqlite', '.sql', '.sav', '.zsav', '.por', '.dta', '.rds'
                 ]
                 if any(ext in url_lower for ext in supported_extensions):
                     for ext in supported_extensions:
