@@ -2158,3 +2158,147 @@ class DatasetAnalysisViewTests(TestCase):
         self.assertIn('analyses', response.context)
         self.assertIn('analysis_form', response.context)
         self.assertIn(self.analysis, response.context['analyses'])
+    
+    def test_analysis_form_hidden_by_default(self):
+        """Test that the analysis upload form is hidden by default in the template"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that the form container exists and has the d-none class (hidden by default)
+        response_content = response.content.decode('utf-8')
+        # Check that the form div contains both the ID and d-none class together
+        self.assertIn('id="analysis-upload-form"', response_content)
+        # Use regex to find the form div tag and verify it has d-none class
+        # The attributes can be in any order
+        import re
+        form_pattern = r'<div[^>]*id="analysis-upload-form"[^>]*>'
+        form_match = re.search(form_pattern, response_content)
+        self.assertIsNotNone(form_match, "Form div with id='analysis-upload-form' should exist")
+        form_tag = form_match.group(0)
+        # Check that d-none is in the class attribute
+        self.assertIn('d-none', form_tag, f"Form div should have 'd-none' class. Found: {form_tag}")
+    
+    def test_add_analysis_button_present_for_authenticated_users(self):
+        """Test that the 'Add Analysis' button is present for authenticated users"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that the toggle button is present
+        self.assertContains(response, 'id="toggle-analysis-form-btn"')
+        self.assertContains(response, 'Add Analysis')
+        self.assertContains(response, 'bi-plus-circle')  # Bootstrap icon
+        self.assertContains(response, 'data-text-show')
+        self.assertContains(response, 'data-text-hide')
+    
+    def test_add_analysis_button_not_present_for_anonymous_users(self):
+        """Test that anonymous users are redirected to login (dataset detail requires auth)"""
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        # Should redirect to login since DatasetDetailView requires authentication
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/user/login/', response.url)
+    
+    def test_toggle_analysis_form_javascript_present(self):
+        """Test that the JavaScript toggle function is present in the template"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that the JavaScript function is present
+        self.assertContains(response, 'function toggleAnalysisForm()')
+        self.assertContains(response, 'analysis-upload-form')
+        self.assertContains(response, 'toggle-analysis-form-btn')
+        self.assertContains(response, 'scrollIntoView')
+    
+    def test_analysis_form_has_correct_structure(self):
+        """Test that the analysis form has the correct HTML structure"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Check form structure
+        self.assertContains(response, 'Upload Analysis or Visualization')
+        self.assertContains(response, 'name="title"')
+        self.assertContains(response, 'name="description"')
+        self.assertContains(response, 'name="file"')
+        self.assertContains(response, 'enctype="multipart/form-data"')
+        # Check cancel button
+        self.assertContains(response, 'Cancel')
+        self.assertContains(response, 'onclick="toggleAnalysisForm()"')
+    
+    def test_analysis_form_action_url_correct(self):
+        """Test that the form action points to the correct upload URL"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        upload_url = reverse('datasets:upload_analysis', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        # Check that the form action is correct
+        self.assertContains(response, f'action="{upload_url}"')
+    
+    def test_can_upload_analysis_context_variable(self):
+        """Test that can_upload_analysis context variable is set correctly"""
+        # For authenticated user
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('can_upload_analysis', response.context)
+        self.assertTrue(response.context['can_upload_analysis'])
+    
+    def test_analysis_section_title_present(self):
+        """Test that the Data Visualization & Analysis section title is present"""
+        self.client.login(username='testuser', password='testpass123')
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Data Visualization & Analysis')
+        # Check that analyses count badge is present
+        if self.dataset.analyses.exists():
+            self.assertContains(response, 'badge bg-secondary')
+    
+    def test_multiple_analyses_displayed(self):
+        """Test that multiple analyses are displayed correctly"""
+        self.client.login(username='testuser', password='testpass123')
+        
+        # Create additional analyses
+        file2 = SimpleUploadedFile('analysis2.pdf', b'content2')
+        analysis2 = DatasetAnalysis.objects.create(
+            dataset=self.dataset,
+            title='Second Analysis',
+            file=file2,
+            file_size=file2.size,
+            uploaded_by=self.user
+        )
+        
+        url = reverse('datasets:dataset_detail', args=[self.dataset.pk])
+        response = self.client.get(url)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('analyses', response.context)
+        analyses = response.context['analyses']
+        self.assertEqual(analyses.count(), 2)
+        self.assertIn(self.analysis, analyses)
+        self.assertIn(analysis2, analyses)
+        
+        # Check that both are displayed in template
+        self.assertContains(response, 'Test Analysis')
+        self.assertContains(response, 'Second Analysis')
