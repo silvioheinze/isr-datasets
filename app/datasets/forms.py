@@ -326,9 +326,11 @@ class DatasetVersionForm(forms.ModelForm):
                 raise forms.ValidationError('File size will be calculated automatically when uploading.')
             
             for upload in uploaded_files:
-                if upload.size > 1024 * 1024 * 1024:
-                    self.add_error('files', f'File "{upload.name}" exceeds the 1GB size limit.')
-                    raise forms.ValidationError('Each uploaded file must be 1GB or smaller.')
+                max_file_size = 10 * 1024 * 1024 * 1024  # 10GB
+                if upload.size > max_file_size:
+                    size_gb = upload.size / (1024 * 1024 * 1024)
+                    self.add_error('files', f'File "{upload.name}" ({size_gb:.2f} GB) exceeds the 10GB size limit.')
+                    raise forms.ValidationError('Each uploaded file must be 10GB or smaller.')
                 total_upload_size += upload.size
             
             # Update file_size field with total upload size

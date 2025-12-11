@@ -414,55 +414,150 @@ class DatasetVersionCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        input_method = form.cleaned_data.get('input_method')
-        uploaded_files = form.cleaned_data.get('uploaded_files', [])
-        total_upload_size = form.cleaned_data.get('uploaded_files_total_size', 0)
+        import logging
+        logger = logging.getLogger('django')
+        
+        try:
+            input_method = form.cleaned_data.get('input_method')
+            uploaded_files = form.cleaned_data.get('uploaded_files', [])
+            total_upload_size = form.cleaned_data.get('uploaded_files_total_size', 0)
 
-        with transaction.atomic():
-            # Set previous versions to not current
-            DatasetVersion.objects.filter(dataset=self.dataset).update(is_current=False)
+            logger.info(f'Creating dataset version for dataset {self.dataset.pk}, user: {self.request.user.username}, '
+                       f'method: {input_method}, files: {len(uploaded_files)}, total_size: {total_upload_size}')
 
-            self.object = form.save(commit=False)
-            self.object.dataset = self.dataset
-            self.object.created_by = self.request.user
-            self.object.is_current = True  # New version becomes current
+            with transaction.atomic():
+                # Set previous versions to not current
+                DatasetVersion.objects.filter(dataset=self.dataset).update(is_current=False)
 
-            # Ensure legacy single-file fields are cleared for upload flow
-            self.object.file = None
+                self.object = form.save(commit=False)
+                self.object.dataset = self.dataset
+                self.object.created_by = self.request.user
+                self.object.is_current = True  # New version becomes current
 
-            if input_method == 'upload':
-                self.object.file_url = ''
-                self.object.file_url_description = ''
-                self.object.file_size_text = ''
-                self.object.file_size = total_upload_size
-            else:
-                # For external URLs, rely on provided metadata but keep computed size at zero
-                self.object.file_size = 0
+                # Ensure legacy single-file fields are cleared for upload flow
+                self.object.file = None
 
-            self.object.save()
+                if input_method == 'upload':
+                    self.object.file_url = ''
+                    self.object.file_url_description = ''
+                    self.object.file_size_text = ''
+                    self.object.file_size = total_upload_size
+                else:
+                    # For external URLs, rely on provided metadata but keep computed size at zero
+                    self.object.file_size = 0
 
-            # Persist uploaded files as separate attachments
-            if input_method == 'upload':
-                for upload in uploaded_files:
-                    DatasetVersionFile.objects.create(
-                        version=self.object,
-                        file=upload,
-                        file_size=upload.size,
-                        original_name=upload.name,
-                    )
+                self.object.save()
+                logger.info(f'Dataset version {self.object.version_number} (ID: {self.object.pk}) created successfully')
 
-        # Send notification about new version
-        send_new_version_notification_email(self.dataset, self.object)
+                # Persist uploaded files as separate attachments
+                if input_method == 'upload':
+                    for idx, upload in enumerate(uploaded_files):
+                        try:
+                            DatasetVersionFile.objects.create(
+                                version=self.object,
+                                file=upload,
+                                file_size=upload.size,
+                                original_name=upload.name,
+                            )
+                            logger.debug(f'File {idx+1}/{len(uploaded_files)} uploaded: {upload.name} ({upload.size} bytes)')
+                        except Exception as e:
+                            logger.error(f'Error saving file {upload.name}: {str(e)}', exc_info=True)
+                            raise
 
-        messages.success(self.request, f'Version {self.object.version_number} created successfully!')
-        return redirect(self.get_success_url())
+            # Send notification about new version
+            try:
+                send_new_version_notification_email(self.dataset, self.object)
+            except Exception as e:
+                logger.warning(f'Failed to send notification email: {str(e)}', exc_info=True)
+                # Don't fail the entire operation if email fails
+
+            messages.success(self.request, f'Version {self.object.version_number} created successfully!')
+            
+            # Handle AJAX requests
+            if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                from django.http import JsonResponse
+                return JsonResponse({
+                    'success': True,
+                    'redirect_url': self.get_success_url()
+                })
+            
+            return redirect(self.get_success_url())
+        except Exception as e:
+            logger.error(f'Error creating dataset version: {str(e)}', exc_info=True)
+            
+            # Handle AJAX requests with error
+            if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                from django.http import JsonResponse
+                from django.conf import settings
+                import traceback
+                error_details = str(e)
+                if hasattr(e, '__traceback__'):
+                    error_details += f"\n\nTraceback:\n{traceback.format_exc()}"
+                return JsonResponse({
+                    'success': False,
+                    'error': f'An error occurred while creating the version: {str(e)}',
+                    'error_details': error_details if settings.DEBUG else None
+                }, status=500)
+            
+            messages.error(self.request, f'An error occurred while creating the version: {str(e)}')
+            return self.form_invalid(form)
 
     def form_invalid(self, form):
+        import logging
+        logger = logging.getLogger('django')
+        
+        # Log form errors
+        error_messages = []
+        for field, errors in form.errors.items():
+            for error in errors:
+                error_msg = f'Form error - {field}: {error}'
+                error_messages.append(error_msg)
+                logger.warning(error_msg)
+        
+        # Log non-field errors
+        for error in form.non_field_errors():
+            error_msg = f'Form error (non-field): {error}'
+            error_messages.append(error_msg)
+            logger.warning(error_msg)
+        
         messages.error(self.request, 'Please correct the errors below.')
+        
+        # Handle AJAX requests
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            from django.http import JsonResponse
+            from django.conf import settings
+            
+            # Format errors for JSON response
+            formatted_errors = {}
+            for field, errors in form.errors.items():
+                formatted_errors[field] = errors
+            
+            return JsonResponse({
+                'success': False,
+                'error': 'Form validation failed. Please check the errors below.',
+                'errors': formatted_errors,
+                'non_field_errors': form.non_field_errors(),
+                'error_messages': error_messages,
+                'error_details': '\n'.join(error_messages) if settings.DEBUG else None
+            }, status=400)
+        
         return super().form_invalid(form)
 
     def get_success_url(self):
         return reverse('datasets:dataset_detail', kwargs={'pk': self.dataset.pk})
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Get the dataset and check permissions
+        self.dataset = get_object_or_404(Dataset, pk=kwargs['dataset_pk'])
+        
+        # Check if user can add versions (owner, contributor, or superuser)
+        if not (request.user == self.dataset.owner or 
+                request.user in self.dataset.contributors.all() or 
+                request.user.is_superuser):
+            messages.error(request, 'You do not have permission to add versions to this dataset.')
+            return redirect('datasets:dataset_detail', pk=self.dataset.pk)
+        
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -134,8 +134,8 @@
                                 <i class="bi bi-upload me-1"></i>
                                 {% trans "Version Files" %} <span class="text-danger">*</span>
                             </label>
-                            <input
-                                type="file"
+                            <input 
+                                type="file" 
                                 name="{{ form.files.name }}"
                                 id="{{ form.files.id_for_label }}"
                                 class="form-control {% if form.files.errors %}is-invalid{% endif %}"
@@ -150,6 +150,15 @@
                             <div class="form-text">
                                 <i class="bi bi-info-circle me-1"></i>
                                 {{ form.files.help_text }}
+                            </div>
+                            
+                            <!-- File Upload Progress Container -->
+                            <div id="file-upload-progress" class="mt-3" style="display: none;">
+                                <div class="mb-2">
+                                    <strong>{% trans "Uploading files..." %}</strong>
+                                    <span id="upload-status-text" class="text-muted ms-2"></span>
+                                </div>
+                                <div id="file-progress-list"></div>
                             </div>
                         </div>
 
@@ -228,13 +237,14 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="btn btn-outline-secondary">
+                            <a href="{% url 'datasets:dataset_detail' dataset.pk %}" class="btn btn-outline-secondary" id="cancel-btn">
                                 <i class="bi bi-arrow-left me-2"></i>
                                 {% trans "Cancel" %}
                             </a>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">
                                 <i class="bi bi-plus-circle me-2"></i>
-                                {% trans "Create Version" %}
+                                <span id="submit-btn-text">{% trans "Create Version" %}</span>
+                                <span id="submit-btn-spinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display: none;"></span>
                             </button>
                         </div>
                     </form>
@@ -269,7 +279,7 @@
                         </li>
                         <li class="mb-2">
                             <i class="bi bi-info-circle text-info me-2"></i>
-                            {% trans "Maximum file size: 1GB (supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL)" %}
+                            {% trans "Maximum file size: 10GB per upload (supported formats: CSV, JSON, Excel, TXT, ZIP, TAR.GZ, GPKG, Shapefile, GeoJSON, KML/KMZ, Raster formats, File/Personal Geodatabase, Esri Layer Files, Esri Map Packages, QGIS Project Files, QML, SpatiaLite, SQL, SPSS, Stata, R)" %}
                         </li>
                         <li>
                             <i class="bi bi-check-circle text-success me-2"></i>
@@ -283,6 +293,11 @@
 </div>
 
 <script>
+// File upload tracking
+let uploadedFiles = [];
+let isUploading = false;
+let uploadPromises = [];
+
 function toggleFileInput() {
     const uploadRadio = document.getElementById('input_method_upload');
     const urlRadio = document.getElementById('input_method_url');
@@ -307,12 +322,498 @@ function toggleFileInput() {
         urlInput.required = false; // Either URL or description is required, handled by server-side validation
         urlDescInput.required = false; // Either URL or description is required, handled by server-side validation
         sizeInput.required = true;
+        // Clear uploaded files when switching to URL mode
+        uploadedFiles = [];
+        uploadPromises = [];
+        hideUploadProgress();
     }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+function showUploadProgress() {
+    const progressContainer = document.getElementById('file-upload-progress');
+    if (progressContainer) {
+        progressContainer.style.display = 'block';
+    }
+}
+
+function hideUploadProgress() {
+    const progressContainer = document.getElementById('file-upload-progress');
+    if (progressContainer) {
+        progressContainer.style.display = 'none';
+    }
+    const progressList = document.getElementById('file-progress-list');
+    if (progressList) {
+        progressList.innerHTML = '';
+    }
+}
+
+function updateFileProgress(fileId, progress, status) {
+    const progressList = document.getElementById('file-progress-list');
+    if (!progressList) return;
+    
+    let progressItem = document.getElementById(`file-progress-${fileId}`);
+    if (!progressItem) {
+        progressItem = document.createElement('div');
+        progressItem.id = `file-progress-${fileId}`;
+        progressItem.className = 'mb-2';
+        progressList.appendChild(progressItem);
+    }
+    
+    const file = uploadedFiles.find(f => f.id === fileId);
+    if (!file) return;
+    
+    let statusIcon = '';
+    let statusClass = '';
+    if (status === 'uploading') {
+        statusIcon = '<i class="bi bi-arrow-up-circle text-primary me-2"></i>';
+        statusClass = 'text-primary';
+    } else if (status === 'complete') {
+        statusIcon = '<i class="bi bi-check-circle text-success me-2"></i>';
+        statusClass = 'text-success';
+    } else if (status === 'error') {
+        statusIcon = '<i class="bi bi-x-circle text-danger me-2"></i>';
+        statusClass = 'text-danger';
+    }
+    
+    progressItem.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="flex-grow-1">
+                ${statusIcon}
+                <span class="${statusClass}">${file.name}</span>
+                <small class="text-muted ms-2">(${formatFileSize(file.size)})</small>
+            </div>
+            <div class="ms-3">
+                ${status === 'uploading' ? '<span class="spinner-border spinner-border-sm text-primary" role="status"></span>' : ''}
+            </div>
+        </div>
+        ${status === 'uploading' ? `
+        <div class="progress mt-1" style="height: 6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                 role="progressbar" 
+                 style="width: ${progress}%" 
+                 aria-valuenow="${progress}" 
+                 aria-valuemin="0" 
+                 aria-valuemax="100">
+            </div>
+        </div>
+        ` : ''}
+    `;
+}
+
+function updateUploadStatusText(text) {
+    const statusText = document.getElementById('upload-status-text');
+    if (statusText) {
+        statusText.textContent = text;
+    }
+}
+
+function uploadFile(file) {
+    return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+        
+        const xhr = new XMLHttpRequest();
+        const fileId = Date.now() + Math.random();
+        
+        uploadedFiles.push({
+            id: fileId,
+            name: file.name,
+            size: file.size,
+            file: file,
+            xhr: xhr
+        });
+        
+        updateFileProgress(fileId, 0, 'uploading');
+        showUploadProgress();
+        
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                updateFileProgress(fileId, percentComplete, 'uploading');
+            }
+        });
+        
+        xhr.addEventListener('load', () => {
+            if (xhr.status === 200) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        updateFileProgress(fileId, 100, 'complete');
+                        resolve(response);
+                    } else {
+                        updateFileProgress(fileId, 0, 'error');
+                        reject(new Error(response.error || 'Upload failed'));
+                    }
+                } catch (e) {
+                    updateFileProgress(fileId, 0, 'error');
+                    reject(new Error('Invalid response from server'));
+                }
+            } else {
+                updateFileProgress(fileId, 0, 'error');
+                reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+        });
+        
+        xhr.addEventListener('error', () => {
+            updateFileProgress(fileId, 0, 'error');
+            reject(new Error('Network error during upload'));
+        });
+        
+        xhr.addEventListener('abort', () => {
+            updateFileProgress(fileId, 0, 'error');
+            reject(new Error('Upload aborted'));
+        });
+        
+        // Note: This is a placeholder endpoint. We'll handle files in the form submission.
+        // For now, we'll just track the files and upload them when form is submitted.
+        // The actual upload happens during form submission via AJAX.
+        resolve({ success: true, file: file });
+    });
+}
+
+function handleFileSelection() {
+    const fileInput = document.getElementById('{{ form.files.id_for_label }}');
+    if (!fileInput) return;
+    
+    fileInput.addEventListener('change', async function(e) {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) {
+            uploadedFiles = [];
+            uploadPromises = [];
+            hideUploadProgress();
+            return;
+        }
+        
+        // Clear previous uploads
+        uploadedFiles = [];
+        uploadPromises = [];
+        
+        // Mark files as ready (we'll upload them on form submission)
+        files.forEach(file => {
+            uploadedFiles.push({
+                id: Date.now() + Math.random(),
+                name: file.name,
+                size: file.size,
+                file: file,
+                ready: true
+            });
+        });
+        
+        // Show file list
+        showUploadProgress();
+        const progressList = document.getElementById('file-progress-list');
+        if (progressList) {
+            progressList.innerHTML = '';
+            uploadedFiles.forEach(file => {
+                const progressItem = document.createElement('div');
+                progressItem.id = `file-progress-${file.id}`;
+                progressItem.className = 'mb-2';
+                progressItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-file-earmark me-2 text-muted"></i>
+                            <span>${file.name}</span>
+                            <small class="text-muted ms-2">(${formatFileSize(file.size)})</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-secondary">{% trans "Ready to upload" %}</span>
+                        </div>
+                    </div>
+                `;
+                progressList.appendChild(progressItem);
+            });
+        }
+    });
+}
+
+function handleFormSubmission() {
+    const form = document.querySelector('form[method="post"]');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitBtnText = document.getElementById('submit-btn-text');
+    const submitBtnSpinner = document.getElementById('submit-btn-spinner');
+    const cancelBtn = document.getElementById('cancel-btn');
+    
+    if (!form) return;
+    
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const uploadRadio = document.getElementById('input_method_upload');
+        if (!uploadRadio || !uploadRadio.checked) {
+            // For URL method, submit normally
+            form.submit();
+            return;
+        }
+        
+        const fileInput = document.getElementById('{{ form.files.id_for_label }}');
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            // No files selected, submit normally (validation will catch this)
+            form.submit();
+            return;
+        }
+        
+        // Disable form during upload
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            if (submitBtnText) {
+                submitBtnText.textContent = '{% trans "Uploading..." %}';
+            }
+            if (submitBtnSpinner) {
+                submitBtnSpinner.style.display = 'inline-block';
+            }
+        }
+        if (cancelBtn) {
+            cancelBtn.disabled = true;
+        }
+        
+        // Update status
+        updateUploadStatusText('{% trans "Preparing files..." %}');
+        
+        // Upload files via AJAX
+        const formData = new FormData(form);
+        const xhr = new XMLHttpRequest();
+        
+        // Track overall progress
+        let totalSize = 0;
+        let uploadedSize = 0;
+        Array.from(fileInput.files).forEach(file => {
+            totalSize += file.size;
+        });
+        
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable && totalSize > 0) {
+                uploadedSize = e.loaded;
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                updateUploadStatusText(`{% trans "Uploading" %}: ${percentComplete}% (${formatFileSize(e.loaded)} / ${formatFileSize(e.total)})`);
+                
+                // Update individual file progress (rough estimate)
+                const files = Array.from(fileInput.files);
+                const sizePerFile = totalSize / files.length;
+                files.forEach((file, index) => {
+                    const fileStart = sizePerFile * index;
+                    const fileEnd = fileStart + file.size;
+                    if (uploadedSize >= fileEnd) {
+                        // File complete
+                        const fileId = uploadedFiles[index]?.id;
+                        if (fileId) {
+                            updateFileProgress(fileId, 100, 'complete');
+                        }
+                    } else if (uploadedSize > fileStart) {
+                        // File in progress
+                        const fileProgress = Math.min(100, Math.round(((uploadedSize - fileStart) / file.size) * 100));
+                        const fileId = uploadedFiles[index]?.id;
+                        if (fileId) {
+                            updateFileProgress(fileId, fileProgress, 'uploading');
+                        }
+                    }
+                });
+            }
+        });
+        
+        xhr.addEventListener('load', () => {
+            console.log('Upload response status:', xhr.status);
+            console.log('Upload response headers:', xhr.getAllResponseHeaders());
+            console.log('Upload response text (first 1000 chars):', xhr.responseText ? xhr.responseText.substring(0, 1000) : '(empty)');
+            
+            if (xhr.status === 200) {
+                // Check if response is JSON
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    console.log('Parsed JSON response:', response);
+                    
+                    if (response.success && response.redirect_url) {
+                        // Success - redirect
+                        window.location.href = response.redirect_url;
+                    } else if (response.error) {
+                        // Error response
+                        let errorMessage = response.error;
+                        
+                        // Add detailed error information if available
+                        if (response.errors) {
+                            errorMessage += '\n\nField errors:';
+                            for (const [field, errors] of Object.entries(response.errors)) {
+                                errorMessage += `\n- ${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`;
+                            }
+                        }
+                        
+                        if (response.non_field_errors && response.non_field_errors.length > 0) {
+                            errorMessage += '\n\nGeneral errors: ' + response.non_field_errors.join(', ');
+                        }
+                        
+                        if (response.error_details) {
+                            console.error('Detailed error:', response.error_details);
+                            errorMessage += '\n\n[Check browser console for full details]';
+                        }
+                        
+                        updateUploadStatusText('{% trans "Upload failed" %}: ' + response.error);
+                        alert(errorMessage);
+                        
+                        // Re-enable form
+                        if (submitBtn) submitBtn.disabled = false;
+                        if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+                        if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+                        if (cancelBtn) cancelBtn.disabled = false;
+                    } else {
+                        // Unexpected response format
+                        console.warn('Unexpected response format:', response);
+                        updateUploadStatusText('{% trans "Unexpected response from server" %}');
+                        alert('{% trans "Unexpected response from server. Please check the console for details." %}');
+                        if (submitBtn) submitBtn.disabled = false;
+                        if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+                        if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+                        if (cancelBtn) cancelBtn.disabled = false;
+                    }
+                } catch (e) {
+                    // Not JSON, might be HTML or redirect
+                    console.log('Response is not JSON, parsing as HTML. Error:', e);
+                    if (xhr.responseURL) {
+                        window.location.href = xhr.responseURL;
+                    } else {
+                        // Try to parse HTML for error messages
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(xhr.responseText, 'text/html');
+                        const errorElements = doc.querySelectorAll('.alert-danger, .error, .invalid-feedback, .non-field-errors');
+                        let errorText = '{% trans "An error occurred. Server returned HTML response." %}';
+                        if (errorElements.length > 0) {
+                            errorText += '\n\n' + Array.from(errorElements).map(el => el.textContent.trim()).filter(text => text.length > 0).join('\n');
+                        }
+                        updateUploadStatusText('{% trans "Upload failed" %}');
+                        alert(errorText + '\n\n[Full response logged to console]');
+                        console.error('HTML response:', xhr.responseText);
+                        if (submitBtn) submitBtn.disabled = false;
+                        if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+                        if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+                        if (cancelBtn) cancelBtn.disabled = false;
+                    }
+                }
+            } else if (xhr.status === 302) {
+                // Redirect response
+                const location = xhr.getResponseHeader('Location');
+                if (location) {
+                    window.location.href = location;
+                } else if (xhr.responseURL) {
+                    window.location.href = xhr.responseURL;
+                } else {
+                    window.location.href = window.location.href;
+                }
+            } else if (xhr.status === 413) {
+                // Request Entity Too Large - specific handling
+                let errorMessage = '{% trans "Upload failed: File is too large" %}';
+                let details = '';
+                
+                // Calculate total file size
+                const fileInput = document.getElementById('{{ form.files.id_for_label }}');
+                if (fileInput && fileInput.files) {
+                    let totalSize = 0;
+                    Array.from(fileInput.files).forEach(file => {
+                        totalSize += file.size;
+                    });
+                    const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+                    const totalSizeGB = (totalSize / (1024 * 1024 * 1024)).toFixed(2);
+                    details = `\n\n{% trans "Total file size" %}: ${totalSizeGB} GB (${totalSizeMB} MB)`;
+                    details += `\n{% trans "Maximum allowed size" %}: 10 GB`;
+                }
+                
+                errorMessage += details;
+                errorMessage += '\n\n{% trans "Please either:" %}';
+                errorMessage += '\n1. {% trans "Compress your files before uploading" %}';
+                errorMessage += '\n2. {% trans "Split into smaller files" %}';
+                errorMessage += '\n3. {% trans "Contact administrator if you need to upload larger files" %}';
+                
+                updateUploadStatusText('{% trans "Upload failed: File too large" %}');
+                alert(errorMessage);
+                console.error('413 Request Entity Too Large - File size limit exceeded');
+                console.error('Response:', xhr.responseText);
+                
+                // Re-enable form
+                if (submitBtn) submitBtn.disabled = false;
+                if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+                if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+                if (cancelBtn) cancelBtn.disabled = false;
+            } else {
+                // HTTP error status
+                let errorMessage = `{% trans "Upload failed" %} (HTTP ${xhr.status} ${xhr.statusText})`;
+                
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    console.error('Error response:', response);
+                    if (response.error) {
+                        errorMessage = response.error;
+                    }
+                    if (response.errors) {
+                        errorMessage += '\n\nField errors:';
+                        for (const [field, errors] of Object.entries(response.errors)) {
+                            errorMessage += `\n- ${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`;
+                        }
+                    }
+                    if (response.error_details) {
+                        console.error('Error details:', response.error_details);
+                        errorMessage += '\n\n[Check browser console for full details]';
+                    }
+                } catch (e) {
+                    // Not JSON
+                    errorMessage += '\n\nResponse: ' + (xhr.responseText ? xhr.responseText.substring(0, 500) : '(empty)');
+                    console.error('Error response text:', xhr.responseText);
+                }
+                
+                updateUploadStatusText(errorMessage);
+                alert(errorMessage + '\n\n{% trans "Please check the browser console for more details." %}');
+                
+                // Re-enable form
+                if (submitBtn) submitBtn.disabled = false;
+                if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+                if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+                if (cancelBtn) cancelBtn.disabled = false;
+            }
+        });
+        
+        xhr.addEventListener('error', () => {
+            console.error('Network error during upload');
+            console.error('Status:', xhr.status);
+            console.error('Status text:', xhr.statusText);
+            console.error('Response:', xhr.responseText);
+            console.error('Ready state:', xhr.readyState);
+            
+            updateUploadStatusText('{% trans "Network error during upload" %}');
+            alert('{% trans "Network error during upload. Please check your connection and try again." %}\n\n{% trans "Check the browser console (F12) for more details." %}');
+            
+            // Re-enable form
+            if (submitBtn) submitBtn.disabled = false;
+            if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+            if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+            if (cancelBtn) cancelBtn.disabled = false;
+        });
+        
+        xhr.addEventListener('abort', () => {
+            updateUploadStatusText('{% trans "Upload cancelled" %}');
+            // Re-enable form
+            if (submitBtn) submitBtn.disabled = false;
+            if (submitBtnText) submitBtnText.textContent = '{% trans "Create Version" %}';
+            if (submitBtnSpinner) submitBtnSpinner.style.display = 'none';
+            if (cancelBtn) cancelBtn.disabled = false;
+        });
+        
+        updateUploadStatusText('{% trans "Starting upload..." %}');
+        xhr.open('POST', form.action);
+        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+        xhr.send(formData);
+    });
 }
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     toggleFileInput();
+    handleFileSelection();
+    handleFormSubmission();
 });
 </script>
 {% endblock content %}
