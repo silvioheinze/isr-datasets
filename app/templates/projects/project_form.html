@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-    {% if form.instance.pk %}{% trans "Edit Project" %}{% else %}{% trans "Add New Project" %}{% endif %} - {% trans "ISR Datasets" %}
+    {% if form.instance.pk %}{% trans "Edit Project" %}{% else %}{% trans "Add New Project" %}{% endif %}- {{ SITE_NAME }}
 {% endblock title %}
 
 {% block content %}

@@ -3,9 +3,9 @@
 
 {% block title %}
     {% if object %}
-        {% trans "Edit Dataset" %} - {% trans "ISR Datasets" %}
+        {% trans "Edit Dataset" %} - {{ SITE_NAME }}
     {% else %}
-        {% trans "Add Dataset" %} - {% trans "ISR Datasets" %}
+        {% trans "Add Dataset" %} - {{ SITE_NAME }}
     {% endif %}
 {% endblock title %}
 

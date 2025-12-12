@@ -3,9 +3,9 @@
 
 {% block title %}
     {% if object %}
-        {% trans "Edit Publisher" %} - {% trans "ISR Datasets" %}
+        {% trans "Edit Publisher" %} - {{ SITE_NAME }}
     {% else %}
-        {% trans "Add Publisher" %} - {% trans "ISR Datasets" %}
+        {% trans "Add Publisher" %} - {{ SITE_NAME }}
     {% endif %}
 {% endblock title %}
 

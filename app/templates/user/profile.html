@@ -1,7 +1,13 @@
 {% extends "_base.html" %}
 {% load i18n %}
 
-{% block title %}{% if is_own_profile %}{% trans "My Profile" %}{% else %}{{ profile_user.get_full_name|default:profile_user.username }} - {% trans "Profile" %}{% endif %} - {% trans "ISR Datasets" %}{% endblock %}
+{% block title %}
+{% if is_own_profile %}
+    {% trans "My Profile" %}
+{% else %}
+    {{ profile_user.get_full_name|default:profile_user.username }} - {% trans "Profile" %}
+{% endif %} - {{ SITE_NAME }}
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">

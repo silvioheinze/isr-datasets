@@ -3,9 +3,9 @@
 
 {% block title %}
     {% if object %}
-        {% trans "Edit Category" %} - {{ object.name }} - {% trans "ISR Datasets" %}
+        {% trans "Edit Category" %} - {{ object.name }} - {{ SITE_NAME }}
     {% else %}
-        {% trans "Add Category" %} - {% trans "ISR Datasets" %}
+        {% trans "Add Category" %} - {{ SITE_NAME }}
     {% endif %}
 {% endblock title %}
 

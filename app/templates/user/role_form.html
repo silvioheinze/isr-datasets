@@ -3,7 +3,11 @@
 {% load static %}
 
 {% block title %}
-    {% if object %}{% trans "Edit Role" %}{% else %}{% trans "Create Role" %}{% endif %}
+    {% if object %}
+        {% trans "Edit Role" %} - {{ SITE_NAME }}
+    {% else %}
+        {% trans "Create Role" %} - {{ SITE_NAME }}
+    {% endif %}
 {% endblock title %}
 
 {% block content %}
