@@ -154,6 +154,9 @@ docker compose up app
 # Execute commands in container
 docker compose exec app python manage.py migrate
 docker compose exec app python manage.py createsuperuser
+
+# Collect static files (for development)
+docker compose exec app python manage.py collectstatic --noinput
 ```
 
 ## 🧪 Testing
@@ -529,7 +532,11 @@ The application includes health checks for:
 
 2. **Static Files**:
    ```bash
-   docker compose exec app python manage.py collectstatic
+   # Collect static files (required for production)
+   docker compose exec app python manage.py collectstatic --noinput
+   
+   # Or with verbosity for debugging
+   docker compose exec app python manage.py collectstatic --noinput --verbosity=2
    ```
 
 3. **Database Migration**:
@@ -577,6 +584,9 @@ docker compose up --build -d
 
 # Run migrations if needed
 docker compose exec app python manage.py migrate
+
+# Collect static files
+docker compose exec app python manage.py collectstatic --noinput
 ```
 
 ## 📈 Roadmap
