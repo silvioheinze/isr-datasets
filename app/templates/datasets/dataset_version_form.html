@@ -139,7 +139,7 @@
                                 name="{{ form.files.name }}"
                                 id="{{ form.files.id_for_label }}"
                                 class="form-control {% if form.files.errors %}is-invalid{% endif %}"
-                                accept=".csv,.json,.xlsx,.xls,.txt,.zip,.tar.gz,.gpkg,.shp,.shx,.dbf,.prj,.sbn,.sbx,.shp.xml,.cpg,.geojson,.kml,.kmz,.tif,.tiff,.jpg,.jpeg,.png,.img,.gdb,.mdb,.lyr,.lyrx,.mpk,.mpkx,.qgs,.qgz,.qml,.sqlite,.sql"
+                                {% if form.files.field.widget.attrs.accept %}accept="{{ form.files.field.widget.attrs.accept }}"{% endif %}
                                 multiple
                             >
                             {% if form.files.errors %}
